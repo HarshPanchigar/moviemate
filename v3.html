@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MovieMate — Book Your Show</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FFFFFF;
+    --bg-soft:#FAF8F3;
+    --border:#ECE7DC;
+    --text:#17151A;
+    --text-muted:#726E63;
+    --text-faint:#A6A197;
+    --gold:#C8912B;
+    --gold-soft:#FBF0DA;
+    --gold-bright:#E8B54A;
+    --black:#17151A;
+    --radius:18px;
+    --shadow-card:0 1px 2px rgba(23,21,26,0.05), 0 10px 24px -14px rgba(23,21,26,0.14);
+    --shadow-lift:0 20px 50px -20px rgba(23,21,26,0.28);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased;}
+  body{min-height:100vh;}
+  img{display:block;max-width:100%;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:inherit;cursor:pointer;}
+  .display{font-family:'Bebas Neue',sans-serif;letter-spacing:0.02em;}
+  .mono{font-family:'Space Mono',monospace;}
+  ::selection{background:var(--gold-soft);color:var(--gold);}
+
+  .container{max-width:1220px;margin:0 auto;padding:0 32px;}
+  .hidden{display:none !important;}
+
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:14px 26px;border-radius:999px;border:none;font-weight:700;font-size:14.5px;
+    transition:transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+  }
+  .btn:active{transform:scale(0.97);}
+  .btn-black{background:var(--black);color:#fff;}
+  .btn-black:hover{box-shadow:var(--shadow-lift);}
+  .btn-outline{background:#fff;border:1.5px solid var(--border);color:var(--text);}
+  .btn-outline:hover{border-color:#D8D0BC;}
+  .btn-gold{background:linear-gradient(180deg,#EFC367,var(--gold));color:#231803;}
+  .btn-block{width:100%;}
+
+  /* ---------- NAV (reel logo restored) ---------- */
+  header.nav{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid var(--border);}
+  .nav-inner{display:flex;align-items:center;gap:36px;padding:16px 32px;max-width:1220px;margin:0 auto;}
+  .logo{display:flex;align-items:center;gap:9px;font-family:'Bebas Neue',sans-serif;font-size:27px;letter-spacing:0.02em;cursor:pointer;flex-shrink:0;color:var(--text);}
+  .logo .reel{width:25px;height:25px;border-radius:50%;border:3px solid var(--gold);position:relative;flex-shrink:0;}
+  .logo .reel::before,.logo .reel::after{content:"";position:absolute;width:5px;height:5px;background:var(--gold);border-radius:50%;}
+  .logo .reel::before{top:2px;left:6.5px;}
+  .logo .reel::after{bottom:2px;right:6.5px;}
+  .logo .mate{color:var(--gold);}
+  .loc{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+  .loc .pin{width:20px;height:20px;flex-shrink:0;}
+  .loc .city{font-size:14.5px;font-weight:700;line-height:1.15;}
+  .loc .state{font-size:12px;color:var(--text-faint);line-height:1.15;}
+  .nav-links{display:flex;align-items:center;gap:6px;flex:1;font-size:14.5px;font-weight:600;color:var(--text-muted);}
+  .nav-links a{padding:9px 16px;border-radius:999px;transition:all .15s ease;}
+  .nav-links a:hover{color:var(--text);}
+  .nav-links a.active{background:var(--gold-soft);color:var(--gold);}
+  .nav-right{display:flex;align-items:center;gap:16px;flex-shrink:0;}
+  .icon-btn{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:none;background:transparent;color:var(--text-muted);}
+  .icon-btn:hover{background:var(--bg-soft);}
+  .nav-auth{display:flex;align-items:center;gap:10px;}
+  .nav-auth .btn{padding:10px 20px;font-size:13.5px;}
+  @media(max-width:980px){.nav-links{display:none;}}
+
+  /* ---------- HERO ---------- */
+  .hero{background:var(--bg-soft);border-bottom:1px solid var(--border);}
+  .hero-inner{max-width:1220px;margin:0 auto;padding:64px 32px 40px;display:grid;grid-template-columns:1fr 0.85fr;gap:60px;align-items:center;position:relative;}
+  .hero-title{font-size:clamp(34px,4.4vw,54px);font-weight:800;letter-spacing:-0.02em;line-height:1.06;margin-bottom:18px;}
+  .hero-meta{font-size:15.5px;color:var(--text-muted);font-weight:600;margin-bottom:16px;}
+  .hero-meta b{color:var(--text);font-weight:700;}
+  .hero-desc{font-size:15px;color:var(--text-muted);line-height:1.7;max-width:480px;margin-bottom:32px;}
+  .hero-poster-wrap{position:relative;}
+  .hero-poster{aspect-ratio:3/4;border-radius:22px;overflow:hidden;box-shadow:var(--shadow-lift);position:relative;background:linear-gradient(160deg,#2c2450,#8b3a62 55%,#C8912B 130%);}
+  .hero-poster .title-on-art{position:absolute;left:22px;right:22px;bottom:24px;color:#fff;}
+  .hero-poster .title-on-art .t1{font-family:'Bebas Neue';font-size:30px;line-height:1.02;text-shadow:0 4px 16px rgba(0,0,0,0.35);}
+  .hero-arrow{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:#fff;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-card);color:var(--text);z-index:3;}
+  .hero-arrow.left{left:-6px;}
+  .hero-arrow.right{right:-6px;}
+  .hero-dots{display:flex;gap:7px;justify-content:center;margin-top:30px;}
+  .hero-dots span{width:8px;height:8px;border-radius:99px;background:#E4DDC9;}
+  .hero-dots span.active{width:26px;background:var(--gold);}
+  @media(max-width:880px){
+    .hero-inner{grid-template-columns:1fr;padding-top:40px;}
+    .hero-poster{max-width:300px;margin:0 auto;}
+    .hero-arrow{display:none;}
+  }
+
+  /* ---------- SECTIONS ---------- */
+  .section{padding:56px 0 8px;}
+  .section-title{font-size:24px;font-weight:800;letter-spacing:-0.01em;margin-bottom:22px;}
+
+  .grid-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:22px;}
+  .rail{display:flex;gap:20px;overflow-x:auto;padding-bottom:10px;scroll-snap-type:x mandatory;}
+  .rail::-webkit-scrollbar{height:5px;}
+  .rail::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px;}
+
+  .card{flex:0 0 190px;scroll-snap-align:start;cursor:pointer;}
+  .card-poster{aspect-ratio:2/3;border-radius:14px;overflow:hidden;margin-bottom:12px;position:relative;box-shadow:var(--shadow-card);transition:transform .18s ease, box-shadow .18s ease;}
+  .card:hover .card-poster{transform:translateY(-4px);box-shadow:var(--shadow-lift);}
+  .card-title{font-size:14.5px;font-weight:700;letter-spacing:-0.01em;margin-bottom:3px;}
+  .card-meta{font-size:12.5px;color:var(--text-faint);font-weight:600;}
+
+  /* poster art — kept to one warm cinematic family (plum / burgundy / amber) so it reads as one brand, not a rainbow grid */
+  .art-1{background:linear-gradient(160deg,#2c2450,#8b3a62 60%,#C8912B);}
+  .art-2{background:linear-gradient(160deg,#241c3d,#5c2a4e 55%,#a1274e);}
+  .art-3{background:linear-gradient(160deg,#3a1c2c,#8b3a3a 55%,#C8912B);}
+  .art-4{background:linear-gradient(160deg,#211a38,#4a2a5c 55%,#8b3a62);}
+  .art-5{background:linear-gradient(160deg,#2e2118,#6f4a26 55%,#E8B54A);}
+  .art-6{background:linear-gradient(160deg,#33231a,#8f6a2a 55%,#C8912B);}
+  .art-7{background:linear-gradient(160deg,#241c30,#5c2a4e 55%,#8b3a3a);}
+  .art-8{background:linear-gradient(160deg,#2b1a1a,#7a2a2a 55%,#C8912B);}
+
+  /* ---------- FILTERS ---------- */
+  .filters{display:flex;gap:10px;flex-wrap:wrap;margin:26px 0 26px;}
+  .chip{padding:10px 18px;border-radius:999px;border:1.5px solid var(--border);background:#fff;font-size:13.5px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px;transition:all .15s ease;}
+  .chip:hover{border-color:#D8D0BC;}
+  .chip.active{background:var(--black);color:#fff;border-color:var(--black);}
+  .chip.dropdown{color:var(--text-muted);}
+
+  /* ---------- FOOTER ---------- */
+  footer{border-top:1px solid var(--border);padding:56px 0 30px;margin-top:40px;background:var(--bg-soft);}
+  .footer-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:36px;margin-bottom:36px;}
+  .footer-col h4{font-size:12.5px;font-weight:800;letter-spacing:0.04em;margin-bottom:16px;color:var(--text);}
+  .footer-col a{display:block;font-size:14px;color:var(--text-muted);margin-bottom:11px;font-weight:600;}
+  .footer-col a:hover{color:var(--gold);}
+  .app-badges{display:flex;gap:10px;margin-top:16px;}
+  .app-badge{border:1px solid var(--border);border-radius:10px;padding:9px 14px;font-size:11px;color:var(--text-muted);display:flex;flex-direction:column;gap:1px;background:#fff;}
+  .app-badge b{font-size:13.5px;color:var(--text);}
+  .footer-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;padding-top:24px;border-top:1px solid var(--border);font-size:12.5px;color:var(--text-faint);font-weight:600;}
+  .socials{display:flex;gap:10px;}
+  .socials a{width:34px;height:34px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;background:#fff;}
+  @media(max-width:760px){.footer-grid{grid-template-columns:1fr 1fr;}}
+
+  /* ================= AUTH PAGES — dark ticket theme restored ================= */
+  .night{
+    --n-bg:#111018;--n-surface:#1A1823;--n-elevated:#232030;--n-stroke:#332f42;
+    --n-gold:#F2B33D;--n-gold-dim:#8a6a26;--n-text:#F3F1EC;--n-muted:#9C97AC;--n-faint:#6b6779;
+    background:var(--n-bg);color:var(--n-text);
+  }
+  .auth-shell{min-height:calc(100vh - 71px);display:grid;grid-template-columns:1fr 1fr;}
+  .auth-visual{position:relative;background:linear-gradient(165deg,#1c1730,#3a1f3f 55%,#5c2a3e);display:flex;flex-direction:column;justify-content:space-between;padding:48px;overflow:hidden;}
+  .auth-visual::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 70% 15%, rgba(242,179,61,0.18), transparent 60%);}
+  .auth-visual-top{position:relative;display:flex;align-items:center;gap:9px;font-family:'Bebas Neue';font-size:24px;color:var(--n-text);}
+  .auth-visual-top .reel{width:25px;height:25px;border-radius:50%;border:3px solid var(--n-gold);position:relative;flex-shrink:0;}
+  .auth-visual-top .reel::before,.auth-visual-top .reel::after{content:"";position:absolute;width:5px;height:5px;background:var(--n-gold);border-radius:50%;}
+  .auth-visual-top .reel::before{top:2px;left:6.5px;}
+  .auth-visual-top .reel::after{bottom:2px;right:6.5px;}
+  .auth-visual-mid{position:relative;max-width:400px;}
+  .auth-visual-mid .display{font-size:clamp(34px,4.5vw,52px);line-height:1.02;margin-bottom:14px;color:var(--n-text);}
+  .auth-visual-mid p{color:rgba(243,241,236,0.68);font-size:15px;line-height:1.6;}
+  .stub-float{position:relative;margin-top:34px;background:rgba(26,24,35,0.65);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:18px 20px;max-width:340px;}
+  .stub-float .row{display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:11.5px;color:var(--n-muted);margin-bottom:6px;}
+  .stub-float .row b{color:var(--n-text);}
+  .stub-float .perf-mini{height:12px;background-image:radial-gradient(circle 4px, #1c1730 4px, transparent 4.4px);background-size:14px 12px;background-position:center;background-repeat:repeat-x;margin:12px -20px;}
+  .auth-visual-bottom{position:relative;font-family:'Space Mono',monospace;font-size:11.5px;color:var(--n-faint);letter-spacing:0.04em;}
+
+  .auth-form-wrap{display:flex;align-items:center;justify-content:center;padding:48px 28px;}
+  .auth-form{width:100%;max-width:380px;}
+  .auth-form h1{font-family:'Bebas Neue';font-size:36px;margin-bottom:8px;color:var(--n-text);}
+  .auth-form .lead{color:var(--n-muted);font-size:14.5px;margin-bottom:30px;}
+  .auth-toggle{display:flex;background:var(--n-surface);border:1px solid var(--n-stroke);border-radius:999px;padding:4px;margin-bottom:26px;}
+  .auth-toggle button{flex:1;border:none;background:none;padding:9px;border-radius:999px;font-size:13px;font-weight:700;color:var(--n-muted);}
+  .auth-toggle button.active{background:var(--n-gold);color:#1a1308;}
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:12.5px;font-weight:700;color:var(--n-muted);margin-bottom:7px;letter-spacing:0.02em;}
+  .field .input-row{display:flex;align-items:center;background:var(--n-surface);border:1px solid var(--n-stroke);border-radius:10px;padding:0 14px;transition:border-color .15s ease;}
+  .field .input-row:focus-within{border-color:var(--n-gold-dim);}
+  .field input{flex:1;background:none;border:none;outline:none;color:var(--n-text);padding:12px 0;font-size:14px;font-family:'Plus Jakarta Sans',sans-serif;}
+  .field input::placeholder{color:var(--n-faint);}
+  .field .toggle-eye{background:none;border:none;color:var(--n-faint);font-size:12px;font-weight:700;}
+  .field-inline{display:flex;gap:12px;}
+  .field-inline .field{flex:1;}
+  .row-between{display:flex;justify-content:space-between;align-items:center;margin:4px 0 22px;font-size:13px;}
+  .checkline{display:flex;align-items:center;gap:8px;color:var(--n-muted);}
+  .checkline input{accent-color:var(--n-gold);}
+  .link-gold{color:var(--n-gold);font-weight:700;}
+  .divider-text{display:flex;align-items:center;gap:12px;margin:22px 0;color:var(--n-faint);font-size:12px;}
+  .divider-text::before,.divider-text::after{content:"";flex:1;height:1px;background:var(--n-stroke);}
+  .social-row{display:flex;gap:12px;}
+  .social-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:11px;border-radius:10px;border:1px solid var(--n-stroke);background:var(--n-surface);font-size:13px;font-weight:700;color:var(--n-text);}
+  .social-btn:hover{border-color:var(--n-gold-dim);}
+  .switch-line{text-align:center;margin-top:26px;font-size:13.5px;color:var(--n-muted);}
+  .night .btn-gold{background:linear-gradient(180deg,#F6C868,var(--n-gold));color:#1a1308;box-shadow:0 6px 18px rgba(242,179,61,0.25);}
+  .night .btn-gold:hover{box-shadow:0 8px 22px rgba(242,179,61,0.4);}
+
+  @media(max-width:900px){
+    .auth-shell{grid-template-columns:1fr;}
+    .auth-visual{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<header class="nav">
+  <div class="nav-inner">
+    <div class="logo" onclick="showPage('home')">
+      <span class="reel"></span>MOVIE<span class="mate">MATE</span>
+    </div>
+    <div class="loc">
+      <svg class="pin" viewBox="0 0 24 24" fill="none" stroke="#C8912B" stroke-width="2.2"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg>
+      <div><div class="city">Ahmedabad</div><div class="state">Gujarat</div></div>
+    </div>
+    <nav class="nav-links">
+      <a href="#">For you</a>
+      <a href="#">Dining</a>
+      <a href="#" class="active" onclick="showPage('home');return false;">Movies</a>
+      <a href="#">Events</a>
+      <a href="#">Stores</a>
+      <a href="#">Activities</a>
+    </nav>
+    <div class="nav-right">
+      <button class="icon-btn" aria-label="Search">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      </button>
+      <div class="nav-auth">
+        <button class="btn btn-outline" onclick="showPage('login')">Log in</button>
+        <button class="btn btn-black" onclick="showPage('signup')">Sign up</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ HOME PAGE ============ -->
+<main id="page-home">
+
+  <section class="hero">
+    <div class="hero-inner">
+      <button class="hero-arrow left" aria-label="Previous"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <button class="hero-arrow right" aria-label="Next"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 18l6-6-6-6"/></svg></button>
+      <div class="hero-copy">
+        <h1 class="hero-title">Crimson Horizon</h1>
+        <div class="hero-meta"><b>UA13+</b> &nbsp;|&nbsp; Action, Sci-Fi +1 more</div>
+        <p class="hero-desc">A pilot stranded beyond the last known border must choose between the mission that made her and the world that's waiting for her to come home.</p>
+        <button class="btn btn-black" onclick="showPage('signup')">Book now</button>
+      </div>
+      <div class="hero-poster-wrap">
+        <div class="hero-poster art-1"><div class="title-on-art"><div class="t1">CRIMSON<br>HORIZON</div></div></div>
+      </div>
+    </div>
+    <div class="hero-dots"><span class="active"></span><span></span><span></span></div>
+  </section>
+
+  <section class="section container">
+    <div class="section-title">This Week's Releases</div>
+    <div class="rail">
+      <article class="card" onclick="showPage('signup')"><div class="card-poster art-6"></div><div class="card-title">Paper Tigers</div><div class="card-meta">UA16+ | Hindi</div></article>
+      <article class="card" onclick="showPage('signup')"><div class="card-poster art-5"></div><div class="card-title">Neon Requiem</div><div class="card-meta">U | English</div></article>
+      <article class="card" onclick="showPage('signup')"><div class="card-poster art-8"></div><div class="card-title">Last Light District</div><div class="card-meta">A | Hindi</div></article>
+      <article class="card" onclick="showPage('signup')"><div class="card-poster art-7"></div><div class="card-title">Hanuman Ansh</div><div class="card-meta">U | Hindi</div></article>
+      <article class="card" onclick="showPage('signup')"><div class="card-poster art-4"></div><div class="card-title">Nine Rivers</div><div class="card-meta">A | Tamil</div></article>
+      <article class="card" onclick="showPage('signup')"><div class="card-poster art-2"></div><div class="card-title">Small Gods</div><div class="card-meta">UA16+ | Malayalam</div></article>
+    </div>
+  </section>
+
+  <section class="section container">
+    <div class="section-title">Only in Theatres</div>
+    <div class="filters">
+      <button class="chip dropdown">Filters ⌄</button>
+      <button class="chip active">Hindi</button>
+      <button class="chip">English</button>
+      <button class="chip">New Releases</button>
+      <button class="chip">Re-Releases</button>
+      <button class="chip">IMAX 2D</button>
+      <button class="chip">3D</button>
+    </div>
+    <div class="grid-cards">
+      <article class="card" onclick="showPage('signup')"><div class="card-poster art-1"></div><div class="card-title">Crimson Horizon</div><div class="card-meta">UA13+ | Hindi, English</div></article>
+      <article class="card" onclick="showPage('signup')"><div class="card-poster art-3"></div><div class="card-title">The Long Monsoon</div><div class="card-meta">A | Gujarati</div></article>
+      <article class="card" onclick="showPage('signup')"><div class="card-poster art-2"></div><div class="card-title">Silver Static</div><div class="card-meta">U | Hindi</div></article>
+      <article class="card" onclick="showPage('signup')"><div class="card-poster art-6"></div><div class="card-title">Dhamaal Squad</div><div class="card-meta">UA13+ | Hindi</div></article>
+      <article class="card" onclick="showPage('signup')"><div class="card-poster art-8"></div><div class="card-title">Bloody Valentine</div><div class="card-meta">A | Hindi</div></article>
+      <article class="card" onclick="showPage('signup')"><div class="card-poster art-4"></div><div class="card-title">Echo Chamber</div><div class="card-meta">UA16+ | English</div></article>
+      <article class="card" onclick="showPage('signup')"><div class="card-poster art-5"></div><div class="card-title">Neon Requiem</div><div class="card-meta">U | Hindi</div></article>
+      <article class="card" onclick="showPage('signup')"><div class="card-poster art-7"></div><div class="card-title">Glass Orchard</div><div class="card-meta">UA13+ | Tamil</div></article>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="logo" style="margin-bottom:16px;"><span class="reel"></span>MOVIE<span class="mate">MATE</span></div>
+          <p style="font-size:13.5px;color:var(--text-muted);line-height:1.6;max-width:260px;font-weight:600;">Book movie tickets in seconds — pick your seat, pay, and walk in. No queue, no printout.</p>
+          <div class="app-badges">
+            <div class="app-badge"><span>Download on the</span><b>App Store</b></div>
+            <div class="app-badge"><span>Get it on</span><b>Google Play</b></div>
+          </div>
+        </div>
+        <div class="footer-col"><h4>EXPLORE</h4><a href="#">Movies</a><a href="#">Cinemas</a><a href="#">Offers</a><a href="#">Gift Cards</a></div>
+        <div class="footer-col"><h4>COMPANY</h4><a href="#">About Us</a><a href="#">Careers</a><a href="#">Partner with us</a><a href="#">Contact</a></div>
+        <div class="footer-col"><h4>CITIES</h4><a href="#">Ahmedabad</a><a href="#">Mumbai</a><a href="#">Bengaluru</a><a href="#">Delhi NCR</a></div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 MovieMate. All rights reserved.</span>
+        <div class="socials"><a href="#">f</a><a href="#">in</a><a href="#">X</a><a href="#">yt</a></div>
+      </div>
+    </div>
+  </footer>
+</main>
+
+<!-- ============ LOGIN PAGE (dark ticket theme) ============ -->
+<main id="page-login" class="hidden night">
+  <div class="auth-shell">
+    <div class="auth-visual">
+      <div class="auth-visual-top"><span class="reel"></span>MOVIE<span style="color:var(--n-gold);">MATE</span></div>
+      <div class="auth-visual-mid">
+        <div class="display">Welcome back<br>to the front row.</div>
+        <p>Sign in to grab your seats before the show sells out, and keep every ticket in one place.</p>
+        <div class="stub-float">
+          <div class="row"><span>FILM</span><b>CRIMSON HORIZON</b></div>
+          <div class="row"><span>SCREEN</span><b>04 · GOLD</b></div>
+          <div class="perf-mini"></div>
+          <div class="row"><span>SEAT</span><b>G12, G13</b></div>
+          <div class="row"><span>SHOW</span><b>07:45 PM</b></div>
+        </div>
+      </div>
+      <div class="auth-visual-bottom">TICKET NO. MM-2026-08-07 · AHMEDABAD</div>
+    </div>
+
+    <div class="auth-form-wrap">
+      <form class="auth-form" onsubmit="return false;">
+        <h1>Log in</h1>
+        <p class="lead">New to MovieMate? <a href="#" class="link-gold" onclick="showPage('signup');return false;">Create an account</a></p>
+
+        <div class="auth-toggle">
+          <button type="button" class="active" onclick="setAuthTab(this,'login-email')">Email</button>
+          <button type="button" onclick="setAuthTab(this,'login-phone')">Phone</button>
+        </div>
+
+        <div id="login-email">
+          <div class="field"><label>Email address</label><div class="input-row"><input type="email" placeholder="you@example.com" /></div></div>
+        </div>
+        <div id="login-phone" class="hidden">
+          <div class="field">
+            <label>Mobile number</label>
+            <div class="input-row"><span style="color:var(--n-muted);font-size:14px;margin-right:6px;">+91</span><input type="tel" placeholder="98765 43210" /></div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Password</label>
+          <div class="input-row">
+            <input id="login-pass" type="password" placeholder="Enter your password" />
+            <button type="button" class="toggle-eye" onclick="toggleEye('login-pass',this)">SHOW</button>
+          </div>
+        </div>
+
+        <div class="row-between">
+          <label class="checkline"><input type="checkbox" /> Remember me</label>
+          <a href="#" class="link-gold">Forgot password?</a>
+        </div>
+
+        <button class="btn btn-gold btn-block" type="submit">Log in</button>
+
+        <div class="divider-text">OR CONTINUE WITH</div>
+        <div class="social-row">
+          <button type="button" class="social-btn">G Google</button>
+          <button type="button" class="social-btn">Apple</button>
+        </div>
+
+        <p class="switch-line">Don't have an account? <a href="#" class="link-gold" onclick="showPage('signup');return false;">Sign up</a></p>
+      </form>
+    </div>
+  </div>
+</main>
+
+<!-- ============ SIGNUP PAGE (dark ticket theme) ============ -->
+<main id="page-signup" class="hidden night">
+  <div class="auth-shell">
+    <div class="auth-visual">
+      <div class="auth-visual-top"><span class="reel"></span>MOVIE<span style="color:var(--n-gold);">MATE</span></div>
+      <div class="auth-visual-mid">
+        <div class="display">One account.<br>Every screen<br>in the city.</div>
+        <p>Create your MovieMate account to book faster, save your favourite cinemas, and never lose a ticket again.</p>
+        <div class="stub-float">
+          <div class="row"><span>MEMBER SINCE</span><b>AUG 2026</b></div>
+          <div class="row"><span>STATUS</span><b>NEW</b></div>
+          <div class="perf-mini"></div>
+          <div class="row"><span>PERK</span><b>₹75 OFF FIRST BOOKING</b></div>
+        </div>
+      </div>
+      <div class="auth-visual-bottom">TICKET NO. MM-2026-08-07 · AHMEDABAD</div>
+    </div>
+
+    <div class="auth-form-wrap">
+      <form class="auth-form" onsubmit="return false;">
+        <h1>Create account</h1>
+        <p class="lead">Already booking with us? <a href="#" class="link-gold" onclick="showPage('login');return false;">Log in</a></p>
+
+        <div class="field"><label>Full name</label><div class="input-row"><input type="text" placeholder="Your name" /></div></div>
+        <div class="field"><label>Email address</label><div class="input-row"><input type="email" placeholder="you@example.com" /></div></div>
+        <div class="field">
+          <label>Mobile number</label>
+          <div class="input-row"><span style="color:var(--n-muted);font-size:14px;margin-right:6px;">+91</span><input type="tel" placeholder="98765 43210" /></div>
+        </div>
+
+        <div class="field-inline">
+          <div class="field">
+            <label>Password</label>
+            <div class="input-row"><input id="signup-pass" type="password" placeholder="Create password" /><button type="button" class="toggle-eye" onclick="toggleEye('signup-pass',this)">SHOW</button></div>
+          </div>
+          <div class="field">
+            <label>Confirm</label>
+            <div class="input-row"><input id="signup-pass2" type="password" placeholder="Re-enter" /><button type="button" class="toggle-eye" onclick="toggleEye('signup-pass2',this)">SHOW</button></div>
+          </div>
+        </div>
+
+        <div class="row-between" style="margin-top:2px;">
+          <label class="checkline"><input type="checkbox" /> I agree to the <a href="#" class="link-gold">Terms</a> &amp; <a href="#" class="link-gold">Privacy Policy</a></label>
+        </div>
+
+        <button class="btn btn-gold btn-block" type="submit">Create account</button>
+
+        <div class="divider-text">OR SIGN UP WITH</div>
+        <div class="social-row">
+          <button type="button" class="social-btn">G Google</button>
+          <button type="button" class="social-btn">Apple</button>
+        </div>
+
+        <p class="switch-line">Already have an account? <a href="#" class="link-gold" onclick="showPage('login');return false;">Log in</a></p>
+      </form>
+    </div>
+  </div>
+</main>
+
+<script>
+  function showPage(name){
+    ['home','login','signup'].forEach(p=>{
+      document.getElementById('page-'+p).classList.toggle('hidden', p!==name);
+    });
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  function setAuthTab(btn, targetId){
+    const parent = btn.parentElement;
+    [...parent.children].forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    ['login-email','login-phone'].forEach(id=>{
+      document.getElementById(id).classList.toggle('hidden', id!==targetId);
+    });
+  }
+  function toggleEye(inputId, btn){
+    const input = document.getElementById(inputId);
+    const isPw = input.type === 'password';
+    input.type = isPw ? 'text' : 'password';
+    btn.textContent = isPw ? 'HIDE' : 'SHOW';
+  }
+  document.querySelectorAll('.filters .chip:not(.dropdown)').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      document.querySelectorAll('.filters .chip:not(.dropdown)').forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>

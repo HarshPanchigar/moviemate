@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MovieMate — Book Your Show</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-base:#111018;
+    --bg-surface:#1A1823;
+    --bg-elevated:#232030;
+    --stroke:#332f42;
+    --gold:#E8283F;
+    --gold-dim:#8a1c2c;
+    --rose:#E8283F;
+    --text:#F3F1EC;
+    --text-muted:#9C97AC;
+    --text-faint:#6b6779;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{background:var(--bg-base);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased;}
+  body{min-height:100vh;}
+  img{display:block;max-width:100%;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:inherit;cursor:pointer;}
+  .display{font-family:'Bebas Neue',sans-serif;letter-spacing:0.02em;}
+  .mono{font-family:'Space Mono',monospace;}
+  ::selection{background:var(--gold);color:#151016;}
+
+  /* ---------- utility ---------- */
+  .container{max-width:1400px;margin:0 auto;padding:0 24px;}
+  .hidden{display:none !important;}
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:12px 22px;border-radius:999px;border:none;font-weight:700;font-size:14.5px;
+    transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
+  }
+  .btn:active{transform:scale(0.97);}
+  /* ---------- UPDATED PREMIUM BUTTON ---------- */
+.btn-gold {
+  background: var(--gold); 
+  color: #fff;
+  /* Replaced the bright gold glow with a soft, neutral dark shadow */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: transform .15s ease, background .15s ease, box-shadow .15s ease;
+}
+
+.btn-gold:hover {
+  background: #ff4459; /* Subtly lighter flat color on hover, no gradients */
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+  .btn-ghost{background:transparent;border:1.5px solid var(--stroke);color:var(--text);}
+  .btn-ghost:hover{border-color:var(--gold-dim);}
+  .btn-block{width:100%;}
+  .eyebrow{
+    font-family:'Space Mono',monospace;font-size:11.5px;letter-spacing:0.18em;text-transform:uppercase;
+    color:var(--gold);display:flex;align-items:center;gap:10px;
+  }
+  .eyebrow::before{content:"";width:22px;height:1px;background:var(--gold-dim);display:inline-block;}
+
+  /* ---------- perforation / ticket motif ---------- */
+  .perf{
+    height:16px;
+    background-image: radial-gradient(circle 5px, var(--bg-base) 5px, transparent 5.5px);
+    background-size: 18px 16px;
+    background-position: center;
+    background-repeat: repeat-x;
+  }
+  .perf-surface{
+    background-image: radial-gradient(circle 5px, var(--bg-surface) 5px, transparent 5.5px);
+  }
+
+  /* ---------- NAV ---------- */
+  header.nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(17,16,24,0.86);backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--stroke);
+  }
+  .nav-inner{
+    display:flex;align-items:center;justify-content:space-between;gap:20px;
+    padding:19px 24px;max-width:1400px;margin:0 auto;
+  }
+  .nav-left{display:flex;align-items:center;gap:18px;min-width:0;}
+  .nav-right{display:flex;align-items:center;gap:24px;flex-shrink:0;}
+  .logo{display:flex;align-items:center;gap:10px;font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:0.03em;cursor:pointer;flex-shrink:0;}
+  .logo .reel{
+    width:29px;height:29px;border-radius:50%;border:3px solid var(--gold);position:relative;flex-shrink:0;
+  }
+  .logo .reel::before,.logo .reel::after{
+    content:"";position:absolute;width:5px;height:5px;background:var(--gold);border-radius:50%;
+  }
+  .logo .reel::before{top:2px;left:7px;}
+  .logo .reel::after{bottom:2px;right:7px;}
+  .logo span.mate{color:var(--gold);}
+  .loc-chip{
+    display:none;
+  }
+  .search-wrap{
+    display:flex;align-items:center;gap:10px;background:var(--bg-surface);
+    border:1px solid var(--stroke);border-radius:999px;padding:12px 20px;width:300px;flex-shrink:0;
+  }
+  .search-wrap svg{flex-shrink:0;opacity:0.55;}
+  .search-wrap input{
+    background:none;border:none;outline:none;color:var(--text);width:100%;font-size:14.5px;font-family:'Plus Jakarta Sans',sans-serif;
+  }
+  .search-wrap input::placeholder{color:var(--text-faint);}
+  .nav-links{display:flex;align-items:center;gap:24px;font-size:15.5px;font-weight:600;color:var(--text-muted);}
+  .nav-links a:hover{color:var(--text);}
+  .nav-links a.active{color:var(--gold);}
+  .nav-city{
+    display:flex;align-items:center;gap:6px;font-size:14.5px;font-weight:700;color:var(--text);
+    border:1px solid var(--stroke);padding:9px 16px;border-radius:999px;white-space:nowrap;flex-shrink:0;
+  }
+  .nav-auth{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+  .nav-auth .btn{padding:12px 20px;font-size:14.5px;}
+  @media(max-width:920px){
+    .search-wrap,.nav-links{display:none;}
+  }
+
+  /* ---------- HERO SLIDER ---------- */
+  .hero{position:relative;overflow:hidden;border-bottom:1px solid var(--stroke);}
+  .hero-bg{
+    position:absolute;inset:0;
+    background:
+      radial-gradient(ellipse 60% 90% at 82% 20%, rgba(242,179,61,0.14), transparent 60%),
+      radial-gradient(ellipse 50% 70% at 10% 80%, rgba(232,40,63,0.12), transparent 60%),
+      linear-gradient(180deg,#161320,#0f0e16 70%);
+  }
+  .hero-inner{position:relative;max-width:1400px;margin:0 auto;padding:72px 68px 46px;}
+  .hero-slide{display:none;grid-template-columns:1.25fr 0.75fr;gap:44px;align-items:center;min-height:580px;}
+  .hero-slide.active{display:grid;}
+  .hero-copy .eyebrow{margin-bottom:16px;}
+  .hero-title{font-size:clamp(40px,5.8vw,66px);line-height:1.02;margin-bottom:18px;}
+  .hero-title .accent{color:var(--gold);}
+  .hero-sub{color:var(--text-muted);font-size:17px;line-height:1.65;max-width:500px;margin-bottom:28px;}
+  .hero-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:30px;}
+  .tag{
+    font-size:12px;font-weight:700;padding:6px 12px;border-radius:999px;
+    background:var(--bg-elevated);border:1px solid var(--stroke);color:var(--text-muted);
+  }
+  .hero-cta{display:flex;gap:14px;}
+  .hero-poster{
+    position:relative;aspect-ratio:3/4;width:100%;max-width:420px;margin-left:auto;border-radius:16px;overflow:hidden;
+    box-shadow:0 24px 48px -18px rgba(0,0,0,0.6), 0 0 0 1px var(--stroke);
+  }
+  .hero-poster::after{
+    content:"";position:absolute;inset:0;background:linear-gradient(0deg, rgba(15,14,22,0.92) 0%, transparent 42%);
+  }
+  .hero-poster-label{
+    position:absolute;left:16px;right:16px;bottom:16px;z-index:2;
+  }
+  .hero-poster-label .film{font-family:'Bebas Neue';font-size:24px;line-height:1;}
+  .hero-poster-label .meta{font-size:11px;color:var(--text-muted);margin-top:5px;font-family:'Space Mono',monospace;}
+  .hero-badge{
+    position:absolute;top:14px;left:14px;z-index:2;background:rgba(17,16,24,0.75);backdrop-filter:blur(6px);
+    border:1px solid rgba(255,255,255,0.15);padding:5px 10px;border-radius:999px;font-size:10.5px;font-weight:700;
+    letter-spacing:0.05em;
+  }
+  .hero-arrow{
+    position:absolute;top:50%;transform:translateY(-50%);z-index:6;width:46px;height:46px;border-radius:50%;
+    background:rgba(17,16,24,0.7);border:1px solid var(--stroke);color:var(--text);
+    display:flex;align-items:center;justify-content:center;font-size:19px;transition:all .15s ease;
+  }
+  .hero-arrow:hover{border-color:var(--gold-dim);background:rgba(17,16,24,0.9);}
+  .hero-arrow-left{left:16px;}
+  .hero-arrow-right{right:16px;}
+  .hero-dots{display:flex;align-items:center;justify-content:center;gap:7px;padding-bottom:36px;position:relative;}
+  .hero-dot{width:8px;height:8px;border-radius:999px;background:var(--stroke);border:none;padding:0;cursor:pointer;transition:all .2s ease;}
+  .hero-dot.active{width:22px;background:var(--gold);}
+  @media(max-width:860px){
+    .hero-inner{padding:36px 48px 20px;}
+    .hero-slide{grid-template-columns:1fr;}
+    .hero-poster{max-width:220px;margin:0 auto;}
+    .hero-arrow{width:34px;height:34px;font-size:15px;}
+    .hero-arrow-left{left:6px;}
+    .hero-arrow-right{right:6px;}
+  }
+
+  /* ---------- SECTION HEADERS ---------- */
+  .section{padding:52px 0;}
+  .section-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:24px;}
+  .section-title{font-family:'Bebas Neue';font-size:32px;letter-spacing:0.01em;}
+  .section-link{font-size:13.5px;font-weight:700;color:var(--gold);display:flex;align-items:center;gap:4px;}
+
+  /* ---------- FILTER CHIPS ---------- */
+  .filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:30px;}
+  .chip{
+    padding:9px 16px;border-radius:999px;border:1px solid var(--stroke);background:var(--bg-surface);
+    font-size:13px;font-weight:700;color:var(--text-muted);transition:all .15s ease;
+  }
+  .chip:hover{border-color:var(--gold-dim);color:var(--text);}
+  .chip.active{background:var(--gold);color:#fff;border-color:var(--gold);}
+
+  /* ---------- MOVIE RAIL / TICKET CARDS ---------- */
+  .rail{display:flex;gap:20px;overflow-x:auto;padding-bottom:14px;scroll-snap-type:x mandatory;}
+  .rail::-webkit-scrollbar{height:6px;}
+  .rail::-webkit-scrollbar-thumb{background:var(--stroke);border-radius:99px;}
+  .stub{
+    flex:0 0 220px;scroll-snap-align:start;background:var(--bg-surface);border-radius:var(--radius);
+    border:1px solid var(--stroke);overflow:hidden;transition:transform .18s ease, border-color .18s ease;
+  }
+  .stub:hover{transform:translateY(-5px);border-color:var(--gold-dim);}
+  .stub-poster{
+    position:relative;aspect-ratio:2/3;
+  }
+  .stub-poster .rating{
+    position:absolute;top:10px;right:10px;background:rgba(17,16,24,0.8);border:1px solid rgba(255,255,255,0.15);
+    padding:3px 8px;border-radius:999px;font-size:11px;font-weight:800;color:var(--gold);display:flex;align-items:center;gap:4px;
+  }
+  .stub-poster .cert{
+    position:absolute;top:10px;left:10px;background:rgba(17,16,24,0.8);
+    padding:3px 7px;border-radius:5px;font-size:10px;font-weight:800;letter-spacing:0.03em;
+  }
+  .stub-poster .title-on-art{
+    position:absolute;left:12px;right:12px;bottom:14px;font-family:'Bebas Neue';font-size:22px;line-height:1;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,0.5);
+  }
+  .stub-divider{height:16px;background-image:radial-gradient(circle 5px, var(--bg-base) 5px, transparent 5.5px);background-size:18px 16px;background-position:center;background-repeat:repeat-x;margin-top:-1px;}
+  .stub-info{padding:14px 16px 16px;}
+  .stub-info .genre{font-size:12px;color:var(--text-muted);margin-bottom:10px;}
+  .stub-info .book{
+    width:100%;padding:9px;border-radius:8px;background:var(--bg-elevated);border:1px solid var(--stroke);
+    color:var(--text);font-weight:700;font-size:12.5px;letter-spacing:0.02em;transition:all .15s ease;
+  }
+  .stub-info .book:hover{background:var(--gold);color:#fff;border-color:var(--gold);}
+
+  /* poster gradients */
+  .art-1{background:linear-gradient(160deg,#2c2450,#8b3a62 60%,#e79b4e);}
+  .art-2{background:linear-gradient(160deg,#1c3a3a,#1f6f6f 55%,#7fd9c4);}
+  .art-3{background:linear-gradient(160deg,#3a1c2c,#a1274e 55%,#f2704f);}
+  .art-4{background:linear-gradient(160deg,#141a3a,#2a4a8f 55%,#6fb8e8);}
+  .art-5{background:linear-gradient(160deg,#241a3a,#5a2a8f 55%,#c46fe8);}
+  .art-6{background:linear-gradient(160deg,#3a2c14,#8f6a2a 55%,#e8c76f);}
+  .art-7{background:linear-gradient(160deg,#1a3a26,#2a8f52 55%,#6fe8a0);}
+  .art-8{background:linear-gradient(160deg,#3a1a1a,#8f2a2a 55%,#e86f6f);}
+
+  /* ---------- WEEKLY STRIP ---------- */
+  .week-strip{display:flex;gap:14px;overflow-x:auto;padding-bottom:8px;}
+  .week-pill{
+    flex:0 0 auto;display:flex;align-items:center;gap:10px;background:var(--bg-surface);border:1px solid var(--stroke);
+    border-radius:999px;padding:8px 16px 8px 8px;font-size:13px;white-space:nowrap;
+  }
+  .week-pill .dot{width:34px;height:34px;border-radius:50%;flex-shrink:0;}
+  .week-pill b{font-weight:800;}
+  .week-pill span{color:var(--text-muted);}
+
+  /* ---------- FOOTER ---------- */
+  footer{border-top:1px solid var(--stroke);padding:48px 0 28px;margin-top:20px;}
+  .footer-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:32px;margin-bottom:36px;}
+  .footer-col h4{font-size:13px;color:var(--text);margin-bottom:14px;letter-spacing:0.03em;}
+  .footer-col a{display:block;font-size:13.5px;color:var(--text-muted);margin-bottom:10px;}
+  .footer-col a:hover{color:var(--gold);}
+  .app-badges{display:flex;gap:10px;margin-top:14px;}
+  .app-badge{border:1px solid var(--stroke);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--text-muted);display:flex;flex-direction:column;gap:1px;}
+  .app-badge b{font-size:13px;color:var(--text);}
+  .footer-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;padding-top:22px;border-top:1px solid var(--stroke);font-size:12.5px;color:var(--text-faint);}
+  .socials{display:flex;gap:10px;}
+  .socials a{width:32px;height:32px;border-radius:50%;border:1px solid var(--stroke);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;}
+  @media(max-width:760px){.footer-grid{grid-template-columns:1fr 1fr;}}
+
+  /* ================= AUTH PAGES ================= */
+  .auth-shell{min-height:calc(100vh - 73px);display:grid;grid-template-columns:1fr 0.92fr;}
+  .auth-visual{
+    position:relative;background:linear-gradient(165deg,#1c1730,#3a1f3f 55%,#5c2a3e);
+    display:flex;flex-direction:column;justify-content:center;gap:28px;padding:48px 56px 48px 48px;overflow:hidden;
+  }
+  /* film-strip perforation seam marking the join between the two panels — reads as a ticket edge, not a decorative blur
+  .auth-visual::after{
+    content:"";position:absolute;top:0;bottom:0;right:0;width:2px;
+    background-image:repeating-linear-gradient(to bottom, rgba(232,40,63,0.65) 0 6px, transparent 6px 18px);
+    box-shadow:0 0 10px rgba(232,40,63,0.35);
+  } */
+  .auth-visual-mid{position:relative;max-width:480px;}
+  .auth-visual-mid .display{font-size:clamp(40px,5.2vw,60px);line-height:1.02;margin-bottom:16px;}
+  .auth-visual-mid p{color:rgba(243,241,236,0.68);font-size:16.5px;line-height:1.65;max-width:420px;}
+  .stub-float{
+    position:relative;margin-top:30px;max-width:420px;isolation:isolate;
+    animation:ticketFloat 5s ease-in-out infinite;
+  }
+  /* soft steady coral glow behind the ticket — distinct from the gold used elsewhere */
+  .stub-float::before{
+    content:"";position:absolute;inset:-16px;z-index:-1;border-radius:24px;filter:blur(16px);
+    background:radial-gradient(ellipse at center, rgba(232,40,63,0.4), transparent 70%);
+  }
+  .stub-card{
+    position:relative;background:linear-gradient(160deg, rgba(40,33,55,0.92), rgba(17,16,24,0.94));
+    backdrop-filter:blur(10px);border:1px solid rgba(232,40,63,0.35);border-radius:16px;
+    padding:22px 26px;overflow:hidden;
+    box-shadow:
+      0 0 0 1px rgba(232,40,63,0.06) inset,
+      0 22px 50px -18px rgba(0,0,0,0.65),
+      0 0 40px -6px rgba(232,40,63,0.35);
+    animation:ticketGlowPulse 3.2s ease-in-out infinite;
+  }
+  .stub-shine{
+    position:absolute;top:-60%;left:-60%;width:35%;height:220%;
+    background:linear-gradient(75deg, transparent, rgba(255,255,255,0.16), transparent);
+    transform:rotate(18deg);animation:shineSweep 3.6s ease-in-out infinite;pointer-events:none;
+  }
+  .stub-badge{
+    position:absolute;top:12px;right:-30px;transform:rotate(40deg);
+    background:linear-gradient(90deg,#8a1c2c,var(--rose));color:#1a0e12;
+    font-family:'Space Mono',monospace;font-size:9.5px;font-weight:700;letter-spacing:0.08em;
+    padding:3px 34px;box-shadow:0 3px 10px rgba(0,0,0,0.35);
+  }
+  .stub-float .row{display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:12.5px;color:var(--text-muted);margin-bottom:8px;position:relative;z-index:1;}
+  .stub-float .row b{color:var(--text);font-size:13px;}
+  .stub-float .perf-mini{
+    height:12px;position:relative;z-index:1;
+    background-image:radial-gradient(circle 4px, #14121c 4px, transparent 4.4px);
+    background-size:14px 12px;background-position:center;background-repeat:repeat-x;margin:14px -26px;
+  }
+  .stub-float .perf-mini::after{
+    content:"";position:absolute;left:20px;right:20px;top:50%;height:1px;transform:translateY(-50%);
+    background:linear-gradient(90deg, transparent, rgba(232,40,63,0.55), transparent);
+  }
+  @keyframes ticketFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
+  @keyframes ticketGlowPulse{
+    0%,100%{box-shadow:0 0 0 1px rgba(232,40,63,0.06) inset, 0 22px 50px -18px rgba(0,0,0,0.65), 0 0 28px -8px rgba(232,40,63,0.28);}
+    50%{box-shadow:0 0 0 1px rgba(232,40,63,0.1) inset, 0 26px 60px -16px rgba(0,0,0,0.7), 0 0 44px -4px rgba(232,40,63,0.5);}
+  }
+  @keyframes shineSweep{
+    0%{left:-60%;}
+    55%{left:130%;}
+    100%{left:130%;}
+  }
+  .auth-visual-bottom{position:relative;font-family:'Space Mono',monospace;font-size:11.5px;color:var(--text-faint);letter-spacing:0.04em;}
+
+  .auth-form-wrap{display:flex;align-items:center;justify-content:center;padding:48px 40px 48px 56px;}
+  .auth-form{width:100%;max-width:380px;}
+  .auth-form h1{font-family:'Bebas Neue';font-size:36px;margin-bottom:8px;}
+  .auth-form .lead{color:var(--text-muted);font-size:14.5px;margin-bottom:30px;}
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:12.5px;font-weight:700;color:var(--text-muted);margin-bottom:7px;letter-spacing:0.02em;}
+  .field .input-row{display:flex;align-items:center;background:var(--bg-surface);border:1px solid var(--stroke);border-radius:10px;padding:0 14px;transition:border-color .15s ease;}
+  .field .input-row:focus-within{border-color:var(--gold-dim);}
+  .field input{
+    flex:1;background:none;border:none;outline:none;color:var(--text);padding:12px 0;font-size:14px;font-family:'Plus Jakarta Sans',sans-serif;
+  }
+  .field input::placeholder{color:var(--text-faint);}
+  .field .toggle-eye{background:none;border:none;color:var(--text-faint);font-size:12px;font-weight:700;}
+  .field-inline{display:flex;gap:12px;}
+  .field-inline .field{flex:1;}
+  .row-between{display:flex;justify-content:space-between;align-items:center;margin:4px 0 22px;font-size:13px;}
+  .checkline{display:flex;align-items:center;gap:8px;color:var(--text-muted);}
+  .checkline input{accent-color:var(--gold);}
+  .link-gold{color:var(--gold);font-weight:700;}
+  .divider-text{display:flex;align-items:center;gap:12px;margin:22px 0;color:var(--text-faint);font-size:12px;}
+  .divider-text::before,.divider-text::after{content:"";flex:1;height:1px;background:var(--stroke);}
+  .social-row{display:flex;gap:12px;}
+  .social-btn{
+    flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:11px;border-radius:10px;
+    border:1px solid var(--stroke);background:var(--bg-surface);font-size:13px;font-weight:700;color:var(--text);
+  }
+  .social-btn:hover{border-color:var(--gold-dim);}
+  .switch-line{text-align:center;margin-top:26px;font-size:13.5px;color:var(--text-muted);}
+
+  @media(max-width:860px){
+    .auth-shell{grid-template-columns:1fr;}
+    .auth-visual{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<header class="nav">
+  <div class="nav-inner">
+    <div class="nav-left">
+      <div class="logo" onclick="showPage('home')">
+        <!-- <span class="reel">-->
+        </span>MOVIE<span class="mate">MATE</span>
+      </div>
+      <div class="nav-city">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#E8283F" stroke-width="2.4"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg>
+        Ahmedabad
+      </div>
+      <div class="search-wrap">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9C97AC" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input type="text" placeholder="Search movies, cinemas..." />
+      </div>
+    </div>
+    <div class="nav-right">
+      <nav class="nav-links">
+        <a href="#" class="active" onclick="showPage('home');return false;">Movies</a>
+        <a href="#">My Bookings</a>
+        <a href="#">Offers</a>
+      </nav>
+      <div class="nav-auth">
+        <button class="btn btn-ghost" onclick="showPage('login')">Log in</button>
+        <button class="btn btn-gold" onclick="showPage('signup')">Sign up</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ HOME PAGE ============ -->
+<main id="page-home">
+
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <button class="hero-arrow hero-arrow-left" onclick="heroNav(-1)" aria-label="Previous">‹</button>
+    <button class="hero-arrow hero-arrow-right" onclick="heroNav(1)" aria-label="Next">›</button>
+    <div class="hero-inner">
+
+      <div class="hero-slide active" data-slide="0">
+        <div class="hero-copy">
+          <div class="eyebrow">Now Booking · Ahmedabad</div>
+          <h1 class="hero-title">Crimson<br>Horizon</h1>
+          <p class="hero-sub">A stranded pilot races against a collapsing sky to warn a city that doesn't believe the end is already here.</p>
+          <div class="hero-tags">
+            <span class="tag">UA13+</span>
+            <span class="tag">Action, Sci-Fi</span>
+            <span class="tag">2h 21m</span>
+          </div>
+          <div class="hero-cta">
+            <button class="btn btn-gold" onclick="showPage('signup')">Book Now</button>
+            <button class="btn btn-ghost">▶ Watch Trailer</button>
+          </div>
+        </div>
+        <div class="hero-poster art-1">
+          <span class="hero-badge">🔥 TRENDING</span>
+          <div class="hero-poster-label">
+            <div class="film">CRIMSON HORIZON</div>
+            <div class="meta">UA13+ · ACTION, SCI-FI · 2H 21M</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-slide" data-slide="1">
+        <div class="hero-copy">
+          <div class="eyebrow">Now Booking · Ahmedabad</div>
+          <h1 class="hero-title">The Long<br>Monsoon</h1>
+          <p class="hero-sub">Two estranged sisters return to their flooded hometown and find the one thing the rain never washed away.</p>
+          <div class="hero-tags">
+            <span class="tag">A</span>
+            <span class="tag">Drama, Romance</span>
+            <span class="tag">2h 08m</span>
+          </div>
+          <div class="hero-cta">
+            <button class="btn btn-gold" onclick="showPage('signup')">Book Now</button>
+            <button class="btn btn-ghost">▶ Watch Trailer</button>
+          </div>
+        </div>
+        <div class="hero-poster art-3">
+          <span class="hero-badge">★ 8.9</span>
+          <div class="hero-poster-label">
+            <div class="film">THE LONG MONSOON</div>
+            <div class="meta">A · DRAMA, ROMANCE · 2H 08M</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-slide" data-slide="2">
+        <div class="hero-copy">
+          <div class="eyebrow">Now Booking · Ahmedabad</div>
+          <h1 class="hero-title">Neon<br>Requiem</h1>
+          <p class="hero-sub">A city built on song faces silence for the first time, and one singer decides she won't let the music die quietly.</p>
+          <div class="hero-tags">
+            <span class="tag">U</span>
+            <span class="tag">Musical, Fantasy</span>
+            <span class="tag">1h 58m</span>
+          </div>
+          <div class="hero-cta">
+            <button class="btn btn-gold" onclick="showPage('signup')">Book Now</button>
+            <button class="btn btn-ghost">▶ Watch Trailer</button>
+          </div>
+        </div>
+        <div class="hero-poster art-5">
+          <span class="hero-badge">🆕 NEW</span>
+          <div class="hero-poster-label">
+            <div class="film">NEON REQUIEM</div>
+            <div class="meta">U · MUSICAL, FANTASY · 1H 58M</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-slide" data-slide="3">
+        <div class="hero-copy">
+          <div class="eyebrow">Now Booking · Ahmedabad</div>
+          <h1 class="hero-title">Echo<br>Chamber</h1>
+          <p class="hero-sub">A journalist chasing a leaked recording realises the voice on the tape knows exactly who's listening.</p>
+          <div class="hero-tags">
+            <span class="tag">UA16+</span>
+            <span class="tag">Thriller</span>
+            <span class="tag">2h 04m</span>
+          </div>
+          <div class="hero-cta">
+            <button class="btn btn-gold" onclick="showPage('signup')">Book Now</button>
+            <button class="btn btn-ghost">▶ Watch Trailer</button>
+          </div>
+        </div>
+        <div class="hero-poster art-4">
+          <span class="hero-badge">★ 7.4</span>
+          <div class="hero-poster-label">
+            <div class="film">ECHO CHAMBER</div>
+            <div class="meta">UA16+ · THRILLER · 2H 04M</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="hero-dots">
+      <button class="hero-dot active" onclick="heroGoto(0)"></button>
+      <button class="hero-dot" onclick="heroGoto(1)"></button>
+      <button class="hero-dot" onclick="heroGoto(2)"></button>
+      <button class="hero-dot" onclick="heroGoto(3)"></button>
+    </div>
+  </section>
+
+  <section class="section container">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow" style="margin-bottom:10px;">In Theatres</div>
+        <div class="section-title">Now Showing</div>
+      </div>
+      <a href="#" class="section-link">View all →</a>
+    </div>
+
+    <div class="filters">
+      <button class="chip active">All</button>
+      <button class="chip">Hindi</button>
+      <button class="chip">English</button>
+      <button class="chip">Gujarati</button>
+      <button class="chip">2D</button>
+      <button class="chip">3D</button>
+      <button class="chip">4DX</button>
+      <button class="chip">Action</button>
+      <button class="chip">Romance</button>
+    </div>
+
+    <div class="rail">
+      <!-- card 1 -->
+      <article class="stub">
+        <div class="stub-poster art-1">
+          <span class="cert">UA13+</span>
+          <span class="rating">★ 8.2</span>
+          <div class="title-on-art">CRIMSON<br>HORIZON</div>
+        </div>
+        <div class="stub-divider"></div>
+        <div class="stub-info">
+          <div class="genre">Action, Sci-Fi · Hindi, English</div>
+          <button class="book">Book Tickets</button>
+        </div>
+      </article>
+      <!-- card 2 -->
+      <article class="stub">
+        <div class="stub-poster art-2">
+          <span class="cert">U</span>
+          <span class="rating">★ 7.6</span>
+          <div class="title-on-art">SILVER<br>STATIC</div>
+        </div>
+        <div class="stub-divider"></div>
+        <div class="stub-info">
+          <div class="genre">Comedy, Drama · Hindi</div>
+          <button class="book">Book Tickets</button>
+        </div>
+      </article>
+      <!-- card 3 -->
+      <article class="stub">
+        <div class="stub-poster art-3">
+          <span class="cert">A</span>
+          <span class="rating">★ 8.9</span>
+          <div class="title-on-art">THE LONG<br>MONSOON</div>
+        </div>
+        <div class="stub-divider"></div>
+        <div class="stub-info">
+          <div class="genre">Drama, Romance · Gujarati</div>
+          <button class="book">Book Tickets</button>
+        </div>
+      </article>
+      <!-- card 4 -->
+      <article class="stub">
+        <div class="stub-poster art-4">
+          <span class="cert">UA16+</span>
+          <span class="rating">★ 7.4</span>
+          <div class="title-on-art">ECHO<br>CHAMBER</div>
+        </div>
+        <div class="stub-divider"></div>
+        <div class="stub-info">
+          <div class="genre">Thriller · English</div>
+          <button class="book">Book Tickets</button>
+        </div>
+      </article>
+      <!-- card 5 -->
+      <article class="stub">
+        <div class="stub-poster art-5">
+          <span class="cert">U</span>
+          <span class="rating">★ 8.0</span>
+          <div class="title-on-art">NEON<br>REQUIEM</div>
+        </div>
+        <div class="stub-divider"></div>
+        <div class="stub-info">
+          <div class="genre">Musical, Fantasy · Hindi</div>
+          <button class="book">Book Tickets</button>
+        </div>
+      </article>
+      <!-- card 6 -->
+      <article class="stub">
+        <div class="stub-poster art-6">
+          <span class="cert">UA13+</span>
+          <span class="rating">★ 7.1</span>
+          <div class="title-on-art">PAPER<br>TIGERS</div>
+        </div>
+        <div class="stub-divider"></div>
+        <div class="stub-info">
+          <div class="genre">Comedy · English, Hindi</div>
+          <button class="book">Book Tickets</button>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="section container" style="padding-top:0;">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow" style="margin-bottom:10px;">Fresh Prints</div>
+        <div class="section-title">This Week's Releases</div>
+      </div>
+    </div>
+    <div class="week-strip">
+      <div class="week-pill"><span class="dot art-7"></span><b>Last Light District</b><span>· Drama</span></div>
+      <div class="week-pill"><span class="dot art-8"></span><b>Glass Orchard</b><span>· Romance</span></div>
+      <div class="week-pill"><span class="dot art-2"></span><b>Static Bloom</b><span>· Family</span></div>
+      <div class="week-pill"><span class="dot art-5"></span><b>Midnight Ferry</b><span>· Thriller</span></div>
+      <div class="week-pill"><span class="dot art-3"></span><b>Nine Rivers</b><span>· Adventure</span></div>
+      <div class="week-pill"><span class="dot art-6"></span><b>Small Gods</b><span>· Comedy</span></div>
+    </div>
+  </section>
+
+  <footer class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <div class="logo" style="margin-bottom:14px;"><span class="reel"></span>MOVIE<span class="mate">MATE</span></div>
+        <p style="font-size:13.5px;color:var(--text-muted);line-height:1.6;max-width:260px;">Book movie tickets in seconds — pick your seat, pay, and walk in. No queue, no printout.</p>
+        <div class="app-badges">
+          <div class="app-badge"><span>Download on the</span><b>App Store</b></div>
+          <div class="app-badge"><span>Get it on</span><b>Google Play</b></div>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Explore</h4>
+        <a href="#">Movies</a><a href="#">My Bookings</a><a href="#">Offers</a><a href="#">Gift Cards</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="#">About Us</a><a href="#">Careers</a><a href="#">Partner with us</a><a href="#">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h4>Cities</h4>
+        <a href="#">Ahmedabad</a><a href="#">Mumbai</a><a href="#">Bengaluru</a><a href="#">Delhi NCR</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 MovieMate. All rights reserved.</span>
+      <div class="socials">
+        <a href="#">f</a><a href="#">in</a><a href="#">X</a><a href="#">yt</a>
+      </div>
+    </div>
+  </footer>
+</main>
+
+<!-- ============ LOGIN PAGE ============ -->
+<main id="page-login" class="hidden">
+  <div class="auth-shell">
+    <div class="auth-visual">
+      <div class="auth-visual-mid">
+        <div class="display">Welcome back<br>to the front row.</div>
+        <p>Sign in to grab your seats before the show sells out, and keep every ticket in one place.</p>
+        <div class="stub-float">
+          <div class="stub-card">
+            <span class="stub-badge">CONFIRMED</span>
+            <span class="stub-shine"></span>
+            <div class="row"><span>FILM</span><b>CRIMSON HORIZON</b></div>
+            <div class="row"><span>SCREEN</span><b>04 · GOLD</b></div>
+            <div class="perf-mini"></div>
+            <div class="row"><span>SEAT</span><b>G12, G13</b></div>
+            <div class="row"><span>SHOW</span><b>07:45 PM</b></div>
+          </div>
+        </div>
+      </div>
+      <div class="auth-visual-bottom">TICKET NO. MM-2026-08-07 · AHMEDABAD</div>
+    </div>
+
+    <div class="auth-form-wrap">
+      <form class="auth-form" onsubmit="return false;">
+        <h1>Log in</h1>
+        <p class="lead">New to MovieMate? <a href="#" class="link-gold" onclick="showPage('signup');return false;">Create an account</a></p>
+
+        <div class="field">
+          <label>Email address</label>
+          <div class="input-row">
+            <input type="email" placeholder="you@example.com" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Password</label>
+          <div class="input-row">
+            <input id="login-pass" type="password" placeholder="Enter your password" />
+            <button type="button" class="toggle-eye" onclick="toggleEye('login-pass',this)">SHOW</button>
+          </div>
+        </div>
+
+        <div class="row-between">
+          <label class="checkline"><input type="checkbox" /> Remember me</label>
+          <a href="#" class="link-gold">Forgot password?</a>
+        </div>
+
+        <button class="btn btn-gold btn-block" type="submit">Log in</button>
+
+        <div class="divider-text">OR CONTINUE WITH</div>
+        <div class="social-row">
+          <button type="button" class="social-btn">G Google</button>
+          <button type="button" class="social-btn"> Apple</button>
+        </div>
+
+        <p class="switch-line">Don't have an account? <a href="#" class="link-gold" onclick="showPage('signup');return false;">Sign up</a></p>
+      </form>
+    </div>
+  </div>
+</main>
+
+<!-- ============ SIGNUP PAGE ============ -->
+<main id="page-signup" class="hidden">
+  <div class="auth-shell">
+    <div class="auth-visual">
+      <div class="auth-visual-mid">
+        <div class="display">One account.<br>Every screen<br>in the city.</div>
+        <p>Create your MovieMate account to book faster, save your favourite cinemas, and never lose a ticket again.</p>
+        <div class="stub-float">
+          <div class="stub-card">
+            <span class="stub-badge">WELCOME</span>
+            <span class="stub-shine"></span>
+            <div class="row"><span>MEMBER SINCE</span><b>AUG 2026</b></div>
+            <div class="row"><span>STATUS</span><b>NEW</b></div>
+            <div class="perf-mini"></div>
+            <div class="row"><span>PERK</span><b>₹75 OFF FIRST BOOKING</b></div>
+          </div>
+        </div>
+      </div>
+      <div class="auth-visual-bottom">TICKET NO. MM-2026-08-07 · AHMEDABAD</div>
+    </div>
+
+    <div class="auth-form-wrap">
+      <form class="auth-form" onsubmit="return false;">
+        <h1>Create account</h1>
+        <p class="lead">Already booking with us? <a href="#" class="link-gold" onclick="showPage('login');return false;">Log in</a></p>
+
+        <div class="field">
+          <label>Full name</label>
+          <div class="input-row">
+            <input type="text" placeholder="Your name" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Email address</label>
+          <div class="input-row">
+            <input type="email" placeholder="you@example.com" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Mobile number</label>
+          <div class="input-row">
+            <span style="color:var(--text-muted);font-size:14px;margin-right:6px;">+91</span>
+            <input type="tel" placeholder="98765 43210" />
+          </div>
+        </div>
+
+        <div class="field-inline">
+          <div class="field">
+            <label>Password</label>
+            <div class="input-row">
+              <input id="signup-pass" type="password" placeholder="Create password" />
+              <button type="button" class="toggle-eye" onclick="toggleEye('signup-pass',this)">SHOW</button>
+            </div>
+          </div>
+          <div class="field">
+            <label>Confirm</label>
+            <div class="input-row">
+              <input id="signup-pass2" type="password" placeholder="Re-enter" />
+              <button type="button" class="toggle-eye" onclick="toggleEye('signup-pass2',this)">SHOW</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="row-between" style="margin-top:2px;">
+          <label class="checkline"><input type="checkbox" /> I agree to the <a href="#" class="link-gold">Terms</a> &amp; <a href="#" class="link-gold">Privacy Policy</a></label>
+        </div>
+
+        <button class="btn btn-gold btn-block" type="submit">Create account</button>
+
+        <div class="divider-text">OR SIGN UP WITH</div>
+        <div class="social-row">
+          <button type="button" class="social-btn">G Google</button>
+          <button type="button" class="social-btn"> Apple</button>
+        </div>
+
+        <p class="switch-line">Already have an account? <a href="#" class="link-gold" onclick="showPage('login');return false;">Log in</a></p>
+      </form>
+    </div>
+  </div>
+</main>
+
+<script>
+  function showPage(name){
+    ['home','login','signup'].forEach(p=>{
+      document.getElementById('page-'+p).classList.toggle('hidden', p!==name);
+    });
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  function toggleEye(inputId, btn){
+    const input = document.getElementById(inputId);
+    const isPw = input.type === 'password';
+    input.type = isPw ? 'text' : 'password';
+    btn.textContent = isPw ? 'HIDE' : 'SHOW';
+  }
+  // ---------- HERO SLIDER ----------
+  let heroIndex = 0;
+  const heroSlides = document.querySelectorAll('.hero-slide');
+  const heroDots = document.querySelectorAll('.hero-dot');
+  let heroTimer = null;
+
+  function heroRender(){
+    heroSlides.forEach((s,i)=> s.classList.toggle('active', i===heroIndex));
+    heroDots.forEach((d,i)=> d.classList.toggle('active', i===heroIndex));
+  }
+  function heroGoto(i){
+    heroIndex = i;
+    heroRender();
+    heroRestart();
+  }
+  function heroNav(dir){
+    heroIndex = (heroIndex + dir + heroSlides.length) % heroSlides.length;
+    heroRender();
+    heroRestart();
+  }
+  function heroRestart(){
+    clearInterval(heroTimer);
+    heroTimer = setInterval(()=> heroNav(1), 6000);
+  }
+  if(heroSlides.length){ heroRestart(); }
+
+  document.querySelectorAll('.filters .chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      document.querySelectorAll('.filters .chip').forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
