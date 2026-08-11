@@ -1,10 +1,11 @@
 # MovieMate — Development Memory
 
 ## Current Phase
-Not started
+started
 
 ## Current Status
 Project documentation completed.
+setup auth
 
 ## Completed
 - PRD.md
@@ -14,7 +15,7 @@ Project documentation completed.
 - Design.md
 
 ## Currently Working On
-None
+Authentication
 
 ## Next Task
 Phase 0 — Project Setup

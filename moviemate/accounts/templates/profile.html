@@ -1,0 +1,1628 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile — MovieMate{% endblock %}
+
+{% block extra_style %}
+
+/* =========================================================
+   PROFILE PAGE
+   ========================================================= */
+
+.profile-shell{
+    min-height:calc(100vh - 73px);
+    display:grid;
+    grid-template-columns:1fr 0.92fr;
+    overflow:hidden;
+}
+
+
+/* =========================================================
+   LEFT SIDE
+   ========================================================= */
+
+.profile-visual{
+    position:relative;
+    display:flex;
+    align-items:center;
+    padding:50px 60px 50px 55px;
+    overflow:hidden;
+
+    background:
+        radial-gradient(
+            circle at 50% 45%,
+            #45223f 0%,
+            #2d1b37 38%,
+            #1c1730 72%,
+            #151222 100%
+        );
+}
+
+
+.profile-visual::before{
+    content:"";
+    position:absolute;
+
+    width:600px;
+    height:600px;
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(232,40,63,.16),
+            transparent 68%
+        );
+
+    filter:blur(25px);
+
+    top:50%;
+    left:50%;
+
+    transform:translate(-50%,-50%);
+
+    pointer-events:none;
+}
+
+
+.profile-visual::after{
+    content:"";
+    position:absolute;
+
+    width:510px;
+    height:510px;
+
+    border-radius:50%;
+
+    border:1px solid rgba(232,40,63,.13);
+
+    top:50%;
+    left:50%;
+
+    transform:translate(-50%,-50%);
+
+    box-shadow:
+        0 0 0 35px rgba(232,40,63,.025),
+        0 0 0 80px rgba(232,40,63,.018);
+
+    pointer-events:none;
+}
+
+
+/* =========================================================
+   LEFT CONTENT
+   ========================================================= */
+
+.profile-visual-content{
+    position:relative;
+    z-index:3;
+
+    width:100%;
+    max-width:550px;
+}
+
+
+.profile-eyebrow{
+    display:flex;
+    align-items:center;
+
+    gap:11px;
+
+    font-family:'Space Mono',monospace;
+
+    font-size:12px;
+
+    letter-spacing:.18em;
+
+    color:#E8283F;
+
+    margin-bottom:17px;
+}
+
+
+.profile-eyebrow::before{
+    content:"";
+
+    width:25px;
+    height:1px;
+
+    background:#E8283F;
+}
+
+
+.profile-display{
+    font-family:'Bebas Neue',sans-serif;
+
+    font-size:clamp(50px,5vw,66px);
+
+    line-height:.96;
+
+    letter-spacing:.015em;
+
+    color:#F3F1EC;
+
+    margin-bottom:15px;
+}
+
+
+.profile-display span{
+    color:#E8283F;
+}
+
+
+.profile-description{
+    color:rgba(243,241,236,.70);
+
+    font-size:15px;
+
+    line-height:1.65;
+
+    max-width:430px;
+}
+
+
+/* =========================================================
+   PROFILE STAGE
+   ========================================================= */
+
+.profile-stage{
+    position:relative;
+
+    width:100%;
+    max-width:510px;
+
+    height:285px;
+
+    margin-top:28px;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+}
+
+
+.profile-stage::before{
+    content:"";
+
+    position:absolute;
+
+    width:360px;
+    height:80px;
+
+    border-radius:50%;
+
+    background:rgba(232,40,63,.22);
+
+    filter:blur(30px);
+
+    bottom:25px;
+
+    left:50%;
+
+    transform:translateX(-50%);
+}
+
+
+/* =========================================================
+   ORBITS
+   ========================================================= */
+
+.profile-orbit{
+    position:absolute;
+
+    width:270px;
+    height:270px;
+
+    border-radius:50%;
+
+    border:1px solid rgba(232,40,63,.17);
+
+    animation:orbitRotate 18s linear infinite;
+}
+
+
+.profile-orbit::before{
+    content:"";
+
+    position:absolute;
+
+    width:8px;
+    height:8px;
+
+    border-radius:50%;
+
+    background:#E8283F;
+
+    box-shadow:
+        0 0 15px rgba(232,40,63,.8);
+
+    top:19px;
+    left:50%;
+
+    transform:translateX(-50%);
+}
+
+
+.profile-orbit.two{
+    width:330px;
+    height:180px;
+
+    transform:rotate(-20deg);
+
+    border-color:rgba(255,255,255,.07);
+
+    animation:
+        orbitRotateReverse 20s linear infinite;
+}
+
+
+.profile-orbit.two::before{
+    width:6px;
+    height:6px;
+
+    background:#F3F1EC;
+
+    box-shadow:
+        0 0 12px rgba(243,241,236,.5);
+
+    top:50%;
+    left:-3px;
+}
+
+
+/* =========================================================
+   AVATAR
+   ========================================================= */
+
+.profile-avatar-stage{
+    position:relative;
+
+    z-index:5;
+
+    width:145px;
+    height:145px;
+
+    border-radius:50%;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    background:
+        linear-gradient(
+            145deg,
+            #E8283F,
+            #8a1c2c
+        );
+
+    border:5px solid rgba(243,241,236,.08);
+
+    box-shadow:
+        0 0 0 10px rgba(232,40,63,.045),
+        0 18px 45px rgba(0,0,0,.45),
+        0 0 55px rgba(232,40,63,.28);
+
+    animation:avatarFloat 5s ease-in-out infinite;
+}
+
+
+.profile-avatar-letter{
+    font-family:'Bebas Neue',sans-serif;
+
+    font-size:70px;
+
+    line-height:1;
+
+    color:white;
+
+    text-shadow:
+        0 3px 15px rgba(0,0,0,.25);
+}
+
+
+.profile-online{
+    position:absolute;
+
+    width:20px;
+    height:20px;
+
+    border-radius:50%;
+
+    background:#75d49a;
+
+    border:4px solid #24182f;
+
+    right:7px;
+    bottom:12px;
+
+    box-shadow:
+        0 0 14px rgba(117,212,154,.5);
+}
+
+
+/* =========================================================
+   FLOATING INFO
+   ========================================================= */
+
+.profile-floating-info{
+    position:absolute;
+
+    z-index:6;
+
+    padding:10px 14px;
+
+    border-radius:9px;
+
+    background:rgba(17,16,24,.78);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    backdrop-filter:blur(10px);
+
+    box-shadow:
+        0 12px 30px rgba(0,0,0,.25);
+}
+
+
+.profile-floating-info small{
+    display:block;
+
+    font-family:'Space Mono',monospace;
+
+    font-size:8px;
+
+    letter-spacing:.08em;
+
+    color:#6e6978;
+
+    margin-bottom:4px;
+}
+
+
+.profile-floating-info b{
+    display:block;
+
+    font-family:'Space Mono',monospace;
+
+    font-size:10px;
+
+    color:#F3F1EC;
+}
+
+
+.profile-floating-info.info-one{
+    left:15px;
+    top:50px;
+}
+
+
+.profile-floating-info.info-two{
+    right:5px;
+    bottom:40px;
+}
+
+
+.profile-floating-info.info-two b{
+    color:#E8283F;
+}
+
+
+/* =========================================================
+   LEFT BOTTOM
+   ========================================================= */
+
+.profile-visual-bottom{
+    position:absolute;
+
+    bottom:25px;
+    left:55px;
+
+    font-family:'Space Mono',monospace;
+
+    font-size:10px;
+
+    letter-spacing:.08em;
+
+    color:rgba(243,241,236,.25);
+}
+
+
+/* =========================================================
+   RIGHT SIDE
+   ========================================================= */
+
+.profile-form-wrap{
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    padding:45px 55px;
+
+    background:#0f0e15;
+
+    overflow:hidden;
+}
+
+
+.profile-form{
+    width:100%;
+    max-width:450px;
+}
+
+
+/* =========================================================
+   MESSAGE
+   ========================================================= */
+
+.profile-message{
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    padding:12px 15px;
+
+    margin-bottom:20px;
+
+    border-radius:10px;
+
+    font-size:13px;
+
+    line-height:1.4;
+}
+
+
+.profile-message-success{
+    color:#75d49a;
+
+    background:rgba(117,212,154,.07);
+
+    border:1px solid rgba(117,212,154,.20);
+}
+
+
+.profile-message-error{
+    color:#ff8a97;
+
+    background:rgba(232,40,63,.08);
+
+    border:1px solid rgba(232,40,63,.25);
+}
+
+
+.profile-message-icon{
+    width:20px;
+    height:20px;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    flex-shrink:0;
+
+    border-radius:50%;
+
+    font-weight:700;
+}
+
+
+/* =========================================================
+   RIGHT HEADER
+   ========================================================= */
+
+.profile-heading{
+    margin-bottom:25px;
+}
+
+
+.profile-heading h1{
+    font-family:'Bebas Neue',sans-serif;
+
+    font-size:46px;
+
+    line-height:1;
+
+    margin-bottom:9px;
+}
+
+
+.profile-heading p{
+    color:var(--text-muted);
+
+    font-size:15px;
+
+    line-height:1.5;
+}
+
+
+/* =========================================================
+   SECTION TITLE
+   ========================================================= */
+
+.account-section-title{
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    margin-bottom:15px;
+}
+
+
+.account-section-title h2{
+    font-family:'Bebas Neue',sans-serif;
+
+    font-size:27px;
+
+    letter-spacing:.02em;
+}
+
+
+.account-section-title span{
+    font-family:'Space Mono',monospace;
+
+    font-size:10px;
+
+    color:#75d49a;
+
+    letter-spacing:.06em;
+}
+
+
+/* =========================================================
+   ACCOUNT INFO
+   ========================================================= */
+
+.account-info{
+    display:grid;
+
+    gap:12px;
+}
+
+
+.account-field{
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:20px;
+
+    padding:17px 18px;
+
+    background:var(--bg-surface);
+
+    border:1px solid var(--stroke);
+
+    border-radius:11px;
+
+    transition:
+        border-color .15s ease,
+        background .15s ease,
+        transform .15s ease;
+}
+
+
+.account-field:hover{
+    border-color:#423b52;
+
+    background:#1d1a27;
+
+    transform:translateX(2px);
+}
+
+
+.account-field-left{
+    display:flex;
+
+    flex-direction:column;
+
+    gap:5px;
+
+    min-width:0;
+}
+
+
+.account-field label{
+    font-family:'Space Mono',monospace;
+
+    font-size:10px;
+
+    color:var(--text-faint);
+
+    letter-spacing:.07em;
+}
+
+
+.account-field-value{
+    font-size:15px;
+
+    line-height:1.4;
+
+    color:var(--text);
+
+    word-break:break-word;
+}
+
+
+.account-field-icon{
+    width:40px;
+    height:40px;
+
+    flex-shrink:0;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    border-radius:9px;
+
+    color:var(--gold);
+
+    background:rgba(232,40,63,.07);
+
+    border:1px solid rgba(232,40,63,.12);
+}
+
+
+/* =========================================================
+   ACTIONS
+   ========================================================= */
+
+.profile-actions{
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:12px;
+
+    margin-top:24px;
+}
+
+
+.profile-action{
+    display:flex;
+
+    align-items:center;
+
+    gap:13px;
+
+    padding:16px;
+
+    border-radius:11px;
+
+    background:var(--bg-surface);
+
+    border:1px solid var(--stroke);
+
+    color:var(--text);
+
+    transition:
+        border-color .15s ease,
+        background .15s ease,
+        transform .15s ease;
+}
+
+
+.profile-action:hover{
+    border-color:var(--gold-dim);
+
+    background:#1d1a27;
+
+    transform:translateY(-2px);
+}
+
+
+.profile-action svg{
+    color:var(--gold);
+
+    flex-shrink:0;
+
+    width:20px;
+    height:20px;
+}
+
+
+.profile-action-content{
+    display:flex;
+
+    flex-direction:column;
+
+    gap:3px;
+}
+
+
+.profile-action-content b{
+    font-size:14px;
+}
+
+
+.profile-action-content span{
+    font-size:10.5px;
+
+    color:var(--text-faint);
+}
+
+
+/* =========================================================
+   DIVIDER
+   ========================================================= */
+
+.profile-divider{
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    margin:23px 0;
+
+    color:var(--text-faint);
+
+    font-family:'Space Mono',monospace;
+
+    font-size:10px;
+}
+
+
+.profile-divider::before,
+.profile-divider::after{
+    content:"";
+
+    flex:1;
+
+    height:1px;
+
+    background:var(--stroke);
+}
+
+
+/* =========================================================
+   LOGOUT
+   ========================================================= */
+
+.logout-button{
+    width:100%;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:9px;
+
+    padding:14px;
+
+    border-radius:11px;
+
+    border:1px solid var(--stroke);
+
+    background:transparent;
+
+    color:var(--text-muted);
+
+    font-size:13px;
+
+    font-weight:700;
+
+    transition:.15s ease;
+}
+
+
+.logout-button:hover{
+    border-color:var(--gold-dim);
+
+    color:var(--text);
+
+    background:var(--bg-surface);
+}
+
+
+/* =========================================================
+   ANIMATIONS
+   ========================================================= */
+
+@keyframes orbitRotate{
+
+    from{
+        transform:rotate(0deg);
+    }
+
+    to{
+        transform:rotate(360deg);
+    }
+
+}
+
+
+@keyframes orbitRotateReverse{
+
+    from{
+        transform:rotate(-20deg);
+    }
+
+    to{
+        transform:rotate(-380deg);
+    }
+
+}
+
+
+@keyframes avatarFloat{
+
+    0%,100%{
+        transform:translateY(0);
+    }
+
+    50%{
+        transform:translateY(-5px);
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media(max-width:860px){
+
+    .profile-shell{
+        grid-template-columns:1fr;
+
+        overflow:visible;
+    }
+
+
+    .profile-visual{
+        min-height:610px;
+
+        padding:50px 35px 80px;
+    }
+
+
+    .profile-form-wrap{
+        padding:50px 30px 65px;
+
+        overflow:visible;
+    }
+
+
+    .profile-form{
+        max-width:520px;
+    }
+
+
+    .profile-visual-bottom{
+        left:35px;
+    }
+
+}
+
+
+@media(max-width:560px){
+
+    .profile-visual{
+        min-height:570px;
+
+        padding:40px 22px 75px;
+    }
+
+
+    .profile-display{
+        font-size:48px;
+    }
+
+
+    .profile-description{
+        font-size:14px;
+    }
+
+
+    .profile-stage{
+        height:270px;
+    }
+
+
+    .profile-orbit{
+        width:230px;
+        height:230px;
+    }
+
+
+    .profile-orbit.two{
+        width:290px;
+        height:160px;
+    }
+
+
+    .profile-avatar-stage{
+        width:125px;
+        height:125px;
+    }
+
+
+    .profile-avatar-letter{
+        font-size:60px;
+    }
+
+
+    .profile-floating-info.info-one{
+        left:0;
+        top:45px;
+    }
+
+
+    .profile-floating-info.info-two{
+        right:0;
+        bottom:30px;
+    }
+
+
+    .profile-visual-bottom{
+        left:22px;
+        font-size:8px;
+    }
+
+
+    .profile-form-wrap{
+        padding:40px 18px 55px;
+    }
+
+
+    .profile-heading h1{
+        font-size:40px;
+    }
+
+
+    .profile-heading p{
+        font-size:14px;
+    }
+
+
+    .account-section-title h2{
+        font-size:24px;
+    }
+
+
+    .account-field-value{
+        font-size:14px;
+    }
+
+
+    .profile-actions{
+        grid-template-columns:1fr;
+    }
+
+}
+
+{% endblock %}
+
+
+
+{% block content %}
+
+<main>
+
+    <div class="profile-shell">
+
+
+        <!-- =================================================
+             LEFT CINEMATIC SIDE
+             ================================================= -->
+
+        <section class="profile-visual">
+
+
+            <div class="profile-visual-content">
+
+
+                <div class="profile-eyebrow">
+
+                    MOVIEMATE MEMBER
+
+                </div>
+
+
+                <div class="profile-display">
+
+                    YOUR MOVIE<br>
+
+                    <span>PROFILE.</span>
+
+                </div>
+
+
+                <p class="profile-description">
+
+                    Everything about your MovieMate account,
+                    right where you need it.
+
+                </p>
+
+
+                <div class="profile-stage">
+
+
+                    <div class="profile-orbit"></div>
+
+                    <div class="profile-orbit two"></div>
+
+
+                    <div class="profile-floating-info info-one">
+
+                        <small>
+
+                            MEMBER ID
+
+                        </small>
+
+                        <b>
+
+                            MM-{{ customer.id|stringformat:"04d" }}
+
+                        </b>
+
+                    </div>
+
+
+                    <div class="profile-floating-info info-two">
+
+                        <small>
+
+                            STATUS
+
+                        </small>
+
+                        <b>
+
+                            ACTIVE
+
+                        </b>
+
+                    </div>
+
+
+                    <div class="profile-avatar-stage">
+
+                        <div class="profile-avatar-letter">
+
+                            {{ customer.full_name|first|upper }}
+
+                        </div>
+
+
+                        <div class="profile-online"></div>
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+            <div class="profile-visual-bottom">
+
+                MOVIEMATE · YOUR ACCOUNT ·
+                MM-{{ customer.id|stringformat:"04d" }}
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =================================================
+             RIGHT SIDE
+             ================================================= -->
+
+        <section class="profile-form-wrap">
+
+
+            <div class="profile-form">
+
+
+                <!-- =================================================
+                     MESSAGES FROM EDIT PROFILE / PASSWORD
+                     ================================================= -->
+
+                {% if messages %}
+
+                    {% for message in messages %}
+
+                        <div class="profile-message
+                            {% if message.tags == 'success' %}
+                                profile-message-success
+                            {% else %}
+                                profile-message-error
+                            {% endif %}
+                        ">
+
+
+                            <span class="profile-message-icon">
+
+                                {% if message.tags == 'success' %}
+
+                                    ✓
+
+                                {% else %}
+
+                                    !
+
+                                {% endif %}
+
+                            </span>
+
+
+                            <span>
+
+                                {{ message }}
+
+                            </span>
+
+
+                        </div>
+
+                    {% endfor %}
+
+                {% endif %}
+
+
+
+                <!-- =================================================
+                     HEADER
+                     ================================================= -->
+
+                <div class="profile-heading">
+
+                    <h1>
+
+                        ACCOUNT
+
+                    </h1>
+
+
+                    <p>
+
+                        Manage your MovieMate profile
+                        and account settings.
+
+                    </p>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     PERSONAL DETAILS
+                     ================================================= -->
+
+                <div class="account-section-title">
+
+                    <h2>
+
+                        Personal Details
+
+                    </h2>
+
+
+                    <span>
+
+                        ● ACTIVE
+
+                    </span>
+
+                </div>
+
+
+
+                <div class="account-info">
+
+
+                    <!-- FULL NAME -->
+
+                    <div class="account-field">
+
+
+                        <div class="account-field-left">
+
+                            <label>
+
+                                FULL NAME
+
+                            </label>
+
+
+                            <div class="account-field-value">
+
+                                {{ customer.full_name }}
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="account-field-icon">
+
+                            <svg
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+
+                                <path
+                                    d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"
+                                ></path>
+
+                                <circle
+                                    cx="12"
+                                    cy="7"
+                                    r="4"
+                                ></circle>
+
+                            </svg>
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- EMAIL -->
+
+                    <div class="account-field">
+
+
+                        <div class="account-field-left">
+
+                            <label>
+
+                                EMAIL ADDRESS
+
+                            </label>
+
+
+                            <div class="account-field-value">
+
+                                {{ customer.email }}
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="account-field-icon">
+
+                            <svg
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+
+                                <rect
+                                    x="3"
+                                    y="5"
+                                    width="18"
+                                    height="14"
+                                    rx="2"
+                                ></rect>
+
+                                <polyline
+                                    points="3 7 12 13 21 7"
+                                ></polyline>
+
+                            </svg>
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- MOBILE -->
+
+                    <div class="account-field">
+
+
+                        <div class="account-field-left">
+
+                            <label>
+
+                                MOBILE NUMBER
+
+                            </label>
+
+
+                            <div class="account-field-value">
+
+                                {{ customer.mobile }}
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="account-field-icon">
+
+                            <svg
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+
+                                <rect
+                                    x="5"
+                                    y="2"
+                                    width="14"
+                                    height="20"
+                                    rx="2"
+                                ></rect>
+
+                                <line
+                                    x1="12"
+                                    y1="18"
+                                    x2="12.01"
+                                    y2="18"
+                                ></line>
+
+                            </svg>
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- =================================================
+                     PROFILE ACTIONS
+                     ================================================= -->
+
+<div class="profile-actions">
+
+    <!-- EDIT PROFILE -->
+
+    <a
+        href="{% url 'edit_profile' %}"
+        class="profile-action"
+    >
+
+        <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+        >
+
+            <path d="M12 20h9"></path>
+
+            <path
+                d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"
+            ></path>
+
+        </svg>
+
+
+        <div class="profile-action-content">
+
+            <b>
+                Edit Profile
+            </b>
+
+            <span>
+                Personal details
+            </span>
+
+        </div>
+
+    </a>
+
+
+
+    <!-- CHANGE PASSWORD -->
+
+    <a
+        href="{% url 'change_password' %}"
+        class="profile-action"
+    >
+
+        <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+        >
+
+            <rect
+                x="3"
+                y="11"
+                width="18"
+                height="10"
+                rx="2"
+            ></rect>
+
+            <path
+                d="M7 11V7a5 5 0 0 1 10 0v4"
+            ></path>
+
+        </svg>
+
+
+        <div class="profile-action-content">
+
+            <b>
+                Change Password
+            </b>
+
+            <span>
+                Account security
+            </span>
+
+        </div>
+
+    </a>
+
+
+
+    <!-- DELETE ACCOUNT -->
+
+    <a
+        href="{% url 'delete_account' %}"
+        class="profile-action profile-delete-action"
+    >
+
+        <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+        >
+
+            <polyline
+                points="3 6 5 6 21 6"
+            ></polyline>
+
+            <path
+                d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"
+            ></path>
+
+            <path
+                d="M10 11v6"
+            ></path>
+
+            <path
+                d="M14 11v6"
+            ></path>
+
+            <path
+                d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"
+            ></path>
+
+        </svg>
+
+
+        <div class="profile-action-content">
+
+            <b>
+                Delete Account
+            </b>
+
+            <span>
+                Permanently remove account
+            </span>
+
+        </div>
+
+    </a>
+
+</div>
+
+
+                <!-- =================================================
+                     DIVIDER
+                     ================================================= -->
+
+                <div class="profile-divider">
+
+                    ACCOUNT
+
+                </div>
+
+
+
+                <!-- =================================================
+                     LOGOUT
+                     ================================================= -->
+
+                <a
+                    href="{% url 'logout' %}"
+                    class="logout-button"
+                >
+
+                    <svg
+                        width="17"
+                        height="17"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+
+                        <path
+                            d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"
+                        ></path>
+
+                        <polyline
+                            points="16 17 21 12 16 7"
+                        ></polyline>
+
+                        <line
+                            x1="21"
+                            y1="12"
+                            x2="9"
+                            y2="12"
+                        ></line>
+
+                    </svg>
+
+
+                    Log out of MovieMate
+
+                </a>
+
+
+            </div>
+
+        </section>
+
+
+    </div>
+
+</main>
+
+{% endblock %}
+
+
+
+{% block footer %}
+{% endblock %}
