@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 74" width="320" height="74" fill="none">
+  <!-- White M -->
+  <path d="M12 58V14h12l14 22L52 14h12v44H52V30L38 50 24 30v28H12z" fill="#FFFFFF"/>
+  <!-- Red M -->
+  <path d="M38 64V20h12l14 22L78 20h12v44H78V36L64 56 50 36v28H38z" fill="#E8283F"/>
+  <!-- Separator bar -->
+  <line x1="102" y1="18" x2="102" y2="58" stroke="#E8283F" stroke-width="2.5" opacity="0.6"/>
+  <!-- Text MOVIEMATE -->
+  <text x="120" y="49" font-family="'Plus Jakarta Sans', 'Bebas Neue', sans-serif" font-weight="800" font-size="30" letter-spacing="3" fill="#FFFFFF">MOVIE<tspan fill="#E8283F">MATE</tspan></text>
+</svg>

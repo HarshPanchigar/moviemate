@@ -1,839 +1,119 @@
 {% extends 'base.html' %}
+{% load static %}
 
+{% block title %}Edit Profile{% endblock %}
 
-{% block title %}Edit Profile — MovieMate{% endblock %}
+{% block nav_profile_active %}active{% endblock %}
 
-
-{% block extra_style %}
-
-/* =========================================================
-   EDIT PROFILE PAGE
-   ========================================================= */
-
-.edit-page{
-    min-height:calc(100vh - 73px);
-
-    height:calc(100vh - 73px);
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    padding:30px 24px;
-
-    position:relative;
-
-    overflow:hidden;
-
-    background:
-        radial-gradient(
-            circle at 12% 30%,
-            rgba(232,40,63,.08),
-            transparent 32%
-        ),
-        radial-gradient(
-            circle at 88% 75%,
-            rgba(85,42,82,.10),
-            transparent 35%
-        ),
-        #0f0e15;
-}
-
-
-/* =========================================================
-   SUBTLE BACKGROUND CIRCLES
-   ========================================================= */
-
-.edit-page::before{
-    content:"";
-
-    position:absolute;
-
-    width:560px;
-
-    height:560px;
-
-    border-radius:50%;
-
-    border:1px solid rgba(232,40,63,.06);
-
-    left:-300px;
-
-    top:50%;
-
-    transform:translateY(-50%);
-
-    box-shadow:
-        0 0 0 45px rgba(232,40,63,.018),
-        0 0 0 90px rgba(232,40,63,.012);
-
-    pointer-events:none;
-}
-
-
-.edit-page::after{
-    content:"";
-
-    position:absolute;
-
-    width:450px;
-
-    height:450px;
-
-    border-radius:50%;
-
-    border:1px solid rgba(255,255,255,.035);
-
-    right:-230px;
-
-    bottom:-230px;
-
-    box-shadow:
-        0 0 0 45px rgba(255,255,255,.012),
-        0 0 0 90px rgba(255,255,255,.007);
-
-    pointer-events:none;
-}
-
-
-/* =========================================================
-   CENTER GLOW
-   ========================================================= */
-
-.edit-bg-glow{
-    position:absolute;
-
-    width:300px;
-
-    height:300px;
-
-    border-radius:50%;
-
-    background:rgba(232,40,63,.07);
-
-    filter:blur(90px);
-
-    left:50%;
-
-    top:50%;
-
-    transform:translate(-50%,-50%);
-
-    pointer-events:none;
-}
-
-
-/* =========================================================
-   MAIN SHELL
-   ========================================================= */
-
-.edit-shell{
-    width:100%;
-
-    max-width:790px;
-
-    position:relative;
-
-    z-index:2;
-}
-
-
-/* =========================================================
-   HEADER
-   ========================================================= */
-
-.edit-heading{
-    text-align:center;
-
-    margin-bottom:21px;
-}
-
-
-.edit-eyebrow{
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    gap:10px;
-
-    font-family:'Space Mono',monospace;
-
-    font-size:11px;
-
-    letter-spacing:.16em;
-
-    color:#E8283F;
-
-    margin-bottom:9px;
-}
-
-
-.edit-eyebrow::before,
-.edit-eyebrow::after{
-    content:"";
-
-    width:22px;
-
-    height:1px;
-
-    background:#E8283F;
-}
-
-
-.edit-heading h1{
-    font-family:'Bebas Neue',sans-serif;
-
-    font-size:48px;
-
-    line-height:1;
-
-    margin-bottom:7px;
-}
-
-
-.edit-heading p{
-    color:var(--text-muted);
-
-    font-size:14px;
-
-    line-height:1.4;
-}
-
-
-/* =========================================================
-   MAIN CARD
-   ========================================================= */
-
-.edit-card{
-    width:100%;
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(30,27,40,.98),
-            rgba(20,18,28,.98)
-        );
-
-    border:1px solid var(--stroke);
-
-    border-radius:16px;
-
-    padding:28px 32px;
-
-    box-shadow:
-        0 25px 60px rgba(0,0,0,.32),
-        0 0 0 1px rgba(232,40,63,.025) inset;
-}
-
-
-/* =========================================================
-   CARD HEADER
-   ========================================================= */
-
-.edit-card-header{
-    display:flex;
-
-    align-items:center;
-
-    gap:15px;
-
-    padding-bottom:18px;
-
-    margin-bottom:20px;
-
-    border-bottom:1px solid var(--stroke);
-}
-
-
-/* =========================================================
-   AVATAR
-   ========================================================= */
-
-.edit-avatar{
-    width:54px;
-
-    height:54px;
-
-    flex-shrink:0;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    border-radius:50%;
-
-    background:
-        linear-gradient(
-            145deg,
-            #E8283F,
-            #8a1c2c
-        );
-
-    color:white;
-
-    font-family:'Bebas Neue',sans-serif;
-
-    font-size:28px;
-
-    box-shadow:
-        0 8px 24px rgba(232,40,63,.18);
-}
-
-
-.edit-card-header h2{
-    font-family:'Bebas Neue',sans-serif;
-
-    font-size:26px;
-
-    line-height:1;
-
-    margin-bottom:5px;
-}
-
-
-.edit-card-header p{
-    color:var(--text-muted);
-
-    font-size:12.5px;
-
-    line-height:1.4;
-}
-
-
-/* =========================================================
-   FORM
-   ========================================================= */
-
-.edit-form{
-    display:grid;
-
-    gap:15px;
-}
-
-
-/* =========================================================
-   FIELD
-   ========================================================= */
-
-.edit-field label{
-    display:block;
-
-    font-family:'Space Mono',monospace;
-
-    font-size:10.5px;
-
-    font-weight:700;
-
-    letter-spacing:.06em;
-
-    color:var(--text-muted);
-
-    margin-bottom:6px;
-}
-
-
-.edit-input{
-    width:100%;
-
-    box-sizing:border-box;
-
-    background:#14121c;
-
-    border:1px solid var(--stroke);
-
-    border-radius:9px;
-
-    padding:12px 15px;
-
-    color:var(--text);
-
-    outline:none;
-
-    font-size:14px;
-
-    font-family:'Plus Jakarta Sans',sans-serif;
-
-    transition:
-        border-color .15s ease,
-        box-shadow .15s ease,
-        background .15s ease;
-}
-
-
-.edit-input::placeholder{
-    color:var(--text-faint);
-}
-
-
-.edit-input:focus{
-    border-color:var(--gold-dim);
-
-    background:#17151f;
-
-    box-shadow:
-        0 0 0 3px rgba(232,40,63,.06);
-}
-
-
-/* =========================================================
-   ERROR / SUCCESS MESSAGE
-   ========================================================= */
-
-.edit-message{
-    padding:10px 13px;
-
-    border-radius:8px;
-
-    font-size:12px;
-
-    line-height:1.4;
-}
-
-
-.edit-error{
-    color:#ff8a97;
-
-    background:rgba(232,40,63,.08);
-
-    border:1px solid rgba(232,40,63,.25);
-}
-
-
-.edit-success{
-    color:#75d49a;
-
-    background:rgba(117,212,154,.07);
-
-    border:1px solid rgba(117,212,154,.20);
-}
-
-
-/* =========================================================
-   ACTIONS
-   ========================================================= */
-
-.edit-actions{
-    display:flex;
-
-    gap:11px;
-
-    margin-top:5px;
-
-    padding-top:18px;
-
-    border-top:1px solid var(--stroke);
-}
-
-
-.edit-actions .btn{
-    min-width:145px;
-
-    padding:12px 20px;
-
-    font-size:13px;
-}
-
-
-/* =========================================================
-   BACK LINK
-   ========================================================= */
-
-.edit-back{
-    text-align:center;
-
-    margin-top:13px;
-}
-
-
-.edit-back a{
-    color:var(--text-faint);
-
-    font-family:'Space Mono',monospace;
-
-    font-size:10px;
-
-    transition:color .15s ease;
-}
-
-
-.edit-back a:hover{
-    color:#E8283F;
-}
-
-
-/* =========================================================
-   MOBILE
-   ========================================================= */
-
-@media(max-width:700px){
-
-    .edit-page{
-        height:auto;
-
-        min-height:calc(100vh - 73px);
-
-        padding:40px 18px 50px;
-
-        align-items:flex-start;
-
-        overflow:visible;
-    }
-
-
-    .edit-heading{
-        margin-top:5px;
-    }
-
-
-    .edit-card{
-        padding:24px 22px;
-    }
-
-}
-
-
-@media(max-width:520px){
-
-    .edit-heading h1{
-        font-size:40px;
-    }
-
-
-    .edit-heading p{
-        font-size:13px;
-    }
-
-
-    .edit-card-header{
-        align-items:flex-start;
-
-        gap:12px;
-    }
-
-
-    .edit-avatar{
-        width:48px;
-
-        height:48px;
-
-        font-size:25px;
-    }
-
-
-    .edit-card-header h2{
-        font-size:23px;
-    }
-
-
-    .edit-card-header p{
-        font-size:11px;
-    }
-
-
-    .edit-input{
-        font-size:13px;
-
-        padding:12px 13px;
-    }
-
-
-    .edit-actions{
-        flex-direction:column;
-    }
-
-
-    .edit-actions .btn{
-        width:100%;
-
-        min-width:0;
-    }
-
-}
-
+{% block extra_head %}
+  <link rel="stylesheet" href="{% static 'accounts/css/profile.css' %}" />
 {% endblock %}
-
-
 
 {% block content %}
 
 <main class="edit-page">
 
-
     <!-- SUBTLE BACKGROUND GLOW -->
-
     <div class="edit-bg-glow"></div>
 
-
     <div class="edit-shell">
-
 
         <!-- =================================================
              PAGE HEADER
              ================================================= -->
-
         <div class="edit-heading">
-
-
             <div class="edit-eyebrow">
-
                 ACCOUNT SETTINGS
-
             </div>
 
-
             <h1>
-
                 EDIT PROFILE
-
             </h1>
 
-
             <p>
-
                 Keep your MovieMate account information up to date.
-
             </p>
-
-
         </div>
-
-
 
         <!-- =================================================
              EDIT CARD
              ================================================= -->
-
         <div class="edit-card">
 
-
             <!-- CARD HEADER -->
-
             <div class="edit-card-header">
-
-
                 <div class="edit-avatar">
-
                     {{ customer.full_name|first|upper }}
-
                 </div>
-
 
                 <div>
-
                     <h2>
-
                         Personal Information
-
                     </h2>
-
-
                     <p>
-
                         Update the details connected to your account.
-
                     </p>
-
                 </div>
-
-
             </div>
-
-
 
             <!-- =================================================
                  FORM
                  ================================================= -->
-
-            <form
-                method="POST"
-                class="edit-form"
-            >
-
+            <form method="POST" class="edit-form">
                 {% csrf_token %}
 
-
-                <!-- =================================================
-                     MESSAGES
-                     ================================================= -->
-
+                <!-- MESSAGES -->
                 {% if messages %}
-
                     {% for message in messages %}
-
-                        <div
-                            class="
-                                edit-message
-                                {% if message.tags == 'success' %}
-                                    edit-success
-                                {% else %}
-                                    edit-error
-                                {% endif %}
-                            "
-                        >
-
+                        <div class="edit-message {% if message.tags == 'success' %}edit-success{% else %}edit-error{% endif %}">
                             {{ message }}
-
                         </div>
-
                     {% endfor %}
-
                 {% endif %}
 
-
-
-                <!-- =================================================
-                     FULL NAME
-                     ================================================= -->
-
+                <!-- FULL NAME -->
                 <div class="edit-field">
-
-
-                    <label for="full_name">
-
-                        FULL NAME
-
-                    </label>
-
-
-                    <input
-                        id="full_name"
-                        class="edit-input"
-                        type="text"
-                        name="full_name"
-                        value="{{ customer.full_name }}"
-                        placeholder="Enter your full name"
-                        required
-                    >
-
-
+                    <label for="full_name">FULL NAME</label>
+                    <input id="full_name" class="edit-input" type="text" name="full_name" value="{{ customer.full_name }}" placeholder="Enter your full name" required>
                 </div>
 
-
-
-                <!-- =================================================
-                     EMAIL
-                     ================================================= -->
-
+                <!-- EMAIL -->
                 <div class="edit-field">
-
-
-                    <label for="email">
-
-                        EMAIL ADDRESS
-
-                    </label>
-
-
-                    <input
-                        id="email"
-                        class="edit-input"
-                        type="email"
-                        name="email"
-                        value="{{ customer.email }}"
-                        placeholder="you@example.com"
-                        required
-                    >
-
-
+                    <label for="email">EMAIL ADDRESS</label>
+                    <input id="email" class="edit-input" type="email" name="email" value="{{ customer.email }}" placeholder="you@example.com" required>
                 </div>
 
-
-
-                <!-- =================================================
-                     MOBILE
-                     ================================================= -->
-
+                <!-- MOBILE -->
                 <div class="edit-field">
-
-
-                    <label for="mobile">
-
-                        MOBILE NUMBER
-
-                    </label>
-
-
-                    <input
-                        id="mobile"
-                        class="edit-input"
-                        type="tel"
-                        name="mobile"
-                        value="{{ customer.mobile }}"
-                        placeholder="Enter your mobile number"
-                        maxlength="15"
-                        required
-                    >
-
-
+                    <label for="mobile">MOBILE NUMBER</label>
+                    <input id="mobile" class="edit-input" type="tel" name="mobile" value="{{ customer.mobile }}" placeholder="Enter your mobile number" maxlength="15" required>
                 </div>
 
-
-
-                <!-- =================================================
-                     ACTIONS
-                     ================================================= -->
-
+                <!-- ACTIONS -->
                 <div class="edit-actions">
-
-
-                    <button
-                        type="submit"
-                        class="btn btn-gold"
-                    >
-
+                    <button type="submit" class="btn btn-gold">
                         Save Changes
-
                     </button>
-
-
-                    <a
-                        href="{% url 'profile' %}"
-                        class="btn btn-ghost"
-                    >
-
+                    <a href="{% url 'profile' %}" class="btn btn-ghost">
                         Cancel
-
                     </a>
-
-
                 </div>
-
-
             </form>
 
-
         </div>
 
-
-
-        <!-- =================================================
-             BACK TO PROFILE
-             ================================================= -->
-
+        <!-- BACK TO PROFILE -->
         <div class="edit-back">
-
             <a href="{% url 'profile' %}">
-
                 ← Back to Profile
-
             </a>
-
         </div>
-
 
     </div>
 
 </main>
 
 {% endblock %}
-
-
 
 {% block footer %}
 {% endblock %}

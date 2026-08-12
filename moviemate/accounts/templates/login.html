@@ -1,181 +1,440 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Log in — MovieMate{% endblock %}
+{% block title %}Log in{% endblock %}
 
-{% block extra_style %}
-  .auth-shell{min-height:calc(100vh - 73px);display:grid;grid-template-columns:1fr 0.92fr;}
-  .auth-visual{
-    position:relative;background:linear-gradient(165deg,#1c1730,#3a1f3f 55%,#5c2a3e);
-    display:flex;flex-direction:column;justify-content:center;gap:28px;padding:48px 56px 48px 48px;overflow:hidden;
-  }
-  .auth-visual-mid{position:relative;max-width:480px;}
-  .auth-visual-mid .display{font-size:clamp(40px,5.2vw,60px);line-height:1.02;margin-bottom:16px;}
-  .auth-visual-mid p{color:rgba(243,241,236,0.68);font-size:16.5px;line-height:1.65;max-width:420px;}
-  .stub-float{
-    position:relative;margin-top:30px;max-width:420px;isolation:isolate;
-    animation:ticketFloat 5s ease-in-out infinite;
-  }
-  .stub-float::before{
-    content:"";position:absolute;inset:-16px;z-index:-1;border-radius:24px;filter:blur(16px);
-    background:radial-gradient(ellipse at center, rgba(232,40,63,0.4), transparent 70%);
-  }
-  .stub-card{
-    position:relative;background:linear-gradient(160deg, rgba(40,33,55,0.92), rgba(17,16,24,0.94));
-    backdrop-filter:blur(10px);border:1px solid rgba(232,40,63,0.35);border-radius:16px;
-    padding:22px 26px;overflow:hidden;
-    box-shadow:
-      0 0 0 1px rgba(232,40,63,0.06) inset,
-      0 22px 50px -18px rgba(0,0,0,0.65),
-      0 0 40px -6px rgba(232,40,63,0.35);
-    animation:ticketGlowPulse 3.2s ease-in-out infinite;
-  }
-  .stub-shine{
-    position:absolute;top:-60%;left:-60%;width:35%;height:220%;
-    background:linear-gradient(75deg, transparent, rgba(255,255,255,0.16), transparent);
-    transform:rotate(18deg);animation:shineSweep 3.6s ease-in-out infinite;pointer-events:none;
-  }
-  .stub-badge{
-    position:absolute;top:12px;right:-30px;transform:rotate(40deg);
-    background:linear-gradient(90deg,#8a1c2c,var(--rose));color:#1a0e12;
-    font-family:'Space Mono',monospace;font-size:9.5px;font-weight:700;letter-spacing:0.08em;
-    padding:3px 34px;box-shadow:0 3px 10px rgba(0,0,0,0.35);
-  }
-  .stub-float .row{display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:12.5px;color:var(--text-muted);margin-bottom:8px;position:relative;z-index:1;}
-  .stub-float .row b{color:var(--text);font-size:13px;}
-  .stub-float .perf-mini{
-    height:12px;position:relative;z-index:1;
-    background-image:radial-gradient(circle 4px, #14121c 4px, transparent 4.4px);
-    background-size:14px 12px;background-position:center;background-repeat:repeat-x;margin:14px -26px;
-  }
-  .stub-float .perf-mini::after{
-    content:"";position:absolute;left:20px;right:20px;top:50%;height:1px;transform:translateY(-50%);
-    background:linear-gradient(90deg, transparent, rgba(232,40,63,0.55), transparent);
-  }
-  @keyframes ticketFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
-  @keyframes ticketGlowPulse{
-    0%,100%{box-shadow:0 0 0 1px rgba(232,40,63,0.06) inset, 0 22px 50px -18px rgba(0,0,0,0.65), 0 0 28px -8px rgba(232,40,63,0.28);}
-    50%{box-shadow:0 0 0 1px rgba(232,40,63,0.1) inset, 0 26px 60px -16px rgba(0,0,0,0.7), 0 0 44px -4px rgba(232,40,63,0.5);}
-  }
-  @keyframes shineSweep{
-    0%{left:-60%;}
-    55%{left:130%;}
-    100%{left:130%;}
-  }
-  .auth-visual-bottom{position:relative;font-family:'Space Mono',monospace;font-size:11.5px;color:var(--text-faint);letter-spacing:0.04em;}
-
-  .auth-form-wrap{display:flex;align-items:center;justify-content:center;padding:48px 40px 48px 56px;}
-  .auth-form{width:100%;max-width:380px;}
-  .auth-form h1{font-family:'Bebas Neue';font-size:36px;margin-bottom:8px;}
-  .auth-form .lead{color:var(--text-muted);font-size:14.5px;margin-bottom:30px;}
-  .form-error{
-    background:rgba(232,40,63,0.1);border:1px solid rgba(232,40,63,0.35);color:#ff8a97;
-    font-size:13px;padding:10px 14px;border-radius:8px;margin-bottom:18px;
-  }
-  .field{margin-bottom:16px;}
-  .field label{display:block;font-size:12.5px;font-weight:700;color:var(--text-muted);margin-bottom:7px;letter-spacing:0.02em;}
-  .field .input-row{display:flex;align-items:center;background:var(--bg-surface);border:1px solid var(--stroke);border-radius:10px;padding:0 14px;transition:border-color .15s ease;}
-  .field .input-row:focus-within{border-color:var(--gold-dim);}
-  .field input{
-    flex:1;background:none;border:none;outline:none;color:var(--text);padding:12px 0;font-size:14px;font-family:'Plus Jakarta Sans',sans-serif;
-  }
-  .field input::placeholder{color:var(--text-faint);}
-  .field .toggle-eye{background:none;border:none;color:var(--text-faint);font-size:12px;font-weight:700;}
-  .row-between{display:flex;justify-content:space-between;align-items:center;margin:4px 0 22px;font-size:13px;}
-  .checkline{display:flex;align-items:center;gap:8px;color:var(--text-muted);}
-  .checkline input{accent-color:var(--gold);}
-  .link-gold{color:var(--gold);font-weight:700;}
-  .divider-text{display:flex;align-items:center;gap:12px;margin:22px 0;color:var(--text-faint);font-size:12px;}
-  .divider-text::before,.divider-text::after{content:"";flex:1;height:1px;background:var(--stroke);}
-  .social-row{display:flex;gap:12px;}
-  .social-btn{
-    flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:11px;border-radius:10px;
-    border:1px solid var(--stroke);background:var(--bg-surface);font-size:13px;font-weight:700;color:var(--text);
-  }
-  .social-btn:hover{border-color:var(--gold-dim);}
-  .switch-line{text-align:center;margin-top:26px;font-size:13.5px;color:var(--text-muted);}
-
-  @media(max-width:860px){
-    .auth-shell{grid-template-columns:1fr;}
-    .auth-visual{display:none;}
-  }
+{% block extra_head %}
+  <link rel="stylesheet" href="{% static 'accounts/css/auth.css' %}" />
 {% endblock %}
+
+
 
 {% block content %}
+
 <main>
-  <div class="auth-shell">
-    <div class="auth-visual">
-      <div class="auth-visual-mid">
-        <div class="display">Welcome back<br>to the front row.</div>
-        <p>Sign in to grab your seats before the show sells out, and keep every ticket in one place.</p>
-        <div class="stub-float">
-          <div class="stub-card">
-            <span class="stub-badge">CONFIRMED</span>
-            <span class="stub-shine"></span>
-            <div class="row"><span>FILM</span><b>CRIMSON HORIZON</b></div>
-            <div class="row"><span>SCREEN</span><b>04 · GOLD</b></div>
-            <div class="perf-mini"></div>
-            <div class="row"><span>SEAT</span><b>G12, G13</b></div>
-            <div class="row"><span>SHOW</span><b>07:45 PM</b></div>
-          </div>
+
+    <div class="auth-shell">
+
+
+        <!-- =================================================
+             LEFT SIDE
+             ================================================= -->
+
+        <div class="auth-visual">
+
+
+            <div class="auth-visual-mid">
+
+
+                <div class="display">
+
+                    Welcome back<br>
+
+                    to the front row.
+
+                </div>
+
+
+                <p>
+
+                    Sign in to grab your seats before the show
+                    sells out, and keep every ticket in one place.
+
+                </p>
+
+
+                <!-- TICKET -->
+
+                <div class="stub-float">
+
+
+                    <div class="stub-card">
+
+
+                        <span class="stub-badge">
+
+                            CONFIRMED
+
+                        </span>
+
+
+                        <span class="stub-shine"></span>
+
+
+                        <div class="row">
+
+                            <span>
+
+                                FILM
+
+                            </span>
+
+                            <b>
+
+                                CRIMSON HORIZON
+
+                            </b>
+
+                        </div>
+
+
+                        <div class="row">
+
+                            <span>
+
+                                SCREEN
+
+                            </span>
+
+                            <b>
+
+                                04 · GOLD
+
+                            </b>
+
+                        </div>
+
+
+                        <div class="perf-mini"></div>
+
+
+                        <div class="row">
+
+                            <span>
+
+                                SEAT
+
+                            </span>
+
+                            <b>
+
+                                G12, G13
+
+                            </b>
+
+                        </div>
+
+
+                        <div class="row">
+
+                            <span>
+
+                                SHOW
+
+                            </span>
+
+                            <b>
+
+                                07:45 PM
+
+                            </b>
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+            <div class="auth-visual-bottom">
+
+                TICKET NO. MM-2026-08-07 · AHMEDABAD
+
+            </div>
+
+
         </div>
-      </div>
-      <div class="auth-visual-bottom">TICKET NO. MM-2026-08-07 · AHMEDABAD</div>
+
+
+
+        <!-- =================================================
+             LOGIN FORM
+             ================================================= -->
+
+        <div class="auth-form-wrap">
+
+
+            <form
+                class="auth-form"
+                method="post"
+                action="{% url 'login' %}"
+            >
+
+                {% csrf_token %}
+
+
+                <h1>
+
+                    Log in
+
+                </h1>
+
+
+                <p class="lead">
+
+                    New to MovieMate?
+
+                    <a
+                        href="{% url 'signup' %}"
+                        class="link-gold"
+                    >
+
+                        Create an account
+
+                    </a>
+
+                </p>
+
+
+
+                <!-- =================================================
+                     LOGIN ERROR
+                     ================================================= -->
+
+                {% if login_error %}
+
+                    <div class="form-error">
+
+
+                        <span class="form-error-icon">
+
+                            !
+
+                        </span>
+
+
+                        <span>
+
+                            {{ login_error }}
+
+                        </span>
+
+
+                    </div>
+
+                {% endif %}
+
+
+
+                <!-- =================================================
+                     EMAIL
+                     ================================================= -->
+
+                <div class="field">
+
+
+                    <label for="id_username">
+
+                        Email address
+
+                    </label>
+
+
+                    <div class="input-row">
+
+
+                        <input
+                            id="id_username"
+                            name="username"
+                            type="email"
+                            value="{{ request.POST.username|default:'' }}"
+                            placeholder="you@example.com"
+                            autocomplete="email"
+                            required
+                        />
+
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- =================================================
+                     PASSWORD
+                     ================================================= -->
+
+                <div class="field">
+
+
+                    <label for="id_password">
+
+                        Password
+
+                    </label>
+
+
+                    <div class="input-row">
+
+
+                        <input
+                            id="id_password"
+                            name="password"
+                            type="password"
+                            placeholder="Enter your password"
+                            autocomplete="current-password"
+                            required
+                        />
+
+
+                        <button
+                            type="button"
+                            class="toggle-eye"
+                            onclick="toggleEye(
+                                'id_password',
+                                this
+                            )"
+                        >
+
+                            SHOW
+
+                        </button>
+
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- =================================================
+                     REMEMBER / FORGOT
+                     ================================================= -->
+
+                <div class="row-between">
+
+
+                    <label class="checkline">
+
+
+                        <input
+                            type="checkbox"
+                            name="remember"
+                            {% if request.POST.remember %}
+                                checked
+                            {% endif %}
+                        />
+
+
+                        Remember me
+
+
+                    </label>
+
+
+                    <a
+                        href="#"
+                        class="link-gold"
+                    >
+
+                        Forgot password?
+
+                    </a>
+
+
+                </div>
+
+
+
+                <!-- =================================================
+                     LOGIN BUTTON
+                     ================================================= -->
+
+                <button
+                    class="btn btn-gold btn-block"
+                    type="submit"
+                >
+
+                    Log in
+
+                </button>
+
+
+
+                <!-- =================================================
+                     SOCIAL LOGIN
+                     ================================================= -->
+
+                <div class="divider-text">
+
+                    OR CONTINUE WITH
+
+                </div>
+
+
+                <div class="social-row">
+
+
+                    <button
+                        type="button"
+                        class="social-btn"
+                    >
+
+                        G Google
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="social-btn"
+                    >
+
+                        Apple
+
+                    </button>
+
+
+                </div>
+
+
+
+                <!-- =================================================
+                     SIGN UP
+                     ================================================= -->
+
+                <p class="switch-line">
+
+                    Don't have an account?
+
+                    <a
+                        href="{% url 'signup' %}"
+                        class="link-gold"
+                    >
+
+                        Sign up
+
+                    </a>
+
+                </p>
+
+
+            </form>
+
+
+        </div>
+
+
     </div>
 
-    <div class="auth-form-wrap">
-      <form class="auth-form" method="post" action="{% url 'login' %}">
-        {% csrf_token %}
-        <h1>Log in</h1>
-        <p class="lead">New to MovieMate? <a href="{% url 'signup' %}" class="link-gold">Create an account</a></p>
-
-        {% if form.non_field_errors %}
-          <div class="form-error">{{ form.non_field_errors.0 }}</div>
-        {% endif %}
-
-        <div class="field">
-          <label for="id_username">Email address</label>
-          <div class="input-row">
-            <input id="id_username" name="username" type="email" placeholder="you@example.com" required />
-          </div>
-        </div>
-
-        <div class="field">
-          <label for="id_password">Password</label>
-          <div class="input-row">
-            <input id="id_password" name="password" type="password" placeholder="Enter your password" required />
-            <button type="button" class="toggle-eye" onclick="toggleEye('id_password',this)">SHOW</button>
-          </div>
-        </div>
-
-        <div class="row-between">
-          <label class="checkline"><input type="checkbox" name="remember" /> Remember me</label>
-          <a href="#" class="link-gold">Forgot password?</a>
-        </div>
-
-        <button class="btn btn-gold btn-block" type="submit">Log in</button>
-
-        <div class="divider-text">OR CONTINUE WITH</div>
-        <div class="social-row">
-          <button type="button" class="social-btn">G Google</button>
-          <button type="button" class="social-btn"> Apple</button>
-        </div>
-
-        <p class="switch-line">Don't have an account? <a href="{% url 'signup' %}" class="link-gold">Sign up</a></p>
-      </form>
-    </div>
-  </div>
 </main>
+
 {% endblock %}
+
+
+
 {% block footer %}
 {% endblock %}
 
+
+
 {% block extra_js %}
-<script>
-  function toggleEye(inputId, btn){
-    const input = document.getElementById(inputId);
-    const isPw = input.type === 'password';
-    input.type = isPw ? 'text' : 'password';
-    btn.textContent = isPw ? 'HIDE' : 'SHOW';
-  }
-</script>
+  <script src="{% static 'accounts/js/auth.js' %}"></script>
 {% endblock %}

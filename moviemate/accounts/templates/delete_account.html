@@ -1,901 +1,112 @@
 {% extends 'base.html' %}
+{% load static %}
 
+{% block title %}Delete Account{% endblock %}
 
-{% block title %}Delete Account — MovieMate{% endblock %}
+{% block nav_profile_active %}active{% endblock %}
 
-
-{% block extra_style %}
-
-/* =========================================================
-   DELETE ACCOUNT PAGE
-   ========================================================= */
-
-.delete-page{
-    min-height:calc(100vh - 73px);
-
-    height:calc(100vh - 73px);
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    padding:30px 24px;
-
-    position:relative;
-
-    overflow:hidden;
-
-    background:
-        radial-gradient(
-            circle at 15% 35%,
-            rgba(232,40,63,.09),
-            transparent 32%
-        ),
-        radial-gradient(
-            circle at 85% 70%,
-            rgba(80,35,70,.10),
-            transparent 35%
-        ),
-        #0f0e15;
-}
-
-
-/* =========================================================
-   BACKGROUND DECORATION
-   ========================================================= */
-
-.delete-page::before{
-    content:"";
-
-    position:absolute;
-
-    width:540px;
-
-    height:540px;
-
-    border-radius:50%;
-
-    border:1px solid rgba(232,40,63,.055);
-
-    left:-290px;
-
-    top:50%;
-
-    transform:translateY(-50%);
-
-    box-shadow:
-        0 0 0 45px rgba(232,40,63,.018),
-        0 0 0 90px rgba(232,40,63,.010);
-
-    pointer-events:none;
-}
-
-
-.delete-page::after{
-    content:"";
-
-    position:absolute;
-
-    width:430px;
-
-    height:430px;
-
-    border-radius:50%;
-
-    border:1px solid rgba(255,255,255,.03);
-
-    right:-220px;
-
-    bottom:-220px;
-
-    box-shadow:
-        0 0 0 45px rgba(255,255,255,.01),
-        0 0 0 90px rgba(255,255,255,.006);
-
-    pointer-events:none;
-}
-
-
-/* =========================================================
-   CENTER GLOW
-   ========================================================= */
-
-.delete-bg-glow{
-    position:absolute;
-
-    width:280px;
-
-    height:280px;
-
-    border-radius:50%;
-
-    background:rgba(232,40,63,.07);
-
-    filter:blur(90px);
-
-    left:50%;
-
-    top:50%;
-
-    transform:translate(-50%,-50%);
-
-    pointer-events:none;
-}
-
-
-/* =========================================================
-   MAIN SHELL
-   ========================================================= */
-
-.delete-shell{
-    width:100%;
-
-    max-width:700px;
-
-    position:relative;
-
-    z-index:2;
-}
-
-
-/* =========================================================
-   HEADER
-   ========================================================= */
-
-.delete-heading{
-    text-align:center;
-
-    margin-bottom:20px;
-}
-
-
-.delete-eyebrow{
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    gap:10px;
-
-    font-family:'Plus Jakarta Sans',monospace;
-
-    font-size:11px;
-
-    letter-spacing:.16em;
-
-    color:#ff6878;
-
-    margin-bottom:9px;
-}
-
-
-.delete-eyebrow::before,
-.delete-eyebrow::after{
-    content:"";
-
-    width:22px;
-
-    height:1px;
-
-    background:#E8283F;
-}
-
-
-.delete-heading h1{
-    font-family:'Bebas Neue',sans-serif;
-
-    font-size:48px;
-
-    line-height:1;
-
-    margin-bottom:7px;
-}
-
-
-.delete-heading p{
-    color:var(--text-muted);
-
-    font-size:14px;
-
-    line-height:1.4;
-}
-
-
-/* =========================================================
-   MAIN CARD
-   ========================================================= */
-
-.delete-card{
-    width:100%;
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(30,27,40,.98),
-            rgba(20,18,28,.98)
-        );
-
-    border:1px solid rgba(232,40,63,.22);
-
-    border-radius:16px;
-
-    padding:30px 32px;
-
-    box-shadow:
-        0 25px 60px rgba(0,0,0,.32),
-        0 0 0 1px rgba(232,40,63,.025) inset;
-}
-
-
-/* =========================================================
-   WARNING HEADER
-   ========================================================= */
-
-.delete-warning{
-    display:flex;
-
-    align-items:center;
-
-    gap:16px;
-
-    padding-bottom:20px;
-
-    margin-bottom:20px;
-
-    border-bottom:1px solid var(--stroke);
-}
-
-
-.delete-icon{
-    width:55px;
-
-    height:55px;
-
-    flex-shrink:0;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    border-radius:12px;
-
-    color:#ff6878;
-
-    background:rgba(232,40,63,.09);
-
-    border:1px solid rgba(232,40,63,.20);
-}
-
-
-.delete-warning h2{
-    font-family:'Bebas Neue',sans-serif;
-
-    font-size:27px;
-
-    line-height:1;
-
-    margin-bottom:5px;
-}
-
-
-.delete-warning p{
-    color:var(--text-muted);
-
-    font-size:12.5px;
-
-    line-height:1.4;
-}
-
-
-/* =========================================================
-   ACCOUNT INFO
-   ========================================================= */
-
-.delete-account-info{
-    display:flex;
-
-    align-items:center;
-
-    gap:14px;
-
-    padding:14px 15px;
-
-    margin-bottom:17px;
-
-    background:#14121c;
-
-    border:1px solid var(--stroke);
-
-    border-radius:10px;
-}
-
-
-.delete-avatar{
-    width:46px;
-
-    height:46px;
-
-    flex-shrink:0;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    border-radius:50%;
-
-    background:
-        linear-gradient(
-            145deg,
-            #E8283F,
-            #8a1c2c
-        );
-
-    color:white;
-
-    font-family:'Bebas Neue',sans-serif;
-
-    font-size:24px;
-}
-
-
-.delete-account-details{
-    min-width:0;
-}
-
-
-.delete-account-details small{
-    display:block;
-
-    font-family:'Space Mono',monospace;
-
-    font-size:9px;
-
-    color:var(--text-faint);
-
-    letter-spacing:.06em;
-
-    margin-bottom:4px;
-}
-
-
-.delete-account-details strong{
-    display:block;
-
-    font-size:14px;
-
-    color:var(--text);
-
-    margin-bottom:2px;
-
-    word-break:break-word;
-}
-
-
-.delete-account-details span{
-    display:block;
-
-    font-size:11px;
-
-    color:var(--text-muted);
-
-    word-break:break-word;
-}
-
-
-/* =========================================================
-   WARNING MESSAGE
-   ========================================================= */
-
-.delete-danger-box{
-    padding:14px 15px;
-
-    margin-bottom:18px;
-
-    border-radius:10px;
-
-    background:rgba(232,40,63,.055);
-
-    border:1px solid rgba(232,40,63,.18);
-}
-
-
-.delete-danger-box strong{
-    display:block;
-
-    color:#ff7b88;
-
-    font-size:13px;
-
-    margin-bottom:6px;
-}
-
-
-.delete-danger-box p{
-    color:var(--text-muted);
-
-    font-size:11.5px;
-
-    line-height:1.55;
-
-    margin:0;
-}
-
-
-/* =========================================================
-   CONFIRMATION
-   ========================================================= */
-
-.delete-confirm{
-    display:flex;
-
-    align-items:flex-start;
-
-    gap:9px;
-
-    margin-bottom:19px;
-
-    color:var(--text-muted);
-
-    font-size:12px;
-
-    line-height:1.5;
-}
-
-
-.delete-confirm input{
-    margin-top:3px;
-
-    accent-color:#E8283F;
-
-    flex-shrink:0;
-}
-
-
-.delete-confirm label{
-    cursor:pointer;
-}
-
-
-/* =========================================================
-   ACTIONS
-   ========================================================= */
-
-.delete-actions{
-    display:flex;
-
-    gap:11px;
-
-    padding-top:19px;
-
-    border-top:1px solid var(--stroke);
-}
-
-
-.delete-actions .btn{
-    min-width:150px;
-
-    padding:12px 20px;
-
-    font-size:13px;
-}
-
-
-.delete-btn{
-    background:#E8283F !important;
-
-    border-color:#E8283F !important;
-
-    color:white !important;
-
-    opacity:.45;
-
-    cursor:not-allowed;
-
-    transition:
-        opacity .15s ease,
-        background .15s ease,
-        transform .15s ease;
-}
-
-
-.delete-btn.ready{
-    opacity:1;
-
-    cursor:pointer;
-}
-
-
-.delete-btn.ready:hover{
-    background:#c91f34 !important;
-
-    border-color:#c91f34 !important;
-
-    transform:translateY(-1px);
-}
-
-
-/* =========================================================
-   BACK LINK
-   ========================================================= */
-
-.delete-back{
-    text-align:center;
-
-    margin-top:13px;
-}
-
-
-.delete-back a{
-    color:var(--text-faint);
-
-    font-family:'Space Mono',monospace;
-
-    font-size:10px;
-
-    transition:color .15s ease;
-}
-
-
-.delete-back a:hover{
-    color:#E8283F;
-}
-
-
-/* =========================================================
-   MOBILE
-   ========================================================= */
-
-@media(max-width:600px){
-
-    .delete-page{
-        height:auto;
-
-        min-height:calc(100vh - 73px);
-
-        padding:40px 18px 50px;
-
-        align-items:flex-start;
-
-        overflow:visible;
-    }
-
-
-    .delete-heading{
-        margin-top:5px;
-    }
-
-
-    .delete-heading h1{
-        font-size:40px;
-    }
-
-
-    .delete-card{
-        padding:24px 20px;
-    }
-
-
-    .delete-warning{
-        align-items:flex-start;
-
-        gap:12px;
-    }
-
-
-    .delete-icon{
-        width:48px;
-
-        height:48px;
-    }
-
-
-    .delete-warning h2{
-        font-size:23px;
-    }
-
-
-    .delete-warning p{
-        font-size:11px;
-    }
-
-
-    .delete-actions{
-        flex-direction:column;
-    }
-
-
-    .delete-actions .btn{
-        width:100%;
-
-        min-width:0;
-    }
-
-}
-
+{% block extra_head %}
+  <link rel="stylesheet" href="{% static 'accounts/css/auth.css' %}" />
 {% endblock %}
-
-
 
 {% block content %}
 
 <main class="delete-page">
 
-
     <!-- SUBTLE BACKGROUND GLOW -->
-
     <div class="delete-bg-glow"></div>
 
-
     <div class="delete-shell">
-
 
         <!-- =================================================
              PAGE HEADER
              ================================================= -->
-
         <div class="delete-heading">
-
-
             <div class="delete-eyebrow">
-
                 ACCOUNT
-
             </div>
 
-
             <h1>
-
                 DELETE ACCOUNT
-
             </h1>
 
-
             <p>
-
                 We're sorry to see you go.
-
             </p>
-
-
         </div>
-
-
 
         <!-- =================================================
              DELETE CARD
              ================================================= -->
-
         <div class="delete-card">
 
-
             <!-- WARNING HEADER -->
-
             <div class="delete-warning">
-
-
                 <div class="delete-icon">
-
-                    <svg
-                        width="25"
-                        height="25"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                    >
-
-                        <path
-                            d="M10.3 3.9 2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"
-                        ></path>
-
-                        <line
-                            x1="12"
-                            y1="9"
-                            x2="12"
-                            y2="13"
-                        ></line>
-
-                        <line
-                            x1="12"
-                            y1="17"
-                            x2="12.01"
-                            y2="17"
-                        ></line>
-
+                    <svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M10.3 3.9 2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"></path>
+                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
                     </svg>
-
                 </div>
-
 
                 <div>
-
-                    <h2>
-
-                        Are you sure?
-
-                    </h2>
-
-
-                    <p>
-
-                        This action cannot be undone.
-
-                    </p>
-
+                    <h2>Are you sure?</h2>
+                    <p>This action cannot be undone.</p>
                 </div>
-
-
             </div>
 
-
-
-            <!-- =================================================
-                 ACCOUNT INFORMATION
-                 ================================================= -->
-
+            <!-- ACCOUNT INFORMATION -->
             <div class="delete-account-info">
-
-
                 <div class="delete-avatar">
-
                     {{ customer.full_name|first|upper }}
-
                 </div>
-
 
                 <div class="delete-account-details">
-
-                    <small>
-
-                        ACCOUNT TO BE DELETED
-
-                    </small>
-
-
-                    <strong>
-
-                        {{ customer.full_name }}
-
-                    </strong>
-
-
-                    <span>
-
-                        {{ customer.email }}
-
-                    </span>
-
+                    <small>ACCOUNT TO BE DELETED</small>
+                    <strong>{{ customer.full_name }}</strong>
+                    <span>{{ customer.email }}</span>
                 </div>
-
-
             </div>
 
-
-
-            <!-- =================================================
-                 DANGER MESSAGE
-                 ================================================= -->
-
+            <!-- DANGER MESSAGE -->
             <div class="delete-danger-box">
-
-
-                <strong>
-
-                    This will permanently delete your account.
-
-                </strong>
-
-
+                <strong>This will permanently delete your account.</strong>
                 <p>
-
-                    Your MovieMate account and associated profile
-                    information will be removed permanently.
-                    You will not be able to recover this account
-                    after deletion.
-
+                    Your MovieMate account and associated profile information will be removed permanently.
+                    You will not be able to recover this account after deletion.
                 </p>
-
-
             </div>
 
-
-
-            <!-- =================================================
-                 CONFIRMATION
-                 ================================================= -->
-
+            <!-- CONFIRMATION -->
             <div class="delete-confirm">
-
-
-                <input
-                    type="checkbox"
-                    id="confirm-delete"
-                    onchange="toggleDeleteButton()"
-                >
-
-
+                <input type="checkbox" id="confirm-delete" onchange="toggleDeleteButton()">
                 <label for="confirm-delete">
-
-                    I understand that deleting my account is permanent
-                    and I want to continue.
-
+                    I understand that deleting my account is permanent and I want to continue.
                 </label>
-
-
             </div>
 
-
-
-            <!-- =================================================
-                 ACTIONS
-                 ================================================= -->
-
-            <form
-                method="POST"
-                action="{% url 'delete_account' %}"
-            >
-
+            <!-- ACTIONS -->
+            <form method="POST" action="{% url 'delete_account' %}">
                 {% csrf_token %}
-
-
                 <div class="delete-actions">
-
-
-                    <button
-                        type="submit"
-                        id="delete-button"
-                        class="btn delete-btn"
-                        disabled
-                    >
-
+                    <button type="submit" id="delete-button" class="btn delete-btn" disabled>
                         Delete My Account
-
                     </button>
-
-
-                    <a
-                        href="{% url 'profile' %}"
-                        class="btn btn-ghost"
-                    >
-
+                    <a href="{% url 'profile' %}" class="btn btn-ghost">
                         Keep My Account
-
                     </a>
-
-
                 </div>
-
-
             </form>
 
-
         </div>
 
-
-
-        <!-- =================================================
-             BACK LINK
-             ================================================= -->
-
+        <!-- BACK LINK -->
         <div class="delete-back">
-
             <a href="{% url 'profile' %}">
-
                 ← Back to Profile
-
             </a>
-
         </div>
-
 
     </div>
 
@@ -903,44 +114,9 @@
 
 {% endblock %}
 
-
-
 {% block footer %}
 {% endblock %}
 
-
-
 {% block extra_js %}
-
-<script>
-
-function toggleDeleteButton(){
-
-    const checkbox =
-        document.getElementById("confirm-delete");
-
-    const button =
-        document.getElementById("delete-button");
-
-
-    if(checkbox.checked){
-
-        button.disabled = false;
-
-        button.classList.add("ready");
-
-    }
-
-    else{
-
-        button.disabled = true;
-
-        button.classList.remove("ready");
-
-    }
-
-}
-
-</script>
-
+  <script src="{% static 'accounts/js/auth.js' %}"></script>
 {% endblock %}

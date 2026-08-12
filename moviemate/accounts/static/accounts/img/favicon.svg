@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 74" width="96" height="74" fill="none">
+  <!-- White M -->
+  <path d="M10 58V14h12l14 22L50 14h12v44H50V30L36 50 22 30v28H10z" fill="#FFFFFF"/>
+  <!-- Red M -->
+  <path d="M36 64V20h12l14 22L76 20h12v44H76V36L62 56 48 36v28H36z" fill="#E8283F"/>
+</svg>
