@@ -1,515 +1,274 @@
-{% extends 'base.html' %}
-{% load static %}
-
-
-{% block title %}Sign up{% endblock %}
-
-
+{% extends 'base.html' %} 
+{% load static %} 
+{% block title %}Sign up{% endblock%} 
 {% block extra_head %}
-  <link rel="stylesheet" href="{% static 'accounts/css/auth.css' %}" />
-{% endblock %}
-
-
-{% block content %}
+<link rel="stylesheet" href="{% static 'accounts/css/auth.css' %}" />
+{% endblock %} {% block content %}
 
 <main>
-
-    <div class="auth-shell">
-
-
-        <!-- =================================================
+  <div class="auth-shell">
+    <!-- =================================================
              LEFT SIDE
              ================================================= -->
 
-        <div class="auth-visual">
-
-            <div class="auth-visual-mid">
-
-
-                <div class="display">
-
-                    One account.<br>
-                    Every screen<br>
-                    in the city.
-
-                </div>
-
-
-                <p>
-
-                    Create your MovieMate account to book faster,
-                    save your favourite cinemas, and never lose
-                    a ticket again.
-
-                </p>
-
-
-                <!-- TICKET -->
-
-                <div class="stub-float">
-
-                    <div class="stub-card">
-
-
-                        <span class="stub-badge">
-
-                            WELCOME
-
-                        </span>
-
-
-                        <span class="stub-shine"></span>
-
-
-                        <div class="row">
-
-                            <span>
-                                MEMBER SINCE
-                            </span>
-
-                            <b>
-                                AUG 2026
-                            </b>
-
-                        </div>
-
-
-                        <div class="row">
-
-                            <span>
-                                STATUS
-                            </span>
-
-                            <b>
-                                NEW
-                            </b>
-
-                        </div>
-
-
-                        <div class="perf-mini"></div>
-
-
-                        <div class="row">
-
-                            <span>
-                                PERK
-                            </span>
-
-                            <b>
-                                ₹75 OFF FIRST BOOKING
-                            </b>
-
-                        </div>
-
-
-                    </div>
-
-                </div>
-
-
-            </div>
-
-
-            <div class="auth-visual-bottom">
-
-                TICKET NO. MM-2026-08-07 · AHMEDABAD
-
-            </div>
-
-
+    <div class="auth-visual">
+      <div class="auth-visual-mid">
+        <div class="display">
+          One account.<br />
+          Every screen<br />
+          in the city.
         </div>
 
+        <p>
+          Create your MovieMate account to book faster, save your favourite
+          cinemas, and never lose a ticket again.
+        </p>
 
+        <!-- TICKET -->
 
-        <!-- =================================================
+        <div class="stub-float">
+          <div class="stub-card">
+            <span class="stub-badge"> WELCOME </span>
+
+            <span class="stub-shine"></span>
+
+            <div class="row">
+              <span> MEMBER SINCE </span>
+
+              <b> AUG 2026 </b>
+            </div>
+
+            <div class="row">
+              <span> STATUS </span>
+
+              <b> NEW </b>
+            </div>
+
+            <div class="perf-mini"></div>
+
+            <div class="row">
+              <span> PERK </span>
+
+              <b> ₹75 OFF FIRST BOOKING </b>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-visual-bottom">TICKET NO. MM-2026-08-07 · AHMEDABAD</div>
+    </div>
+
+    <!-- =================================================
              RIGHT SIDE
              ================================================= -->
 
-        <div class="auth-form-wrap">
+    <div class="auth-form-wrap">
+      <form class="auth-form" method="post" action="{% url 'signup' %}">
+        {% csrf_token %}
 
-
-            <form
-                class="auth-form"
-                method="post"
-                action="{% url 'signup' %}"
-            >
-
-                {% csrf_token %}
-
-
-                <!-- =================================================
+        <!-- =================================================
                      MESSAGES
                      ================================================= -->
 
-                {% if messages %}
+        {% if messages %}
+        {% for message in messages %}
+        <div class="form-error">
+          <span class="form-error-icon"> ! </span>
+          <span>{{ message }}</span>
+        </div>
+        {% endfor %}
+        {% endif %}
 
-                    {% for message in messages %}
-
-                        <div class="form-message {{ message.tags }}">
-
-                            {{ message }}
-
-                        </div>
-
-                    {% endfor %}
-
-                {% endif %}
-
-
-                <!-- =================================================
+        <!-- =================================================
                      HEADING
                      ================================================= -->
 
-                <h1>
+        <h1>Create account</h1>
 
-                    Create account
+        <p class="lead">
+          Already booking with us?
 
-                </h1>
+          <a href="{% url 'login' %}" class="link-gold"> Log in </a>
+        </p>
 
-
-                <p class="lead">
-
-                    Already booking with us?
-
-                    <a
-                        href="{% url 'login' %}"
-                        class="link-gold"
-                    >
-
-                        Log in
-
-                    </a>
-
-                </p>
-
-
-                <!-- =================================================
+        <!-- =================================================
                      FULL NAME
                      ================================================= -->
 
-                <div class="field">
+        <div class="field">
+          <label for="id_full_name"> Full name </label>
 
-                    <label for="id_full_name">
+          <div class="input-row">
+            <input
+              id="id_full_name"
+              name="full_name"
+              type="text"
+              value="{{ full_name|default:'' }}"
+              placeholder="Your name"
+              required
+            />
+          </div>
+        </div>
 
-                        Full name
-
-                    </label>
-
-
-                    <div class="input-row">
-
-                        <input
-                            id="id_full_name"
-                            name="full_name"
-                            type="text"
-                            value="{{ full_name|default:'' }}"
-                            placeholder="Your name"
-                            required
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <!-- =================================================
+        <!-- =================================================
                      EMAIL
                      ================================================= -->
 
-                <div class="field">
+        <div class="field">
+          <label for="id_email"> Email address </label>
 
-                    <label for="id_email">
+          <div class="input-row">
+            <input
+              id="id_email"
+              name="email"
+              type="email"
+              value="{{ email|default:'' }}"
+              placeholder="you@example.com"
+              required
+            />
+          </div>
+        </div>
 
-                        Email address
-
-                    </label>
-
-
-                    <div class="input-row">
-
-                        <input
-                            id="id_email"
-                            name="email"
-                            type="email"
-                            value="{{ email|default:'' }}"
-                            placeholder="you@example.com"
-                            required
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <!-- =================================================
+        <!-- =================================================
                      MOBILE
                      ================================================= -->
 
-                <div class="field">
+        <div class="field">
+          <label for="id_mobile"> Mobile number </label>
 
-                    <label for="id_mobile">
+          <div class="input-row">
+            <span
+              style="
+                color: var(--text-muted);
+                font-size: 14px;
+                margin-right: 6px;
+              "
+            >
+              +91
+            </span>
 
-                        Mobile number
+            <input
+              id="id_mobile"
+              name="mobile"
+              type="tel"
+              value="{{ mobile|default:'' }}"
+              placeholder="98765 43210"
+              maxlength="15"
+              required
+            />
+          </div>
+        </div>
 
-                    </label>
-
-
-                    <div class="input-row">
-
-                        <span
-                            style="
-                                color:var(--text-muted);
-                                font-size:14px;
-                                margin-right:6px;
-                            "
-                        >
-
-                            +91
-
-                        </span>
-
-
-                        <input
-                            id="id_mobile"
-                            name="mobile"
-                            type="tel"
-                            value="{{ mobile|default:'' }}"
-                            placeholder="98765 43210"
-                            maxlength="15"
-                            required
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <!-- =================================================
+        <!-- =================================================
                      PASSWORDS
                      ================================================= -->
 
-                <div class="field-inline">
+        <div class="field-inline">
+          <!-- PASSWORD -->
 
+          <div class="field">
+            <label for="id_password1"> Password </label>
 
-                    <!-- PASSWORD -->
+            <div class="input-row">
+              <input
+                id="id_password1"
+                name="password1"
+                type="password"
+                placeholder="Create password"
+                minlength="8"
+                required
+              />
 
-                    <div class="field">
+              <button
+                type="button"
+                class="toggle-eye"
+                onclick="toggleEye('id_password1', this)"
+              >
+                SHOW
+              </button>
+            </div>
+          </div>
 
-                        <label for="id_password1">
+          <!-- CONFIRM -->
 
-                            Password
+          <div class="field">
+            <label for="id_password2"> Confirm </label>
 
-                        </label>
+            <div class="input-row">
+              <input
+                id="id_password2"
+                name="password2"
+                type="password"
+                placeholder="Re-enter"
+                minlength="8"
+                required
+              />
 
+              <button
+                type="button"
+                class="toggle-eye"
+                onclick="toggleEye('id_password2', this)"
+              >
+                SHOW
+              </button>
+            </div>
+          </div>
+        </div>
 
-                        <div class="input-row">
-
-                            <input
-                                id="id_password1"
-                                name="password1"
-                                type="password"
-                                placeholder="Create password"
-                                required
-                            >
-
-
-                            <button
-                                type="button"
-                                class="toggle-eye"
-                                onclick="toggleEye(
-                                    'id_password1',
-                                    this
-                                )"
-                            >
-
-                                SHOW
-
-                            </button>
-
-                        </div>
-
-                    </div>
-
-
-
-                    <!-- CONFIRM -->
-
-                    <div class="field">
-
-                        <label for="id_password2">
-
-                            Confirm
-
-                        </label>
-
-
-                        <div class="input-row">
-
-                            <input
-                                id="id_password2"
-                                name="password2"
-                                type="password"
-                                placeholder="Re-enter"
-                                required
-                            >
-
-
-                            <button
-                                type="button"
-                                class="toggle-eye"
-                                onclick="toggleEye(
-                                    'id_password2',
-                                    this
-                                )"
-                            >
-
-                                SHOW
-
-                            </button>
-
-                        </div>
-
-                    </div>
-
-
-                </div>
-
-
-                <!-- =================================================
+        <!-- =================================================
                      TERMS
                      ================================================= -->
 
-                <div
-                    class="row-between"
-                    style="margin-top:2px;"
-                >
+        <div class="row-between" style="margin-top: 2px">
+          <label class="checkline">
+            <input type="checkbox" required />
 
-                    <label class="checkline">
+            <span>
+              I agree to the
 
-                        <input
-                            type="checkbox"
-                            required
-                        >
+              <a href="#" class="link-gold"> Terms </a>
 
+              &amp;
 
-                        <span>
+              <a href="#" class="link-gold"> Privacy Policy </a>
+            </span>
+          </label>
+        </div>
 
-                            I agree to the
-
-                            <a
-                                href="#"
-                                class="link-gold"
-                            >
-
-                                Terms
-
-                            </a>
-
-                            &amp;
-
-                            <a
-                                href="#"
-                                class="link-gold"
-                            >
-
-                                Privacy Policy
-
-                            </a>
-
-                        </span>
-
-                    </label>
-
-                </div>
-
-
-                <!-- =================================================
+        <!-- =================================================
                      CREATE ACCOUNT
                      ================================================= -->
 
-                <button
-                    class="btn btn-gold btn-block"
-                    type="submit"
-                >
+        <button class="btn btn-gold btn-block" type="submit">
+          Create account
+        </button>
 
-                    Create account
-
-                </button>
-
-
-                <!-- =================================================
+        <!-- =================================================
                      SOCIAL
                      ================================================= -->
 
-                <div class="divider-text">
+        <div class="divider-text">OR SIGN UP WITH</div>
 
-                    OR SIGN UP WITH
+        <div class="social-row">
+          <button type="button" class="social-btn">G Google</button>
 
-                </div>
+          <button type="button" class="social-btn">Apple</button>
+        </div>
 
-
-                <div class="social-row">
-
-                    <button
-                        type="button"
-                        class="social-btn"
-                    >
-
-                        G Google
-
-                    </button>
-
-
-                    <button
-                        type="button"
-                        class="social-btn"
-                    >
-
-                        Apple
-
-                    </button>
-
-                </div>
-
-
-                <!-- =================================================
+        <!-- =================================================
                      LOGIN
                      ================================================= -->
 
-                <p class="switch-line">
+        <p class="switch-line">
+          Already have an account?
 
-                    Already have an account?
-
-                    <a
-                        href="{% url 'login' %}"
-                        class="link-gold"
-                    >
-
-                        Log in
-
-                    </a>
-
-                </p>
-
-
-            </form>
-
-
-        </div>
-
-
+          <a href="{% url 'login' %}" class="link-gold"> Log in </a>
+        </p>
+      </form>
     </div>
-
+  </div>
 </main>
 
-{% endblock %}
-
-
-{% block footer %}
-{% endblock %}
-
-
-{% block extra_js %}
-  <script src="{% static 'accounts/js/auth.js' %}"></script>
+{% endblock %} {% block footer %} {% endblock %} {% block extra_js %}
+<script src="{% static 'accounts/js/auth.js' %}"></script>
 {% endblock %}

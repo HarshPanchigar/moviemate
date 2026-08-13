@@ -1,630 +1,307 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block title %}Profile{% endblock %}
-
-{% block nav_profile_active %}active{% endblock %}
-
-{% block extra_head %}
-  <link rel="stylesheet" href="{% static 'accounts/css/profile.css' %}" />
-{% endblock %}
-
-
-
-{% block content %}
+{% extends 'base.html' %} 
+{% load static %} 
+{% block title %}Profile{% endblock%} 
+{% block nav_profile_active %}active{% endblock %} {% block extra_head %}
+<link rel="stylesheet" href="{% static 'accounts/css/profile.css' %}" />
+{% endblock %} {% block content %}
 
 <main>
-
-    <div class="profile-shell">
-
-
-        <!-- =================================================
+  <div class="profile-shell">
+    <!-- =================================================
              LEFT CINEMATIC SIDE
              ================================================= -->
 
-        <section class="profile-visual">
+    <section class="profile-visual">
+      <div class="profile-visual-content">
+        <div class="profile-eyebrow">MOVIEMATE MEMBER</div>
 
+        <div class="profile-display">
+          YOUR MOVIE<br />
 
-            <div class="profile-visual-content">
+          <span>PROFILE.</span>
+        </div>
 
+        <p class="profile-description">
+          Everything about your MovieMate account, right where<br> you need it.
+        </p>
 
-                <div class="profile-eyebrow">
+        <div class="profile-stage">
+          <div class="profile-orbit"></div>
 
-                    MOVIEMATE MEMBER
+          <div class="profile-orbit two"></div>
 
-                </div>
+          <div class="profile-floating-info info-one">
+            <small> MEMBER ID </small>
 
+            <b> MM-{{ customer.id|stringformat:"04d" }} </b>
+          </div>
 
-                <div class="profile-display">
+          <div class="profile-floating-info info-two">
+            <small> STATUS </small>
 
-                    YOUR MOVIE<br>
+            <b> ACTIVE </b>
+          </div>
 
-                    <span>PROFILE.</span>
-
-                </div>
-
-
-                <p class="profile-description">
-
-                    Everything about your MovieMate account,
-                    right where you need it.
-
-                </p>
-
-
-                <div class="profile-stage">
-
-
-                    <div class="profile-orbit"></div>
-
-                    <div class="profile-orbit two"></div>
-
-
-                    <div class="profile-floating-info info-one">
-
-                        <small>
-
-                            MEMBER ID
-
-                        </small>
-
-                        <b>
-
-                            MM-{{ customer.id|stringformat:"04d" }}
-
-                        </b>
-
-                    </div>
-
-
-                    <div class="profile-floating-info info-two">
-
-                        <small>
-
-                            STATUS
-
-                        </small>
-
-                        <b>
-
-                            ACTIVE
-
-                        </b>
-
-                    </div>
-
-
-                    <div class="profile-avatar-stage">
-
-                        <div class="profile-avatar-letter">
-
-                            {{ customer.full_name|first|upper }}
-
-                        </div>
-
-
-                        <div class="profile-online"></div>
-
-                    </div>
-
-
-                </div>
-
-
+          <div class="profile-avatar-stage">
+            <div class="profile-avatar-letter">
+              {{ customer.full_name|first|upper }}
             </div>
 
+            <div class="profile-online"></div>
+          </div>
+        </div>
+      </div>
 
-            <div class="profile-visual-bottom">
+      <div class="profile-visual-bottom">
+        MOVIEMATE · YOUR ACCOUNT · MM-{{ customer.id|stringformat:"04d" }}
+      </div>
+    </section>
 
-                MOVIEMATE · YOUR ACCOUNT ·
-                MM-{{ customer.id|stringformat:"04d" }}
-
-            </div>
-
-
-        </section>
-
-
-
-        <!-- =================================================
+    <!-- =================================================
              RIGHT SIDE
              ================================================= -->
 
-        <section class="profile-form-wrap">
-
-
-            <div class="profile-form">
-
-
-                <!-- =================================================
+    <section class="profile-form-wrap">
+      <div class="profile-form">
+        <!-- =================================================
                      MESSAGES FROM EDIT PROFILE / PASSWORD
                      ================================================= -->
 
-                {% if messages %}
+        {% if messages %} {% for message in messages %}
 
-                    {% for message in messages %}
+        <div
+          class="profile-message {% if message.tags == 'success' %} profile-message-success {% else %} profile-message-error {% endif %}"
+        >
+          <span class="profile-message-icon">
+            {% if message.tags == 'success' %} ✓ {% else %} ! {% endif %}
+          </span>
 
-                        <div class="profile-message
-                            {% if message.tags == 'success' %}
-                                profile-message-success
-                            {% else %}
-                                profile-message-error
-                            {% endif %}
-                        ">
+          <span> {{ message }} </span>
+        </div>
 
+        {% endfor %} {% endif %}
 
-                            <span class="profile-message-icon">
-
-                                {% if message.tags == 'success' %}
-
-                                    ✓
-
-                                {% else %}
-
-                                    !
-
-                                {% endif %}
-
-                            </span>
-
-
-                            <span>
-
-                                {{ message }}
-
-                            </span>
-
-
-                        </div>
-
-                    {% endfor %}
-
-                {% endif %}
-
-
-
-                <!-- =================================================
+        <!-- =================================================
                      HEADER
                      ================================================= -->
 
-                <div class="profile-heading">
+        <div class="profile-heading">
+          <h1>ACCOUNT</h1>
 
-                    <h1>
+          <p>Manage your MovieMate profile and account settings.</p>
+        </div>
 
-                        ACCOUNT
-
-                    </h1>
-
-
-                    <p>
-
-                        Manage your MovieMate profile
-                        and account settings.
-
-                    </p>
-
-                </div>
-
-
-
-                <!-- =================================================
+        <!-- =================================================
                      PERSONAL DETAILS
                      ================================================= -->
 
-                <div class="account-section-title">
-
-                    <h2>
-
-                        Personal Details
-
-                    </h2>
-
-
-                    <span>
-
-                        ● ACTIVE
-
-                    </span>
-
-                </div>
-
-
-
-                <div class="account-info">
-
-
-                    <!-- FULL NAME -->
-
-                    <div class="account-field">
-
-
-                        <div class="account-field-left">
-
-                            <label>
-
-                                FULL NAME
-
-                            </label>
-
-
-                            <div class="account-field-value">
-
-                                {{ customer.full_name }}
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="account-field-icon">
-
-                            <svg
-                                width="20"
-                                height="20"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            >
-
-                                <path
-                                    d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"
-                                ></path>
-
-                                <circle
-                                    cx="12"
-                                    cy="7"
-                                    r="4"
-                                ></circle>
-
-                            </svg>
-
-                        </div>
-
-
-                    </div>
-
-
-
-                    <!-- EMAIL -->
-
-                    <div class="account-field">
-
-
-                        <div class="account-field-left">
-
-                            <label>
-
-                                EMAIL ADDRESS
-
-                            </label>
-
-
-                            <div class="account-field-value">
-
-                                {{ customer.email }}
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="account-field-icon">
-
-                            <svg
-                                width="20"
-                                height="20"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            >
-
-                                <rect
-                                    x="3"
-                                    y="5"
-                                    width="18"
-                                    height="14"
-                                    rx="2"
-                                ></rect>
-
-                                <polyline
-                                    points="3 7 12 13 21 7"
-                                ></polyline>
-
-                            </svg>
-
-                        </div>
-
-
-                    </div>
-
-
-
-                    <!-- MOBILE -->
-
-                    <div class="account-field">
-
-
-                        <div class="account-field-left">
-
-                            <label>
-
-                                MOBILE NUMBER
-
-                            </label>
-
-
-                            <div class="account-field-value">
-
-                                {{ customer.mobile }}
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="account-field-icon">
-
-                            <svg
-                                width="20"
-                                height="20"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            >
-
-                                <rect
-                                    x="5"
-                                    y="2"
-                                    width="14"
-                                    height="20"
-                                    rx="2"
-                                ></rect>
-
-                                <line
-                                    x1="12"
-                                    y1="18"
-                                    x2="12.01"
-                                    y2="18"
-                                ></line>
-
-                            </svg>
-
-                        </div>
-
-
-                    </div>
-
-
-                </div>
-
-
-
-                <!-- =================================================
+        <div class="account-section-title">
+          <h2>Personal Details</h2>
+
+          <span> ● ACTIVE </span>
+        </div>
+
+        <div class="account-info">
+          <!-- FULL NAME -->
+
+          <div class="account-field">
+            <div class="account-field-left">
+              <label> FULL NAME </label>
+
+              <div class="account-field-value">{{ customer.full_name }}</div>
+            </div>
+
+            <div class="account-field-icon">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </div>
+          </div>
+
+          <!-- EMAIL -->
+
+          <div class="account-field">
+            <div class="account-field-left">
+              <label> EMAIL ADDRESS </label>
+
+              <div class="account-field-value">{{ customer.email }}</div>
+            </div>
+
+            <div class="account-field-icon">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+
+                <polyline points="3 7 12 13 21 7"></polyline>
+              </svg>
+            </div>
+          </div>
+
+          <!-- MOBILE -->
+
+          <div class="account-field">
+            <div class="account-field-left">
+              <label> MOBILE NUMBER </label>
+
+              <div class="account-field-value">{{ customer.mobile }}</div>
+            </div>
+
+            <div class="account-field-icon">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="5" y="2" width="14" height="20" rx="2"></rect>
+
+                <line x1="12" y1="18" x2="12.01" y2="18"></line>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- =================================================
                      PROFILE ACTIONS
                      ================================================= -->
 
-<div class="profile-actions">
+        <div class="profile-actions">
+          <!-- EDIT PROFILE -->
 
-    <!-- EDIT PROFILE -->
+          <a href="{% url 'edit_profile' %}" class="profile-action">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M12 20h9"></path>
 
-    <a
-        href="{% url 'edit_profile' %}"
-        class="profile-action"
-    >
+              <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
+            </svg>
 
-        <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-        >
+            <div class="profile-action-content">
+              <b> Edit Profile </b>
 
-            <path d="M12 20h9"></path>
+              <span> Personal details </span>
+            </div>
+          </a>
 
-            <path
-                d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"
-            ></path>
+          <!-- CHANGE PASSWORD -->
 
-        </svg>
+          <a href="{% url 'change_password' %}" class="profile-action">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="3" y="11" width="18" height="10" rx="2"></rect>
 
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
 
-        <div class="profile-action-content">
+            <div class="profile-action-content">
+              <b> Change Password </b>
 
-            <b>
-                Edit Profile
-            </b>
+              <span> Account security </span>
+            </div>
+          </a>
 
-            <span>
-                Personal details
-            </span>
+          <!-- DELETE ACCOUNT -->
 
+          <a
+            href="{% url 'delete_account' %}"
+            class="profile-action profile-delete-action"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="3 6 5 6 21 6"></polyline>
+
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
+
+              <path d="M10 11v6"></path>
+
+              <path d="M14 11v6"></path>
+
+              <path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path>
+            </svg>
+
+            <div class="profile-action-content">
+              <b> Delete Account </b>
+
+              <span> Permanently remove account </span>
+            </div>
+          </a>
         </div>
 
-    </a>
-
-
-
-    <!-- CHANGE PASSWORD -->
-
-    <a
-        href="{% url 'change_password' %}"
-        class="profile-action"
-    >
-
-        <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-        >
-
-            <rect
-                x="3"
-                y="11"
-                width="18"
-                height="10"
-                rx="2"
-            ></rect>
-
-            <path
-                d="M7 11V7a5 5 0 0 1 10 0v4"
-            ></path>
-
-        </svg>
-
-
-        <div class="profile-action-content">
-
-            <b>
-                Change Password
-            </b>
-
-            <span>
-                Account security
-            </span>
-
-        </div>
-
-    </a>
-
-
-
-    <!-- DELETE ACCOUNT -->
-
-    <a
-        href="{% url 'delete_account' %}"
-        class="profile-action profile-delete-action"
-    >
-
-        <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-        >
-
-            <polyline
-                points="3 6 5 6 21 6"
-            ></polyline>
-
-            <path
-                d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"
-            ></path>
-
-            <path
-                d="M10 11v6"
-            ></path>
-
-            <path
-                d="M14 11v6"
-            ></path>
-
-            <path
-                d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"
-            ></path>
-
-        </svg>
-
-
-        <div class="profile-action-content">
-
-            <b>
-                Delete Account
-            </b>
-
-            <span>
-                Permanently remove account
-            </span>
-
-        </div>
-
-    </a>
-
-</div>
-
-
-                <!-- =================================================
+        <!-- =================================================
                      DIVIDER
                      ================================================= -->
 
-                <div class="profile-divider">
+        <div class="profile-divider">ACCOUNT</div>
 
-                    ACCOUNT
-
-                </div>
-
-
-
-                <!-- =================================================
+        <!-- =================================================
                      LOGOUT
                      ================================================= -->
 
-                <a
-                    href="{% url 'logout' %}"
-                    class="logout-button"
-                >
+        <a href="{% url 'logout' %}" class="logout-button">
+          <svg
+            width="17"
+            height="17"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
 
-                    <svg
-                        width="17"
-                        height="17"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                    >
+            <polyline points="16 17 21 12 16 7"></polyline>
 
-                        <path
-                            d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"
-                        ></path>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
 
-                        <polyline
-                            points="16 17 21 12 16 7"
-                        ></polyline>
-
-                        <line
-                            x1="21"
-                            y1="12"
-                            x2="9"
-                            y2="12"
-                        ></line>
-
-                    </svg>
-
-
-                    Log out of MovieMate
-
-                </a>
-
-
-            </div>
-
-        </section>
-
-
-    </div>
-
+          Log out of MovieMate
+        </a>
+      </div>
+    </section>
+  </div>
 </main>
 
-{% endblock %}
-
-
-
-{% block footer %}
-{% endblock %}
+{% endblock %} 
+{% block footer %} {% endblock %}

@@ -141,23 +141,41 @@
    ANIMATIONS
    ========================================================= */
 @keyframes ticketFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-6px);
+  }
 }
 
 @keyframes ticketGlowPulse {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow: 0 0 0 1px rgba(232, 40, 63, 0.06) inset, 0 22px 50px -18px rgba(0, 0, 0, 0.65), 0 0 28px -8px rgba(232, 40, 63, 0.28);
   }
+
   50% {
     box-shadow: 0 0 0 1px rgba(232, 40, 63, 0.1) inset, 0 26px 60px -16px rgba(0, 0, 0, 0.7), 0 0 44px -4px rgba(232, 40, 63, 0.5);
   }
 }
 
 @keyframes shineSweep {
-  0% { left: -60%; }
-  55% { left: 130%; }
-  100% { left: 130%; }
+  0% {
+    left: -60%;
+  }
+
+  55% {
+    left: 130%;
+  }
+
+  100% {
+    left: 130%;
+  }
 }
 
 .auth-visual-bottom {
@@ -195,7 +213,8 @@
   margin-bottom: 30px;
 }
 
-.form-error {
+.form-error,
+.form-message {
   display: flex;
   align-items: center;
   gap: 9px;
@@ -207,6 +226,12 @@
   border-radius: 8px;
   margin-bottom: 18px;
   line-height: 1.4;
+}
+
+.form-message.success {
+  background: rgba(117, 212, 154, 0.1);
+  border-color: rgba(117, 212, 154, 0.35);
+  color: #75d49a;
 }
 
 .form-error-icon {
@@ -360,9 +385,11 @@
   .auth-shell {
     grid-template-columns: 1fr;
   }
+
   .auth-visual {
     display: none;
   }
+
   .auth-form-wrap {
     min-height: calc(100vh - 73px);
     padding: 40px 25px;
@@ -373,12 +400,15 @@
   .auth-form-wrap {
     padding: 35px 18px;
   }
+
   .auth-form h1 {
     font-size: 34px;
   }
+
   .auth-form .lead {
     font-size: 13.5px;
   }
+
   .social-row {
     flex-direction: column;
   }
@@ -663,9 +693,11 @@
     align-items: flex-start;
     overflow: visible;
   }
+
   .password-heading {
     margin-top: 5px;
   }
+
   .password-card {
     padding: 24px 22px;
   }
@@ -675,30 +707,38 @@
   .password-heading h1 {
     font-size: 40px;
   }
+
   .password-heading p {
     font-size: 13px;
   }
+
   .password-header {
     align-items: flex-start;
     gap: 12px;
   }
+
   .password-icon {
     width: 48px;
     height: 48px;
   }
+
   .password-header h2 {
     font-size: 23px;
   }
+
   .password-header p {
     font-size: 11px;
   }
+
   .password-input {
     font-size: 13px;
     padding: 12px 65px 12px 13px;
   }
+
   .password-actions {
     flex-direction: column;
   }
+
   .password-actions .btn {
     width: 100%;
     min-width: 0;
@@ -997,32 +1037,41 @@
     align-items: flex-start;
     overflow: visible;
   }
+
   .delete-heading {
     margin-top: 5px;
   }
+
   .delete-heading h1 {
     font-size: 40px;
   }
+
   .delete-card {
     padding: 24px 20px;
   }
+
   .delete-warning {
     align-items: flex-start;
     gap: 12px;
   }
+
   .delete-icon {
     width: 48px;
     height: 48px;
   }
+
   .delete-warning h2 {
     font-size: 23px;
   }
+
   .delete-warning p {
     font-size: 11px;
   }
+
   .delete-actions {
     flex-direction: column;
   }
+
   .delete-actions .btn {
     width: 100%;
     min-width: 0;
