@@ -1,0 +1,414 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Ticket Pass #{{ booking.booking_id|stringformat:".8s" }} | MovieMate{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+    .ticket-page-container {
+        max-width: 840px;
+        margin: 0 auto;
+        padding: 40px 20px 70px;
+    }
+
+    .success-banner {
+        text-align: center;
+        margin-bottom: 28px;
+    }
+
+    .success-icon {
+        width: 56px;
+        height: 56px;
+        background: rgba(16, 185, 129, 0.15);
+        border: 2px solid #10B981;
+        color: #34D399;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 12px;
+    }
+
+    /* Full Printable Ticket PDF Container */
+    .printable-pdf-area {
+        background: #14131D;
+        border: 1.5px solid #2F2C3D;
+        border-radius: 24px;
+        padding: 32px 36px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+        color: #fff;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .pdf-brand-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 24px;
+    }
+
+    .brand-logo {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 32px;
+        letter-spacing: 1px;
+        color: #fff;
+    }
+
+    .brand-logo span {
+        color: #E8283F;
+    }
+
+    .ticket-pass-card {
+        background: #191826;
+        border: 2px dashed #ED1D37;
+        border-radius: 20px;
+        padding: 28px 30px;
+        margin-bottom: 28px;
+    }
+
+    .ticket-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+    .pass-id-label, .status-label {
+        font-size: 11px;
+        font-weight: 800;
+        color: #858193;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+    }
+
+    .pass-id-value {
+        font-family: 'Space Mono', monospace;
+        font-size: 22px;
+        font-weight: 900;
+        color: #ED1D37;
+    }
+
+    .status-badge {
+        background: rgba(16, 185, 129, 0.15);
+        color: #10B981;
+        border: 1px solid #10B981;
+        padding: 5px 14px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        display: inline-block;
+    }
+
+    .ticket-divider {
+        height: 1px;
+        background: rgba(255, 255, 255, 0.12);
+        margin-bottom: 24px;
+    }
+
+    .ticket-body {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+    }
+
+    .ticket-details {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        flex: 1;
+    }
+
+    .detail-row {
+        font-size: 15px;
+        line-height: 1.4;
+    }
+
+    .detail-label {
+        color: #A09CB0;
+        margin-right: 6px;
+    }
+
+    .detail-value {
+        color: #fff;
+        font-weight: 750;
+    }
+
+    .seats-value {
+        color: #ED1D37;
+        font-weight: 800;
+    }
+
+    .ticket-qr-card {
+        background: #FFFFFF;
+        border-radius: 18px;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        width: 190px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    }
+
+    .ticket-qr-card img {
+        width: 145px;
+        height: 145px;
+        display: block;
+    }
+
+    .qr-label {
+        color: #111;
+        font-size: 12px;
+        font-weight: 800;
+        margin-top: 10px;
+        text-align: center;
+    }
+
+    .qr-hash {
+        font-family: 'Space Mono', monospace;
+        font-size: 10px;
+        color: #555;
+        margin-top: 2px;
+        text-align: center;
+        letter-spacing: 0.5px;
+    }
+
+    /* Additional Important Information Grid */
+    .important-info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        background: #191826;
+        border: 1px solid #2B283A;
+        border-radius: 16px;
+        padding: 22px;
+        margin-bottom: 24px;
+    }
+
+    .info-box-title {
+        font-size: 12px;
+        font-weight: 800;
+        color: #E8283F;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 10px;
+    }
+
+    .info-list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .info-list li {
+        font-size: 12.5px;
+        color: #B5B0C4;
+        line-height: 1.5;
+        display: flex;
+        gap: 8px;
+    }
+
+    .info-list li::before {
+        content: "•";
+        color: #E8283F;
+        font-weight: bold;
+    }
+
+    /* Footer Notes */
+    .pdf-footer-note {
+        text-align: center;
+        padding-top: 16px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        color: #858193;
+        font-size: 12px;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 16px;
+        margin-top: 32px;
+    }
+
+    @media (max-width: 650px) {
+        .ticket-body {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .important-info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="ticket-page-container">
+
+    <div class="success-banner">
+        <div class="success-icon">
+            <svg width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
+        </div>
+        <span class="eyebrow" style="justify-content: center; color: #34D399;">Booking Confirmed!</span>
+        <h1 style="font-family: 'Bebas Neue'; font-size: 38px; margin: 4px 0 0;">{{ booking.showtime.movie.title }}</h1>
+    </div>
+
+    <!-- FULL PRINTABLE & DOWNLOADABLE PDF TICKET AREA -->
+    <div id="printablePdfArea" class="printable-pdf-area">
+        
+        <!-- Brand Header -->
+        <div class="pdf-brand-header">
+            <div class="brand-logo">MOVIE<span>MATE</span></div>
+            <div style="text-align: right;">
+                <div style="font-size: 11px; color: #858193; font-weight: 700;">OFFICIAL ENTRY PASS</div>
+                <div style="font-size: 12px; color: #fff; font-weight: 600;">Ahmedabad Premier Cinema</div>
+            </div>
+        </div>
+
+        <!-- TICKET PASS CARD (Exact Match to Screenshot) -->
+        <div class="ticket-pass-card">
+            <div class="ticket-header">
+                <div>
+                    <div class="pass-id-label">BOOKING PASS ID</div>
+                    <div class="pass-id-value">#{{ booking.booking_id|stringformat:".8s" }}</div>
+                </div>
+                <div style="text-align: right;">
+                    <div class="status-label">STATUS</div>
+                    <span class="status-badge">CONFIRMED</span>
+                </div>
+            </div>
+
+            <div class="ticket-divider"></div>
+
+            <div class="ticket-body">
+                <div class="ticket-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Name:</span>
+                        <span class="detail-value">{{ booking.customer.full_name }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Cinema:</span>
+                        <span class="detail-value">{{ booking.showtime.cinema.name }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Date & Time:</span>
+                        <span class="detail-value">{{ booking.showtime.show_date|date:"M. d, Y" }} {{ booking.showtime.start_time|time:"h:i A" }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Seats ({{ booking.seat_tier|upper }}):</span>
+                        <span class="detail-value seats-value">{{ booking.seats }}</span>
+                    </div>
+                </div>
+
+                <!-- Scannable Verification QR Code Card -->
+                <div class="ticket-qr-card">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data={{ booking.qr_code_hash }}" alt="Ticket QR Code">
+                    <div class="qr-label">Scan to Verify</div>
+                    <div class="qr-hash">{{ booking.qr_code_hash }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADDITIONAL IMPORTANT DETAILS & ENTRY GUIDELINES -->
+        <div class="important-info-grid">
+            <div>
+                <div class="info-box-title">📌 Essential Entry Guidelines</div>
+                <ul class="info-list">
+                    <li>Please arrive <b>15 minutes</b> prior to the showtime start.</li>
+                    <li>Present this PDF or digital QR code at the cinema entry gate.</li>
+                    <li>Government issued photo ID may be requested at entry.</li>
+                </ul>
+            </div>
+            <div>
+                <div class="info-box-title">🍿 Cinema Policies & Support</div>
+                <ul class="info-list">
+                    <li>Outside food and beverages are strictly not permitted.</li>
+                    <li>Tickets are non-refundable and non-transferable once confirmed.</li>
+                    <li>Support Helpdesk: <b>support@moviemate.com</b></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Summary Footer -->
+        <div class="pdf-footer-note">
+            Total Amount Paid: <b style="color: #fff;">₹{{ booking.total_amount }}</b> • Booked on {{ booking.created_at|date:"F d, Y h:i A" }} • Thank you for choosing MovieMate!
+        </div>
+
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+        <button id="downloadPdfBtn" onclick="downloadPdfTicket()" class="btn btn-gold" style="flex: 1; justify-content: center; padding: 14px; font-size: 15px;">
+            📄 Download Official PDF Ticket Pass
+        </button>
+        <a href="{% url 'my_bookings' %}" class="btn btn-ghost" style="flex: 1; justify-content: center; padding: 14px; font-size: 15px;">
+            My Bookings History
+        </a>
+    </div>
+
+</main>
+
+<script>
+function downloadPdfTicket() {
+    const btn = document.getElementById('downloadPdfBtn');
+    if (btn) {
+        btn.innerHTML = '⏳ Generating PDF Ticket...';
+        btn.disabled = true;
+    }
+
+    const element = document.getElementById('printablePdfArea');
+
+    html2canvas(element, {
+        scale: 3,
+        backgroundColor: '#14131D',
+        useCORS: true,
+        logging: false
+    }).then(canvas => {
+        const { jsPDF } = window.jspdf;
+        const imgData = canvas.toDataURL('image/png');
+        
+        // Create A4 PDF Document
+        const pdf = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4'
+        });
+
+        const imgWidth = 190;
+        const pageHeight = 295;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+        pdf.save('MovieMate_Ticket_Pass_{{ booking.booking_id|stringformat:".8s" }}.pdf');
+
+        if (btn) {
+            btn.innerHTML = '📄 Download Official PDF Ticket Pass';
+            btn.disabled = false;
+        }
+    }).catch(err => {
+        console.error('PDF error:', err);
+        window.print();
+        if (btn) {
+            btn.innerHTML = '📄 Download Official PDF Ticket Pass';
+            btn.disabled = false;
+        }
+    });
+}
+</script>
+{% endblock %}

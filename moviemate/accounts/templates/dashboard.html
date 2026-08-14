@@ -12,238 +12,250 @@
 {% block content %}
 <main>
 
+  <!-- Hero Section: Featured Movie(s) Selected from Admin Panel -->
   <section class="hero">
     <div class="hero-bg"></div>
-    <button class="hero-arrow hero-arrow-left" onclick="heroNav(-1)" aria-label="Previous">‹</button>
-    <button class="hero-arrow hero-arrow-right" onclick="heroNav(1)" aria-label="Next">›</button>
+    {% if hero_movies and hero_movies|length > 1 %}
+      <button class="hero-arrow hero-arrow-left" onclick="heroNav(-1)" aria-label="Previous">‹</button>
+      <button class="hero-arrow hero-arrow-right" onclick="heroNav(1)" aria-label="Next">›</button>
+    {% endif %}
+    
     <div class="hero-inner">
-
-      <div class="hero-slide active" data-slide="0">
-        <div class="hero-copy">
-          <div class="eyebrow">Now Booking · Ahmedabad</div>
-          <h1 class="hero-title">Crimson<br>Horizon</h1>
-          <p class="hero-sub">A stranded pilot races against a collapsing sky to warn a city that doesn't believe the
-            end is already here.</p>
-          <div class="hero-tags">
-            <span class="tag">UA13+</span>
-            <span class="tag">Action, Sci-Fi</span>
-            <span class="tag">2h 21m</span>
+      {% if hero_movies %}
+        {% for movie in hero_movies %}
+        <div class="hero-slide {% if forloop.first %}active{% endif %}" data-slide="{{ forloop.counter0 }}">
+          <div class="hero-copy">
+            <div class="eyebrow">Featured Premiere · Ahmedabad</div>
+            <h1 class="hero-title">{{ movie.title }}</h1>
+            <p class="hero-sub">{{ movie.plot|default:"Experience the thrilling cinema journey on the big screen."|truncatewords:28 }}</p>
+            <div class="hero-tags">
+              <span class="tag">★ {{ movie.rating }}</span>
+              <span class="tag">{{ movie.genre }}</span>
+              <span class="tag">{{ movie.duration_minutes }}m</span>
+              {% if movie.is_hero %}
+                <span class="tag" style="background: rgba(232, 40, 63, 0.2); border-color: var(--gold); color: #fff;">FEATURED HERO</span>
+              {% endif %}
+            </div>
+            <div class="hero-cta">
+              <a class="btn btn-gold" href="{% url 'select_theater' movie.id %}">Book Tickets Now</a>
+            </div>
           </div>
-          <div class="hero-cta">
-            <a class="btn btn-gold" href="{% url 'signup' %}">Book Now</a>
-            <button class="btn btn-ghost">▶ Watch Trailer</button>
-          </div>
-        </div>
-        <div class="hero-poster art-1">
-          <span class="hero-badge">🔥 TRENDING</span>
-          <div class="hero-poster-label">
-            <div class="film">CRIMSON HORIZON</div>
-            <div class="meta">UA13+ · ACTION, SCI-FI · 2H 21M</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="hero-slide" data-slide="1">
-        <div class="hero-copy">
-          <div class="eyebrow">Now Booking · Ahmedabad</div>
-          <h1 class="hero-title">The Long<br>Monsoon</h1>
-          <p class="hero-sub">Two estranged sisters return to their flooded hometown and find the one thing the rain
-            never washed away.</p>
-          <div class="hero-tags">
-            <span class="tag">A</span>
-            <span class="tag">Drama, Romance</span>
-            <span class="tag">2h 08m</span>
-          </div>
-          <div class="hero-cta">
-            <a class="btn btn-gold" href="{% url 'signup' %}">Book Now</a>
-            <button class="btn btn-ghost">▶ Watch Trailer</button>
+          <div class="hero-poster" style="{% if movie.poster_url %}background-image: url('{{ movie.poster_url }}'); background-size: cover; background-position: center;{% else %}background: var(--bg-elevated);{% endif %}">
+            <span class="hero-badge" style="text-transform: uppercase;">
+              {% if movie.display_tag == 'hot' %}⭐ HOT
+              {% elif movie.display_tag == 'trending' %}🔥TRENDING
+              {% elif movie.display_tag == 'top_rated' %}🏆 TOP RATED
+              {% else %}🆕 NEW RELEASE{% endif %}
+            </span>
+            <div class="hero-poster-label">
+              <div class="film">{{ movie.title|upper }}</div>
+              <div class="meta">★ {{ movie.rating }} · {{ movie.genre|upper }} · {{ movie.duration_minutes }}M</div>
+            </div>
           </div>
         </div>
-        <div class="hero-poster art-3">
-          <span class="hero-badge">★ 8.9</span>
-          <div class="hero-poster-label">
-            <div class="film">THE LONG MONSOON</div>
-            <div class="meta">A · DRAMA, ROMANCE · 2H 08M</div>
+        {% endfor %}
+      {% else %}
+        <div class="hero-slide active" data-slide="0">
+          <div class="hero-copy">
+            <div class="eyebrow">Now Booking · Ahmedabad</div>
+            <h1 class="hero-title">MovieMate Cinema</h1>
+            <p class="hero-sub">Select movies from the Admin Panel to feature them in the Hero Banner.</p>
+            <div class="hero-cta">
+              <a class="btn btn-gold" href="{% url 'dashboard' %}">Browse Movies</a>
+            </div>
           </div>
         </div>
-      </div>
-
-      <div class="hero-slide" data-slide="2">
-        <div class="hero-copy">
-          <div class="eyebrow">Now Booking · Ahmedabad</div>
-          <h1 class="hero-title">Neon<br>Requiem</h1>
-          <p class="hero-sub">A city built on song faces silence for the first time, and one singer decides she won't
-            let the music die quietly.</p>
-          <div class="hero-tags">
-            <span class="tag">U</span>
-            <span class="tag">Musical, Fantasy</span>
-            <span class="tag">1h 58m</span>
-          </div>
-          <div class="hero-cta">
-            <a class="btn btn-gold" href="{% url 'signup' %}">Book Now</a>
-            <button class="btn btn-ghost">▶ Watch Trailer</button>
-          </div>
-        </div>
-        <div class="hero-poster art-5">
-          <span class="hero-badge">🆕 NEW</span>
-          <div class="hero-poster-label">
-            <div class="film">NEON REQUIEM</div>
-            <div class="meta">U · MUSICAL, FANTASY · 1H 58M</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="hero-slide" data-slide="3">
-        <div class="hero-copy">
-          <div class="eyebrow">Now Booking · Ahmedabad</div>
-          <h1 class="hero-title">Echo<br>Chamber</h1>
-          <p class="hero-sub">A journalist chasing a leaked recording realises the voice on the tape knows exactly who's
-            listening.</p>
-          <div class="hero-tags">
-            <span class="tag">UA16+</span>
-            <span class="tag">Thriller</span>
-            <span class="tag">2h 04m</span>
-          </div>
-          <div class="hero-cta">
-            <a class="btn btn-gold" href="{% url 'signup' %}">Book Now</a>
-            <button class="btn btn-ghost">▶ Watch Trailer</button>
-          </div>
-        </div>
-        <div class="hero-poster art-4">
-          <span class="hero-badge">★ 7.4</span>
-          <div class="hero-poster-label">
-            <div class="film">ECHO CHAMBER</div>
-            <div class="meta">UA16+ · THRILLER · 2H 04M</div>
-          </div>
-        </div>
-      </div>
-
+      {% endif %}
     </div>
+
+    {% if hero_movies and hero_movies|length > 1 %}
     <div class="hero-dots">
-      <button class="hero-dot active" onclick="heroGoto(0)"></button>
-      <button class="hero-dot" onclick="heroGoto(1)"></button>
-      <button class="hero-dot" onclick="heroGoto(2)"></button>
-      <button class="hero-dot" onclick="heroGoto(3)"></button>
+      {% for movie in hero_movies %}
+        <button class="hero-dot {% if forloop.first %}active{% endif %}" onclick="heroGoto({{ forloop.counter0 }})"></button>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </section>
+
+  <!-- Section 1: This Week's Releases (5 in a row grid) -->
+  <section class="section container" style="margin-top: 48px;">
+    <div class="section-head" style="margin-bottom: 24px;">
+      <div>
+        <div class="eyebrow" style="margin-bottom: 8px;">Just Arrived</div>
+        <h2 class="section-title" style="font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 0.02em; margin: 0;">This Week's Releases</h2>
+      </div>
+    </div>
+
+    <div class="movie-grid-5">
+      {% if this_week_movies %}
+        {% for movie in this_week_movies %}
+        <article class="stub">
+          <div class="stub-poster">
+            {% if movie.poster_url %}
+              <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" class="stub-poster-img">
+            {% else %}
+              <div style="width: 100%; height: 100%; background: var(--bg-elevated); display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--text-muted);">No Poster</div>
+            {% endif %}
+            <div class="stub-poster-overlay"></div>
+            <span class="rating" style="background: rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.15); color: #FBBF24; padding: 4px 8px; border-radius: 6px; font-weight: 800; font-size: 11.5px; position: absolute; top: 10px; right: 10px; z-index: 2;">★ {{ movie.rating }}</span>
+            <span style="background: var(--gold); color: #fff; padding: 3px 8px; border-radius: 4px; font-weight: 800; font-size: 10px; position: absolute; top: 10px; left: 10px; text-transform: uppercase; z-index: 2;">NEW</span>
+            <div class="title-on-art" style="position: absolute; bottom: 12px; left: 12px; right: 12px; font-family: 'Bebas Neue'; font-size: 22px; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.9); z-index: 2; line-height: 1.05;">{{ movie.title|upper }}</div>
+          </div>
+          <div class="stub-divider"></div>
+          <div class="stub-info" style="padding: 12px 14px 14px;">
+            <div class="genre" style="font-size: 12px; color: var(--text-muted); font-weight: 500;">{{ movie.genre }} • {{ movie.duration_minutes }}m</div>
+            <a href="{% url 'select_theater' movie.id %}" class="btn btn-gold btn-block" style="margin-top: 10px; font-size: 12.5px; padding: 9px; border-radius: 8px;">Book Tickets</a>
+          </div>
+        </article>
+        {% endfor %}
+      {% else %}
+        <div style="color: var(--text-muted); font-size: 14px; grid-column: span 5; padding: 20px;">No new releases added for this week yet.</div>
+      {% endif %}
     </div>
   </section>
 
-  <section class="section container">
-    <div class="section-head">
+  <!-- Section 2: All Movies (5 in a row grid layout with Genre Filters) -->
+  <section class="section container" style="margin-top: 56px; margin-bottom: 60px;">
+    <div class="section-head" style="margin-bottom: 20px; flex-wrap: wrap; gap: 16px;">
       <div>
-        <div class="eyebrow" style="margin-bottom:10px;">In Theatres</div>
-        <div class="section-title">Now Showing</div>
+        <div class="eyebrow" style="margin-bottom: 8px;">Explore All</div>
+        <h2 class="section-title" style="font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 0.02em; margin: 0;">Now Showing (All Movies)</h2>
       </div>
-      <a href="#" class="section-link">View all →</a>
+      
+      <!-- Filter Option Chips -->
+      <div class="filters" style="margin: 0; gap: 8px;">
+        <button class="chip active" onclick="filterGenre('all', this)">All Movies</button>
+        <button class="chip" onclick="filterGenre('action', this)">Action</button>
+        <button class="chip" onclick="filterGenre('sci-fi', this)">Sci-Fi</button>
+        <button class="chip" onclick="filterGenre('drama', this)">Drama</button>
+        <button class="chip" onclick="filterGenre('trending', this)">Trending</button>
+        <button class="chip" onclick="filterGenre('top_rated', this)">Top Rated</button>
+        <button class="chip" onclick="filterGenre('hot', this)">🔥 Hot</button>
+      </div>
     </div>
 
-    <div class="filters">
-      <button class="chip active">All</button>
-      <button class="chip">Hindi</button>
-      <button class="chip">English</button>
-      <button class="chip">Gujarati</button>
-      <button class="chip">2D</button>
-      <button class="chip">3D</button>
-      <button class="chip">4DX</button>
-      <button class="chip">Action</button>
-      <button class="chip">Romance</button>
-    </div>
-
-    <div class="rail">
-      <article class="stub">
-        <div class="stub-poster art-1">
-          <span class="cert">UA13+</span>
-          <span class="rating">★ 8.2</span>
-          <div class="title-on-art">CRIMSON<br>HORIZON</div>
-        </div>
-        <div class="stub-divider"></div>
-        <div class="stub-info">
-          <div class="genre">Action, Sci-Fi · Hindi, English</div>
-          <button class="book">Book Tickets</button>
-        </div>
-      </article>
-      <article class="stub">
-        <div class="stub-poster art-2">
-          <span class="cert">U</span>
-          <span class="rating">★ 7.6</span>
-          <div class="title-on-art">SILVER<br>STATIC</div>
-        </div>
-        <div class="stub-divider"></div>
-        <div class="stub-info">
-          <div class="genre">Comedy, Drama · Hindi</div>
-          <button class="book">Book Tickets</button>
-        </div>
-      </article>
-      <article class="stub">
-        <div class="stub-poster art-3">
-          <span class="cert">A</span>
-          <span class="rating">★ 8.9</span>
-          <div class="title-on-art">THE LONG<br>MONSOON</div>
-        </div>
-        <div class="stub-divider"></div>
-        <div class="stub-info">
-          <div class="genre">Drama, Romance · Gujarati</div>
-          <button class="book">Book Tickets</button>
-        </div>
-      </article>
-      <article class="stub">
-        <div class="stub-poster art-4">
-          <span class="cert">UA16+</span>
-          <span class="rating">★ 7.4</span>
-          <div class="title-on-art">ECHO<br>CHAMBER</div>
-        </div>
-        <div class="stub-divider"></div>
-        <div class="stub-info">
-          <div class="genre">Thriller · English</div>
-          <button class="book">Book Tickets</button>
-        </div>
-      </article>
-      <article class="stub">
-        <div class="stub-poster art-5">
-          <span class="cert">U</span>
-          <span class="rating">★ 8.0</span>
-          <div class="title-on-art">NEON<br>REQUIEM</div>
-        </div>
-        <div class="stub-divider"></div>
-        <div class="stub-info">
-          <div class="genre">Musical, Fantasy · Hindi</div>
-          <button class="book">Book Tickets</button>
-        </div>
-      </article>
-      <article class="stub">
-        <div class="stub-poster art-6">
-          <span class="cert">UA13+</span>
-          <span class="rating">★ 7.1</span>
-          <div class="title-on-art">PAPER<br>TIGERS</div>
-        </div>
-        <div class="stub-divider"></div>
-        <div class="stub-info">
-          <div class="genre">Comedy · English, Hindi</div>
-          <button class="book">Book Tickets</button>
-        </div>
-      </article>
+    <div class="movie-grid-5" id="allMoviesGrid">
+      {% if all_movies %}
+        {% for movie in all_movies %}
+        <article class="stub" data-genre="{{ movie.genre|lower }}" data-tag="{{ movie.display_tag|lower }}">
+          <div class="stub-poster">
+            {% if movie.poster_url %}
+              <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" class="stub-poster-img">
+            {% else %}
+              <div style="width: 100%; height: 100%; background: var(--bg-elevated); display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--text-muted);">No Poster</div>
+            {% endif %}
+            <div class="stub-poster-overlay"></div>
+            <span class="rating" style="background: rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.15); color: #FBBF24; padding: 4px 8px; border-radius: 6px; font-weight: 800; font-size: 11.5px; position: absolute; top: 10px; right: 10px; z-index: 2;">★ {{ movie.rating }}</span>
+            <div class="title-on-art" style="position: absolute; bottom: 12px; left: 12px; right: 12px; font-family: 'Bebas Neue'; font-size: 22px; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.9); z-index: 2; line-height: 1.05;">{{ movie.title|upper }}</div>
+          </div>
+          <div class="stub-divider"></div>
+          <div class="stub-info" style="padding: 12px 14px 14px;">
+            <div class="genre" style="font-size: 12px; color: var(--text-muted); font-weight: 500;">{{ movie.genre }} • {{ movie.duration_minutes }}m</div>
+            <a href="{% url 'select_theater' movie.id %}" class="btn btn-gold btn-block" style="margin-top: 10px; font-size: 12.5px; padding: 9px; border-radius: 8px;">Book Tickets</a>
+          </div>
+        </article>
+        {% endfor %}
+      {% else %}
+        <div style="color: var(--text-muted); font-size: 14px; grid-column: span 5; padding: 20px;">No movies currently active. Add movies from Admin Panel.</div>
+      {% endif %}
     </div>
   </section>
-  {% comment %}
-  <section class="section container" style="padding-top:0;">
-    <div class="section-head">
-      <div>
-        <div class="eyebrow" style="margin-bottom:10px;">Fresh Prints</div>
-        <div class="section-title">This Week's Releases</div>
+
+  <!-- Section 3: Frequently Asked Questions (FAQs) -->
+  <section class="section container" style="margin-top: 60px; margin-bottom: 80px;">
+    <div class="section-head" style="margin-bottom: 32px; justify-content: center;">
+      <div style="text-align: center;">
+        <div class="eyebrow" style="margin-bottom: 8px; justify-content: center;">Got Questions?</div>
+        <h2 class="section-title" style="font-family: 'Bebas Neue', sans-serif; font-size: 40px; letter-spacing: 0.02em; margin: 0;">Frequently Asked Questions</h2>
+        <p style="color: var(--text-muted); font-size: 14.5px; margin-top: 6px; max-width: 540px; margin-left: auto; margin-right: auto;">Everything you need to know about MovieMate tickets & cinema bookings in Ahmedabad.</p>
       </div>
     </div>
-    <div class="week-strip">
-      <div class="week-pill"><span class="dot art-7"></span><b>Last Light District</b><span>· Drama</span></div>
-      <div class="week-pill"><span class="dot art-8"></span><b>Glass Orchard</b><span>· Romance</span></div>
-      <div class="week-pill"><span class="dot art-2"></span><b>Static Bloom</b><span>· Family</span></div>
-      <div class="week-pill"><span class="dot art-5"></span><b>Midnight Ferry</b><span>· Thriller</span></div>
-      <div class="week-pill"><span class="dot art-3"></span><b>Nine Rivers</b><span>· Adventure</span></div>
-      <div class="week-pill"><span class="dot art-6"></span><b>Small Gods</b><span>· Comedy</span></div>
+
+    <div class="faq-container" style="max-width: 860px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px;">
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>How do I book movie tickets on MovieMate?</span>
+          <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div class="faq-answer">
+          <p>Booking is simple! Select your desired movie from the home page, pick your preferred cinema hall in Ahmedabad and showtime date, choose your seat tier (Platinum, Gold, or Silver), and complete payment to instantly receive your digital ticket with QR code.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>Where can I view my booked ticket QR code for entry?</span>
+          <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div class="faq-answer">
+          <p>Click on <b>My Bookings</b> in the top navigation bar. Every confirmed booking contains your live ticket details along with a verified digital QR code that can be scanned at the cinema entrance.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>Which cities are currently supported on MovieMate?</span>
+          <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div class="faq-answer">
+          <p>MovieMate is currently operational exclusively in <b>Ahmedabad</b>. We are actively expanding to Mumbai, Bengaluru, and Delhi NCR soon!</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>What seat categories and pricing tiers are available?</span>
+          <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div class="faq-answer">
+          <p>We provide three seat tiers depending on the theater setup: <b>Platinum</b> (Recliners & Premium View), <b>Gold</b> (Executive Middle Rows), and <b>Silver</b> (Standard View). Prices are displayed transparently during showtime selection.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>Can I change or cancel my movie booking?</span>
+          <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div class="faq-answer">
+          <p>Confirmed bookings are locked into the cinema system to guarantee your seat reservation. You can review all your booking details anytime under the <b>My Bookings</b> tab.</p>
+        </div>
+      </div>
     </div>
-  </section> {% endcomment %}
+  </section>
 
 </main>
 {% endblock %}
 
 {% block extra_js %}
 <script src="{% static 'accounts/js/dashboard.js' %}"></script>
+<script>
+function filterGenre(category, btn) {
+  document.querySelectorAll('.filters .chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+
+  const cards = document.querySelectorAll('#allMoviesGrid .stub');
+  const cat = category.toLowerCase();
+
+  cards.forEach(card => {
+    const genre = (card.getAttribute('data-genre') || '').toLowerCase();
+    const tag = (card.getAttribute('data-tag') || '').toLowerCase();
+
+    if (cat === 'all' || genre.includes(cat) || tag === cat) {
+      card.style.display = 'flex';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+
+function toggleFaq(btn) {
+  const item = btn.parentElement;
+  const isActive = item.classList.contains('active');
+  document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+  if (!isActive) {
+    item.classList.add('active');
+  }
+}
+</script>
 {% endblock %}

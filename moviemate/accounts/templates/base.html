@@ -38,20 +38,24 @@
             <circle cx="12" cy="9.5" r="2.4" />
           </svg>
           Ahmedabad
+          <div class="city-tooltip-badge">Currently we are only available in Ahmedabad</div>
         </div>
-        <div class="search-wrap">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9C97AC" stroke-width="2.4">
+        <div class="search-wrap" onclick="openSearchModalPopup()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9C97AC" stroke-width="2.2" class="search-icon">
             <circle cx="11" cy="11" r="7" />
             <path d="M21 21l-4.3-4.3" />
           </svg>
-          <input type="text" placeholder="Search movies, cinemas..." />
+          <input type="text" id="headerSearchInput" placeholder="Search movies" readonly />
         </div>
       </div>
       <div class="nav-right">
         <nav class="nav-links">
           <a href="{% url 'dashboard' %}" class="{% block nav_movies_active %}{% endblock %}">Movies</a>
-          <a href="#">My Bookings</a>
+          <a href="{% url 'my_bookings' %}">My Bookings</a>
           <a href="#">Offers</a>
+          {% if customer.role == 'admin' %}
+          <a href="{% url 'admin_panel:dashboard' %}" style="color: #3B82F6;">Admin</a>
+          {% endif %}
         </nav>
         <div class="nav-auth">
           {% if request.session.customer_id %}
@@ -123,8 +127,107 @@
   </footer>
   {% endblock %}
 
+  <!-- Full Search Modal Popup -->
+  <div id="searchModalPopup" class="search-modal-overlay">
+    <div class="search-popup-card">
+      <div class="search-popup-header">
+        <div class="search-popup-input-wrap">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5">
+            <circle cx="11" cy="11" r="7" />
+            <path d="M21 21l-4.3-4.3" />
+          </svg>
+          <input type="text" id="popupSearchInput" placeholder="Search by title" onkeyup="handlePopupSearch(event)" autocomplete="off" />
+          <button type="button" onclick="closeSearchPopup()" class="search-popup-close">&times;</button>
+        </div>
+      </div>
+      <div id="popupSearchResults" class="popup-search-results">
+        <div style="text-align: center; color: var(--text-muted); padding: 40px 20px; font-size: 14px;">
+          Type any movie title, genre, or tag above to explore available shows in Ahmedabad...
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Base Scripts -->
   <script src="{% static 'accounts/js/base.js' %}"></script>
+  <script>
+  let popupSearchTimer = null;
+
+  function openSearchModalPopup() {
+    const modal = document.getElementById('searchModalPopup');
+    const input = document.getElementById('popupSearchInput');
+    if (modal) {
+      modal.style.display = 'flex';
+      setTimeout(() => input && input.focus(), 100);
+    }
+  }
+
+  function closeSearchPopup() {
+    const modal = document.getElementById('searchModalPopup');
+    if (modal) {
+      modal.style.display = 'none';
+    }
+  }
+
+  function handlePopupSearch(e) {
+    const input = document.getElementById('popupSearchInput');
+    const resultsContainer = document.getElementById('popupSearchResults');
+    if (!input || !resultsContainer) return;
+
+    const query = input.value.trim();
+    if (!query) {
+      resultsContainer.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 40px 20px; font-size: 14px;">Type any movie title, genre, or tag above to explore available shows in Ahmedabad...</div>';
+      return;
+    }
+
+    clearTimeout(popupSearchTimer);
+    popupSearchTimer = setTimeout(() => {
+      fetch(`/search-api/?q=${encodeURIComponent(query)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.movies && data.movies.length > 0) {
+            resultsContainer.innerHTML = `
+              <div class="popup-movies-grid">
+                ${data.movies.map(m => `
+                  <div class="popup-movie-card">
+                    <div class="popup-card-poster">
+                      <img src="${m.poster_url}" alt="${m.title}">
+                      <span class="popup-card-rating">★ ${m.rating}</span>
+                    </div>
+                    <div class="popup-movie-info">
+                      <div class="popup-movie-title">${m.title}</div>
+                      <div class="popup-movie-meta">${m.genre}</div>
+                      <a href="/movie/${m.id}/theaters/" class="btn btn-gold btn-block" style="margin-top: 10px; font-size: 13px; padding: 10px; border-radius: 8px;">Book Tickets</a>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            `;
+          } else {
+            resultsContainer.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 50px 20px; font-size: 15px;">No movies found matching "<b style="color:#fff;">${query}</b>"</div>`;
+          }
+        })
+        .catch(() => {
+          resultsContainer.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 40px 20px; font-size: 14px;">Error fetching search results.</div>';
+        });
+    }, 150);
+  }
+
+  // Close modal on Escape key press
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeSearchPopup();
+    }
+  });
+
+  // Close modal when clicking backdrop
+  document.addEventListener('click', function(e) {
+    const modal = document.getElementById('searchModalPopup');
+    if (e.target === modal) {
+      closeSearchPopup();
+    }
+  });
+  </script>
   {% block extra_js %}{% endblock %}
 </body>
 

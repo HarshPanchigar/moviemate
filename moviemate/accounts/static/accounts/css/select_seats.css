@@ -1,0 +1,466 @@
+/* =========================================================
+   MOVIEMATE - REALISTIC CINEMA SEAT SELECTION
+========================================================= */
+
+.seat-page {
+    max-width: 1050px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+}
+
+/* ================= HEADER ================= */
+
+.booking-header {
+    text-align: center;
+    margin-bottom: 34px;
+}
+
+.step-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    color: #ff304d;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.step-label::before,
+.step-label::after {
+    content: "";
+    width: 25px;
+    height: 1px;
+    background: #ff304d;
+}
+
+.booking-title {
+    margin: 0;
+    color: #fff;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(34px, 5vw, 46px);
+    line-height: 1;
+    letter-spacing: .5px;
+}
+
+.booking-info {
+    margin: 10px 0 0;
+    color: #8f8b9d;
+    font-size: 13.5px;
+}
+
+.booking-info strong {
+    color: #e9e7ef;
+}
+
+
+/* ================= TIER SELECTOR ================= */
+
+.tier-wrapper {
+    margin: 0 auto 35px;
+    max-width: 850px;
+}
+
+.tier-title {
+    margin: 0 0 13px;
+    color: #858193;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+.tier-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+}
+
+.tier-option {
+    position: relative;
+    display: block;
+    padding: 16px 18px;
+    background: #191821;
+    border: 1.5px solid #302d3d;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tier-option:hover {
+    border-color: #4a4657;
+    background: #1d1b25;
+    transform: translateY(-2px);
+}
+
+.tier-option:has(input:checked) {
+    border-color: #ff304d;
+    background: linear-gradient(145deg, rgba(243, 38, 69, .14), #191821);
+    box-shadow: 0 8px 25px rgba(243, 38, 69, .12);
+}
+
+.tier-option input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.tier-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.tier-radio {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    border: 2px solid #555163;
+    border-radius: 50%;
+    position: relative;
+}
+
+.tier-option:has(input:checked) .tier-radio {
+    border-color: #ff304d;
+}
+
+.tier-option:has(input:checked) .tier-radio::after {
+    content: "";
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #ff304d;
+    border-radius: 50%;
+}
+
+.tier-name {
+    display: block;
+    margin-bottom: 3px;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.tier-price {
+    color: #858193;
+    font-size: 11.5px;
+}
+
+
+/* ================= REALISTIC PERSPECTIVE SCREEN ================= */
+
+.screen-wrapper {
+    max-width: 680px;
+    margin: 0 auto 42px;
+    text-align: center;
+    perspective: 400px;
+}
+
+.screen {
+    height: 12px;
+    background: linear-gradient(90deg, rgba(255, 48, 77, 0.1), #ff304d 20%, #ffca28 50%, #ff304d 80%, rgba(255, 48, 77, 0.1));
+    border-radius: 50% 50% 0 0;
+    box-shadow: 0 8px 30px rgba(255, 48, 77, .5);
+    transform: rotateX(-15deg);
+}
+
+.screen-label {
+    margin-top: 12px;
+    color: #858193;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+}
+
+
+/* ================= SEAT AREA & REALISTIC ARMCHAIRS ================= */
+
+.seat-area {
+    max-width: 880px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.tier-section {
+    padding: 20px;
+    border-radius: 18px;
+    background: #171622;
+}
+
+.tier-section.platinum {
+    border: 1px solid rgba(96, 165, 250, .28);
+    background: radial-gradient(circle at 50% 0%, rgba(96, 165, 250, 0.08), transparent 70%), #171622;
+}
+
+.tier-section.gold {
+    border: 1px solid rgba(251, 191, 36, .28);
+    background: radial-gradient(circle at 50% 0%, rgba(251, 191, 36, 0.08), transparent 70%), #171622;
+}
+
+.tier-section.silver {
+    border: 1px solid rgba(156, 163, 175, .28);
+    background: radial-gradient(circle at 50% 0%, rgba(156, 163, 175, 0.08), transparent 70%), #171622;
+}
+
+.tier-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+}
+
+.section-name {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+}
+
+.section-rows {
+    color: #858193;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.platinum .section-name { color: #60a5fa; }
+.gold .section-name { color: #fbbf24; }
+.silver .section-name { color: #a1a1aa; }
+
+.seat-grid {
+    display: grid;
+    gap: 12px 10px;
+    justify-content: center;
+}
+
+.seat-grid.grid-10 {
+    grid-template-columns: repeat(10, minmax(40px, 48px));
+}
+
+.seat-grid.grid-12 {
+    grid-template-columns: repeat(12, minmax(36px, 44px));
+}
+
+/* REALISTIC CINEMA CHAIR DESIGN */
+.seat-btn {
+    position: relative;
+    height: 44px;
+    border: 1.5px solid #363246;
+    border-radius: 9px 9px 4px 4px;
+    background: linear-gradient(180deg, #2a2638 0%, #1e1b27 100%);
+    color: #d1cdde;
+    font-size: 11px;
+    font-weight: 800;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.12), 0 3px 6px rgba(0, 0, 0, 0.35);
+    transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Armrests on both sides of seat */
+.seat-btn::before, .seat-btn::after {
+    content: "";
+    position: absolute;
+    bottom: 2px;
+    width: 3.5px;
+    height: 22px;
+    background: #393548;
+    border-radius: 2px;
+}
+
+.seat-btn::before { left: -2px; }
+.seat-btn::after { right: -2px; }
+
+.seat-btn:not(.booked):hover {
+    transform: translateY(-3px) scale(1.05);
+    border-color: #ff304d;
+    color: #fff;
+    background: linear-gradient(180deg, #3d364f 0%, #282336 100%);
+    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.25), 0 6px 16px rgba(255, 48, 77, 0.3);
+}
+
+/* Selected state: glowing crimson red armchair */
+.seat-btn.selected {
+    background: linear-gradient(180deg, #ff3352 0%, #c9122c 100%) !important;
+    border-color: #ff667c !important;
+    color: #fff !important;
+    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.4), 0 8px 22px rgba(237, 29, 55, 0.55) !important;
+}
+
+.seat-btn.selected::before, .seat-btn.selected::after {
+    background: #e01b36;
+}
+
+/* Booked state: disabled muted slate */
+.seat-btn.booked {
+    background: #272632 !important;
+    border-color: #31303d !important;
+    color: #555466 !important;
+    cursor: not-allowed !important;
+    box-shadow: none !important;
+    opacity: 0.65;
+    text-decoration: line-through;
+}
+
+.seat-btn.booked::before, .seat-btn.booked::after {
+    background: #201f29;
+}
+
+
+/* ================= LEGEND ================= */
+
+.seat-legend {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 24px;
+    margin: 32px auto 36px;
+    color: #858193;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.legend-seat {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    border: 1.5px solid #363246;
+    background: linear-gradient(180deg, #2a2638 0%, #1e1b27 100%);
+}
+
+.legend-seat.selected {
+    background: linear-gradient(180deg, #ff3352 0%, #c9122c 100%);
+    border-color: #ff667c;
+}
+
+.legend-seat.booked {
+    background: #272632;
+    border-color: #31303d;
+    opacity: 0.65;
+}
+
+
+/* ================= CHECKOUT BAR ================= */
+
+.checkout-bar {
+    position: sticky;
+    bottom: 20px;
+    z-index: 100;
+    max-width: 680px;
+    margin: 25px auto 0;
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    background: rgba(23, 22, 34, 0.96);
+    border: 1.5px solid #393646;
+    border-radius: 18px;
+    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(16px);
+}
+
+.summary {
+    min-width: 0;
+}
+
+.summary-row {
+    color: #858193;
+    font-size: 12px;
+    margin-bottom: 3px;
+}
+
+.summary-row strong {
+    color: #fff;
+    text-transform: uppercase;
+}
+
+.summary-total {
+    margin-top: 4px;
+    color: #fff;
+    font-size: 20px;
+    font-weight: 850;
+}
+
+.summary-total span {
+    color: #ff304d;
+}
+
+.proceed-btn {
+    flex-shrink: 0;
+    padding: 13px 24px;
+    border: 0;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #f32645, #ed1d39);
+    color: #fff;
+    font-size: 13.5px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 6px 20px rgba(243, 38, 69, 0.35);
+}
+
+.proceed-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #ff3855, #f32645);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(243, 38, 69, 0.5);
+}
+
+.proceed-btn:disabled {
+    opacity: .4;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 800px) {
+
+    .seat-page {
+        padding: 28px 15px 60px;
+    }
+
+    .seat-grid.grid-10 {
+        grid-template-columns: repeat(10, minmax(28px, 1fr));
+    }
+
+    .seat-grid.grid-12 {
+        grid-template-columns: repeat(12, minmax(24px, 1fr));
+    }
+
+    .seat-btn {
+        height: 38px;
+        font-size: 9.5px;
+    }
+
+    .checkout-bar {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .proceed-btn {
+        width: 100%;
+    }
+}

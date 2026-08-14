@@ -1,0 +1,283 @@
+{% extends 'admin_panel/base_admin.html' %}
+
+{% block title %}Dashboard & Analytics | MovieMate Admin{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px;">
+    <div>
+        <h1 style="font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 0.02em; margin: 0;">System Dashboard & Analytics</h1>
+        <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">Real-time business operational statistics, analytics, and show allocation metrics.</p>
+    </div>
+    <div style="display: flex; gap: 10px;">
+        <span style="background: rgba(59, 130, 246, 0.15); border: 1px solid var(--blue-primary); color: var(--blue-light); padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 13px; display: flex; align-items: center; gap: 8px;">
+            <span style="width: 8px; height: 8px; background: #10B981; border-radius: 50%; display: inline-block;"></span> Live System Active
+        </span>
+    </div>
+</div>
+
+<!-- Key Performance Metrics Grid -->
+<div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px;">
+    <div class="stat-card">
+        <div class="stat-info">
+            <div class="label">Registered Clients</div>
+            <div class="value">{{ total_customers }}</div>
+        </div>
+        <div class="stat-icon">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-info">
+            <div class="label">Catalog Movies</div>
+            <div class="value">{{ total_movies }}</div>
+        </div>
+        <div class="stat-icon">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"></path></svg>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-info">
+            <div class="label">Cinema Venues</div>
+            <div class="value">{{ total_cinemas }}</div>
+        </div>
+        <div class="stat-icon">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h4m-4 0v-4a2 2 0 012-2h2a2 2 0 012 2v4"></path></svg>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-info">
+            <div class="label">Total Shows Scheduled</div>
+            <div class="value">{{ total_shows }}</div>
+        </div>
+        <div class="stat-icon">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-info">
+            <div class="label">Total Revenue</div>
+            <div class="value" style="color: #10B981;">₹{{ total_revenue }}</div>
+        </div>
+        <div class="stat-icon">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V6m0 8v2m0-8c-1.11 0-2.08.402-2.599 1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        </div>
+    </div>
+</div>
+
+<!-- Interactive Analytics Charts Grid -->
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 28px;">
+    <!-- Chart 1: Shows & Booking Performance per Movie -->
+    <div class="panel-card" style="padding: 24px;">
+        <div class="panel-header" style="margin-bottom: 20px;">
+            <div class="panel-title" style="font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 10px;">
+                <svg width="20" height="20" fill="none" stroke="var(--blue-light)" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                Movie Catalog Allocations & Ticket Bookings
+            </div>
+            <span style="font-size: 12px; color: var(--text-muted);">Allocated Shows vs Bookings</span>
+        </div>
+        <div style="position: relative; height: 260px; width: 100%;">
+            <canvas id="movieAnalyticsChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Chart 2: Revenue Distribution by Genre -->
+    <div class="panel-card" style="padding: 24px;">
+        <div class="panel-header" style="margin-bottom: 20px;">
+            <div class="panel-title" style="font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 10px;">
+                <svg width="20" height="20" fill="none" stroke="#F59E0B" stroke-width="2" viewBox="0 0 24 24"><path d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg>
+                Revenue by Genre
+            </div>
+            <span style="font-size: 12px; color: var(--text-muted);">Category Share</span>
+        </div>
+        <div style="position: relative; height: 260px; width: 100%; display: flex; align-items: center; justify-content: center;">
+            <canvas id="genreRevenueChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Row 2: Cinema Allocations & Recent Activity -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 28px;">
+    <!-- Chart 3: Show Allocations per Cinema Venue -->
+    <div class="panel-card" style="padding: 24px;">
+        <div class="panel-header" style="margin-bottom: 20px;">
+            <div class="panel-title" style="font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 10px;">
+                <svg width="20" height="20" fill="none" stroke="#10B981" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h4m-4 0v-4a2 2 0 012-2h2a2 2 0 012 2v4"></path></svg>
+                Cinema Venue Show Allocations
+            </div>
+            <a href="{% url 'admin_panel:allocations' %}" style="font-size: 13px; color: var(--blue-primary); font-weight: 700;">Manage Allocations &rarr;</a>
+        </div>
+        <div style="position: relative; height: 220px; width: 100%;">
+            <canvas id="cinemaDistributionChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Admin Activity Feed -->
+    <div class="panel-card" style="padding: 24px;">
+        <div class="panel-header" style="margin-bottom: 16px;">
+            <div class="panel-title" style="font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 10px;">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Admin Activity Audit Feed
+            </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px; max-height: 220px; overflow-y: auto;">
+            {% for log in recent_logs %}
+            <div style="padding: 10px 12px; background: var(--bg-elevated); border-radius: 8px; border-left: 3px solid var(--blue-primary);">
+                <div style="font-size: 13px; font-weight: 600; color: var(--text);">{{ log.action }}</div>
+                <div style="font-size: 11px; color: var(--text-faint); margin-top: 4px; display: flex; justify-content: space-between;">
+                    <span>By {{ log.performed_by }}</span>
+                    <span>{{ log.timestamp|date:"M d, H:i" }}</span>
+                </div>
+            </div>
+            {% empty %}
+            <div style="color: var(--text-muted); font-size: 13px; text-align: center; padding: 20px;">No recent system logs.</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Table: Recent Users -->
+<div class="panel-card" style="padding: 24px;">
+    <div class="panel-header" style="margin-bottom: 16px;">
+        <div class="panel-title" style="font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 10px;">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+            Recently Registered Client Accounts
+        </div>
+        <a href="{% url 'admin_panel:users' %}" style="font-size: 13px; color: var(--blue-primary); font-weight: 700;">View All Users &rarr;</a>
+    </div>
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Full Name</th>
+                <th>Email Address</th>
+                <th>Mobile</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for customer in recent_customers %}
+            <tr>
+                <td style="font-weight: 700;">{{ customer.full_name }}</td>
+                <td>{{ customer.email }}</td>
+                <td style="color: var(--text-muted);">{{ customer.mobile }}</td>
+                <td>
+                    <a href="{% url 'admin_panel:delete_user' customer.id %}" class="btn-danger-sm" onclick="return confirm('Remove user {{ customer.full_name }}?')">Remove</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 24px;">No client users registered yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. Movie Analytics Bar Chart
+    const movieLabels = {{ movie_labels_json|safe }};
+    const movieShows = {{ movie_shows_json|safe }};
+    const movieBookings = {{ movie_bookings_json|safe }};
+
+    const ctxMovie = document.getElementById('movieAnalyticsChart').getContext('2d');
+    new Chart(ctxMovie, {
+        type: 'bar',
+        data: {
+            labels: movieLabels,
+            datasets: [
+                {
+                    label: 'Scheduled Shows',
+                    data: movieShows,
+                    backgroundColor: 'rgba(59, 130, 246, 0.75)',
+                    borderColor: '#3B82F6',
+                    borderWidth: 1,
+                    borderRadius: 4
+                },
+                {
+                    label: 'Tickets Booked',
+                    data: movieBookings,
+                    backgroundColor: 'rgba(16, 185, 129, 0.75)',
+                    borderColor: '#10B981',
+                    borderWidth: 1,
+                    borderRadius: 4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { labels: { color: '#94A3B8', font: { family: 'Plus Jakarta Sans', size: 12 } } }
+            },
+            scales: {
+                x: { ticks: { color: '#94A3B8' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                y: { ticks: { color: '#94A3B8' }, grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true }
+            }
+        }
+    });
+
+    // 2. Genre Revenue Doughnut Chart
+    const genreLabels = {{ genre_labels_json|safe }};
+    const genreRevenue = {{ genre_revenue_json|safe }};
+
+    const ctxGenre = document.getElementById('genreRevenueChart').getContext('2d');
+    new Chart(ctxGenre, {
+        type: 'doughnut',
+        data: {
+            labels: genreLabels,
+            datasets: [{
+                data: genreRevenue,
+                backgroundColor: [
+                    '#3B82F6', '#10B981', '#F59E0B', '#EC4899', '#8B5CF6', '#6366F1'
+                ],
+                borderWidth: 2,
+                borderColor: '#1E293B'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'right', labels: { color: '#94A3B8', font: { family: 'Plus Jakarta Sans', size: 11 } } }
+            }
+        }
+    });
+
+    // 3. Cinema Distribution Horizontal Bar Chart
+    const cinemaLabels = {{ cinema_labels_json|safe }};
+    const cinemaShows = {{ cinema_shows_json|safe }};
+
+    const ctxCinema = document.getElementById('cinemaDistributionChart').getContext('2d');
+    new Chart(ctxCinema, {
+        type: 'bar',
+        data: {
+            labels: cinemaLabels,
+            datasets: [{
+                label: 'Showtimes Allocated',
+                data: cinemaShows,
+                backgroundColor: 'rgba(139, 92, 246, 0.75)',
+                borderColor: '#8B5CF6',
+                borderWidth: 1,
+                borderRadius: 4
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                x: { ticks: { color: '#94A3B8' }, grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true },
+                y: { ticks: { color: '#94A3B8' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

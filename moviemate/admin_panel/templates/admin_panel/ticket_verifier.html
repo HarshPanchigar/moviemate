@@ -1,0 +1,60 @@
+{% extends 'admin_panel/base_admin.html' %}
+
+{% block title %}Ticket QR Verifier | MovieMate Admin{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 28px;">
+    <h1 style="font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 0.02em;">Gate Ticket Verification</h1>
+    <p style="color: var(--text-muted); font-size: 14px;">Scan or input ticket QR verification hash to validate cinema entry tickets.</p>
+</div>
+
+{% if message_text %}
+<div style="margin-bottom: 24px; padding: 18px 24px; border-radius: var(--radius); font-weight: 700; font-size: 15px; 
+    {% if 'SUCCESS' in message_text %}background: rgba(16, 185, 129, 0.15); border: 1px solid #10B981; color: #34D399;
+    {% elif 'WARNING' in message_text %}background: rgba(245, 158, 11, 0.15); border: 1px solid #F59E0B; color: #FBBF24;
+    {% else %}background: rgba(239, 68, 68, 0.15); border: 1px solid #EF4444; color: #F87171;{% endif %}">
+    {{ message_text }}
+</div>
+{% endif %}
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 28px;">
+    <!-- Scan / Hash Entry Form -->
+    <div class="panel-card">
+        <div class="panel-header">
+            <div class="panel-title">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
+                Enter Ticket Verification Payload / Scan Hash
+            </div>
+        </div>
+        <form action="{% url 'admin_panel:verifier' %}" method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Ticket Hash Code</label>
+                <input type="text" name="qr_hash" class="form-control" placeholder="e.g. MM-7f9a1b8c..." required style="font-family: 'Space Mono', monospace; font-size: 15px;">
+            </div>
+            <button type="submit" class="btn-blue" style="width: 100%; justify-content: center; padding: 14px;">Verify & Validate Ticket Entry</button>
+        </form>
+    </div>
+
+    <!-- Scanned Details Box -->
+    <div class="panel-card">
+        <div class="panel-header">
+            <div class="panel-title">Scanned Ticket Details</div>
+        </div>
+        {% if scanned_booking %}
+            <div style="display: flex; flex-direction: column; gap: 12px; font-size: 14px;">
+                <div><span style="color: var(--text-muted);">Customer:</span> <b>{{ scanned_booking.customer.full_name }}</b></div>
+                <div><span style="color: var(--text-muted);">Movie:</span> <b>{{ scanned_booking.showtime.movie.title }}</b></div>
+                <div><span style="color: var(--text-muted);">Cinema:</span> <b>{{ scanned_booking.showtime.cinema.name }} ({{ scanned_booking.showtime.cinema.city }})</b></div>
+                <div><span style="color: var(--text-muted);">Show Date & Time:</span> <b>{{ scanned_booking.showtime.show_date }} {{ scanned_booking.showtime.start_time }}</b></div>
+                <div><span style="color: var(--text-muted);">Seats Tier:</span> <b style="text-transform: uppercase; color: var(--blue-light);">{{ scanned_booking.seat_tier }} ({{ scanned_booking.seats }})</b></div>
+                <div><span style="color: var(--text-muted);">Total Paid:</span> <b style="color: #34D399;">₹{{ scanned_booking.total_amount }}</b></div>
+            </div>
+        {% else %}
+            <div style="color: var(--text-muted); font-size: 13.5px; text-align: center; padding: 40px;">
+                No active ticket scanned in this session. Enter hash code to verify.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

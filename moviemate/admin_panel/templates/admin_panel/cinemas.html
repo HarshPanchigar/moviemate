@@ -1,0 +1,233 @@
+{% extends 'admin_panel/base_admin.html' %}
+
+{% block title %}Cinemas & Halls | MovieMate Admin{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+    <div>
+        <h1 style="font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 0.02em; margin: 0;">Cinema Halls Management</h1>
+        <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">Register, edit, view full hall details, or delete theater venues across cities.</p>
+    </div>
+    <button class="btn-blue" onclick="document.getElementById('addCinemaModal').style.display='flex'">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"></path></svg>
+        Add New Cinema
+    </button>
+</div>
+
+<!-- Search Filter -->
+<div class="panel-card" style="padding: 16px; margin-bottom: 20px;">
+    <input type="text" id="cinemaSearchInput" class="form-control" placeholder="Search by cinema name or city..." onkeyup="filterCinemasTable()">
+</div>
+
+<div class="panel-card">
+    <table class="admin-table" id="cinemasTable">
+        <thead>
+            <tr>
+                <th>Cinema Name</th>
+                <th>City</th>
+                <th>Address</th>
+                <th>Total Screens</th>
+                <th>Active Showtimes</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in cinemas_data %}
+            <tr data-name="{{ item.cinema.name|lower }}" data-city="{{ item.cinema.city|lower }}">
+                <td style="font-weight: 700; color: var(--text);">{{ item.cinema.name }}</td>
+                <td><span style="background: var(--blue-primary); color: #fff; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 700;">{{ item.cinema.city }}</span></td>
+                <td style="color: var(--text-muted); max-width: 280px;">{{ item.cinema.address }}</td>
+                <td style="font-weight: 600;">{{ item.cinema.total_screens }} Screens</td>
+                <td>
+                    <span style="background: rgba(16, 185, 129, 0.15); color: #10B981; padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 12px;">
+                        {{ item.total_shows }} Shows
+                    </span>
+                </td>
+                <td>
+                    <div style="display: flex; gap: 6px; align-items: center;">
+                        <button onclick="openViewFullCinemaModal('{{ item.cinema.name|escapejs }}', '{{ item.cinema.city|escapejs }}', '{{ item.cinema.address|escapejs }}', {{ item.cinema.total_screens }}, '{{ item.cinema.facilities|escapejs }}', '{{ item.total_shows }}', '{{ item.bookings_count }}', [{% for m in item.movies_active %}'{{ m.title|escapejs }}'{% if not forloop.last %},{% endif %}{% endfor %}])" 
+                                class="btn-blue" style="padding: 5px 10px; font-size: 11.5px;">
+                            View Full
+                        </button>
+
+                        <button onclick="editCinema({{ item.cinema.id }}, '{{ item.cinema.name|escapejs }}', '{{ item.cinema.city|escapejs }}', '{{ item.cinema.address|escapejs }}', {{ item.cinema.total_screens }})" 
+                                class="btn-blue" style="padding: 5px 10px; font-size: 11.5px; background: rgba(255,255,255,0.08); border: 1px solid var(--stroke);">
+                            Edit
+                        </button>
+
+                        <a href="{% url 'admin_panel:delete_cinema' item.cinema.id %}" class="btn-danger-sm" style="padding: 5px 10px; font-size: 11.5px;" onclick="return confirm('Delete Cinema {{ item.cinema.name }}?')">Delete</a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 32px;">No cinemas registered yet. Click "Add New Cinema" above to add one.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal: View Full Cinema Venue Details -->
+<div id="viewFullCinemaModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 250; align-items: center; justify-content: center; padding: 20px;">
+    <div style="background: var(--bg-surface); border: 1px solid var(--stroke); border-radius: var(--radius); width: 100%; max-width: 580px; padding: 28px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div>
+                <h3 id="vfcName" style="font-size: 22px; font-weight: 800; color: var(--text); margin: 0;"></h3>
+                <span id="vfcCity" style="background: var(--blue-primary); color: #fff; padding: 2px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; display: inline-block; margin-top: 6px;"></span>
+            </div>
+            <button onclick="document.getElementById('viewFullCinemaModal').style.display='none'" style="background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer;">&times;</button>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px;">
+            <div style="background: var(--bg-elevated); padding: 14px; border-radius: 8px;">
+                <div style="font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 4px;">Venue Location Address</div>
+                <div id="vfcAddress" style="font-size: 14px; color: var(--text); line-height: 1.4;"></div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+                <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); padding: 12px; border-radius: 8px; text-align: center;">
+                    <div style="font-size: 11px; color: var(--text-muted);">Total Screens</div>
+                    <div id="vfcScreens" style="font-size: 18px; font-weight: 800; color: var(--blue-light);"></div>
+                </div>
+                <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); padding: 12px; border-radius: 8px; text-align: center;">
+                    <div style="font-size: 11px; color: var(--text-muted);">Active Shows</div>
+                    <div id="vfcShows" style="font-size: 18px; font-weight: 800; color: #10B981;"></div>
+                </div>
+                <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.2); padding: 12px; border-radius: 8px; text-align: center;">
+                    <div style="font-size: 11px; color: var(--text-muted);">Total Bookings</div>
+                    <div id="vfcBookings" style="font-size: 18px; font-weight: 800; color: #F59E0B;"></div>
+                </div>
+            </div>
+
+            <div style="background: var(--bg-elevated); padding: 14px; border-radius: 8px;">
+                <div style="font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 6px;">Facilities & Features</div>
+                <div id="vfcFacilities" style="font-size: 13px; color: var(--text);"></div>
+            </div>
+
+            <div style="background: var(--bg-elevated); padding: 14px; border-radius: 8px;">
+                <div style="font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">Currently Screening Movies</div>
+                <div id="vfcMoviesList" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end;">
+            <button onclick="document.getElementById('viewFullCinemaModal').style.display='none'" class="btn-blue">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Add Cinema -->
+<div id="addCinemaModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 200; align-items: center; justify-content: center;">
+    <div style="background: var(--bg-surface); border: 1px solid var(--stroke); border-radius: var(--radius); width: 100%; max-width: 500px; padding: 28px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="font-size: 20px; font-weight: 700; color: var(--text); margin: 0;">Add Cinema Hall</h3>
+            <button onclick="document.getElementById('addCinemaModal').style.display='none'" style="background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer;">&times;</button>
+        </div>
+        <form action="{% url 'admin_panel:add_cinema' %}" method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Cinema Name</label>
+                <input type="text" name="name" class="form-control" placeholder="e.g. PVR Acropolis" required>
+            </div>
+            <div class="form-group">
+                <label>City</label>
+                <input type="text" name="city" class="form-control" placeholder="e.g. Ahmedabad" value="Ahmedabad" required>
+            </div>
+            <div class="form-group">
+                <label>Address</label>
+                <textarea name="address" class="form-control" rows="3" placeholder="Full cinema location address..." required></textarea>
+            </div>
+            <div class="form-group">
+                <label>Total Screens</label>
+                <input type="number" name="screens" class="form-control" value="4" required>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+                <button type="button" onclick="document.getElementById('addCinemaModal').style.display='none'" class="btn-danger-sm" style="background: transparent;">Cancel</button>
+                <button type="submit" class="btn-blue">Save Cinema</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal: Edit Cinema -->
+<div id="editCinemaModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 200; align-items: center; justify-content: center;">
+    <div style="background: var(--bg-surface); border: 1px solid var(--stroke); border-radius: var(--radius); width: 100%; max-width: 500px; padding: 28px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="font-size: 20px; font-weight: 700; color: var(--text); margin: 0;">Edit Cinema Hall</h3>
+            <button onclick="document.getElementById('editCinemaModal').style.display='none'" style="background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer;">&times;</button>
+        </div>
+        <form id="editCinemaForm" method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Cinema Name</label>
+                <input type="text" name="name" id="editName" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label>City</label>
+                <input type="text" name="city" id="editCity" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label>Address</label>
+                <textarea name="address" id="editAddress" class="form-control" rows="3" required></textarea>
+            </div>
+            <div class="form-group">
+                <label>Total Screens</label>
+                <input type="number" name="screens" id="editScreens" class="form-control" required>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+                <button type="button" onclick="document.getElementById('editCinemaModal').style.display='none'" class="btn-danger-sm" style="background: transparent;">Cancel</button>
+                <button type="submit" class="btn-blue">Update Cinema</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openViewFullCinemaModal(name, city, address, screens, facilities, shows, bookings, activeMovies) {
+    document.getElementById('vfcName').innerText = name;
+    document.getElementById('vfcCity').innerText = city;
+    document.getElementById('vfcAddress').innerText = address;
+    document.getElementById('vfcScreens').innerText = screens + ' Screens';
+    document.getElementById('vfcShows').innerText = shows + ' Shows';
+    document.getElementById('vfcBookings').innerText = bookings + ' Tickets';
+    document.getElementById('vfcFacilities').innerText = facilities || '4K Dolby Atmos, Recliners, Food Court';
+
+    const moviesContainer = document.getElementById('vfcMoviesList');
+    if (activeMovies && activeMovies.length > 0) {
+        moviesContainer.innerHTML = activeMovies.map(m => `
+            <span style="background: rgba(59, 130, 246, 0.15); color: var(--blue-light); padding: 4px 10px; border-radius: 6px; font-weight: 600; font-size: 12px;">${m}</span>
+        `).join('');
+    } else {
+        moviesContainer.innerHTML = '<span style="color: var(--text-muted); font-size: 12px;">No movies currently scheduled.</span>';
+    }
+
+    document.getElementById('viewFullCinemaModal').style.display = 'flex';
+}
+
+function editCinema(id, name, city, address, screens) {
+    document.getElementById('editCinemaForm').action = `/admin-panel/cinemas/edit/${id}/`;
+    document.getElementById('editName').value = name;
+    document.getElementById('editCity').value = city;
+    document.getElementById('editAddress').value = address;
+    document.getElementById('editScreens').value = screens;
+    document.getElementById('editCinemaModal').style.display = 'flex';
+}
+
+function filterCinemasTable() {
+    const q = document.getElementById('cinemaSearchInput').value.toLowerCase();
+    const rows = document.querySelectorAll('#cinemasTable tbody tr');
+
+    rows.forEach(row => {
+        const name = row.getAttribute('data-name') || '';
+        const city = row.getAttribute('data-city') || '';
+
+        if (!q || name.includes(q) || city.includes(q)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+</script>
+{% endblock %}

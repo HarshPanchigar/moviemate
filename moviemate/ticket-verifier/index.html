@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MovieMate Ticket Verifier App</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+    <!-- html5-qrcode scanner library -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #0E0D14;
+            color: #FFFFFF;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 16px 40px;
+        }
+
+        .verifier-container {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        /* App Header */
+        .app-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .app-brand {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 36px;
+            letter-spacing: 1.5px;
+            color: #fff;
+        }
+
+        .app-brand span {
+            color: #ED1D37;
+        }
+
+        .app-subtitle {
+            font-size: 11px;
+            font-weight: 800;
+            color: #858193;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: -2px;
+        }
+
+        /* Server Config Collapsible */
+        .server-config-card {
+            background: #171622;
+            border: 1px solid #2B283A;
+            border-radius: 14px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+        }
+
+        .server-config-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11px;
+            font-weight: 800;
+            color: #858193;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        .server-input-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .server-input {
+            flex: 1;
+            background: #0E0D14;
+            border: 1px solid #332F45;
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: #fff;
+            font-size: 13px;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .server-save-btn {
+            background: #ED1D37;
+            border: 0;
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        /* Scanner Box Area */
+        .scanner-card {
+            background: #171622;
+            border: 1px solid #2B283A;
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #reader {
+            width: 100%;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #000;
+            border: 1.5px solid #332F45;
+        }
+
+        #reader video {
+            object-fit: cover !important;
+            border-radius: 16px;
+        }
+
+        /* Manual Input Area */
+        .manual-entry-card {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .manual-input {
+            flex: 1;
+            background: #0E0D14;
+            border: 1.5px solid #332F45;
+            border-radius: 12px;
+            padding: 12px 14px;
+            color: #fff;
+            font-size: 14px;
+            font-family: 'Space Mono', monospace;
+            text-transform: uppercase;
+        }
+
+        .manual-input:focus {
+            outline: none;
+            border-color: #ED1D37;
+        }
+
+        .verify-btn {
+            background: linear-gradient(135deg, #ED1D37, #C9122C);
+            border: 0;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 6px 18px rgba(237, 29, 55, 0.4);
+            transition: all 0.2s ease;
+        }
+
+        .verify-btn:active {
+            transform: scale(0.96);
+        }
+
+        /* Result Display Card */
+        .result-card {
+            display: none;
+            background: #171622;
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+            margin-top: 10px;
+            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-card.valid {
+            border: 2px solid #10B981;
+        }
+
+        .result-card.already-used {
+            border: 2px solid #F59E0B;
+        }
+
+        .result-card.invalid {
+            border: 2px solid #ED1D37;
+        }
+
+        .status-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .status-icon-circle {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+
+        .valid .status-icon-circle {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10B981;
+            border: 1px solid #10B981;
+        }
+
+        .already-used .status-icon-circle {
+            background: rgba(245, 158, 11, 0.2);
+            color: #F59E0B;
+            border: 1px solid #F59E0B;
+        }
+
+        .invalid .status-icon-circle {
+            background: rgba(237, 29, 55, 0.2);
+            color: #ED1D37;
+            border: 1px solid #ED1D37;
+        }
+
+        .status-title {
+            font-size: 16px;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .valid .status-title { color: #34D399; }
+        .already-used .status-title { color: #FBBF24; }
+        .invalid .status-title { color: #FF5269; }
+
+        .ticket-info-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .info-label {
+            color: #858193;
+            font-size: 12px;
+        }
+
+        .info-val {
+            color: #fff;
+            font-weight: 750;
+            text-align: right;
+        }
+
+        .highlight-seats {
+            color: #ED1D37;
+            font-weight: 800;
+            font-size: 16px;
+        }
+
+        .scan-next-btn {
+            width: 100%;
+            background: #252235;
+            border: 1px solid #3B3750;
+            color: #fff;
+            padding: 14px;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .scan-next-btn:active {
+            background: #332F47;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="verifier-container">
+
+        <!-- App Header -->
+        <header class="app-header">
+            <div class="app-brand">MOVIE<span>MATE</span></div>
+            <div class="app-subtitle">Gate Ticket Verifier Scanner</div>
+        </header>
+
+        <!-- Server Host Config -->
+        <div class="server-config-card">
+            <div class="server-config-header" onclick="toggleServerConfig()">
+                <span id="currentHostStatus">⚙️ Target Backend API Host</span>
+                <span id="configToggleArrow">▼</span>
+            </div>
+            <div class="server-input-group" id="serverConfigBody" style="display: none;">
+                <input type="text" id="serverHostInput" class="server-input" value="http://127.0.0.1:8000" placeholder="e.g. http://127.0.0.1:8000 or https://moviemate.com">
+                <button class="server-save-btn" onclick="saveServerHost()">Save</button>
+            </div>
+        </div>
+
+        <!-- Camera Scanner Area -->
+        <div class="scanner-card" id="scannerCard">
+            <div id="reader"></div>
+
+            <div class="manual-entry-card">
+                <input type="text" id="manualCodeInput" class="manual-input" placeholder="Enter hash e.g. 8064B8DDC6D56514" onkeydown="if(event.key==='Enter') verifyManualCode()">
+                <button class="verify-btn" onclick="verifyManualCode()">Verify</button>
+            </div>
+        </div>
+
+        <!-- Verification Result Card -->
+        <div id="resultCard" class="result-card">
+            <div class="status-header">
+                <div class="status-icon-circle" id="resultIcon">✓</div>
+                <div>
+                    <div class="status-title" id="resultTitle">TICKET VERIFIED</div>
+                    <div style="font-size: 11px; color: #858193; font-family: 'Space Mono', monospace;" id="resultPassId">#8064B8DD</div>
+                </div>
+            </div>
+
+            <div class="ticket-info-grid" id="resultDetails">
+                <!-- Dynamic ticket properties populated via JS -->
+            </div>
+
+            <button class="scan-next-btn" onclick="resetScanner()">
+                📷 Scan Next Attendee Ticket
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        let html5QrcodeScanner = null;
+        let isProcessing = false;
+
+        function getBackendHost() {
+            let val = localStorage.getItem('mm_verifier_host');
+            if (val && val.trim()) {
+                return val.trim().replace(/\/$/, '');
+            }
+            if (window.location.protocol.startsWith('http')) {
+                return window.location.origin;
+            }
+            // Default fallback for file:// or standalone deployment
+            return 'http://127.0.0.1:8000';
+        }
+
+        // Initialize host input value
+        document.getElementById('serverHostInput').value = getBackendHost();
+
+        function toggleServerConfig() {
+            const body = document.getElementById('serverConfigBody');
+            const arrow = document.getElementById('configToggleArrow');
+            if (body.style.display === 'none') {
+                body.style.display = 'flex';
+                arrow.innerText = '▲';
+            } else {
+                body.style.display = 'none';
+                arrow.innerText = '▼';
+            }
+        }
+
+        function saveServerHost() {
+            let val = document.getElementById('serverHostInput').value.trim();
+            if (!val) val = 'http://127.0.0.1:8000';
+            localStorage.setItem('mm_verifier_host', val);
+            alert('Backend API Host saved: ' + val);
+            toggleServerConfig();
+        }
+
+        // Web Audio Feedback Beep
+        function playBeep(isSuccess) {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                
+                osc.type = 'sine';
+                osc.frequency.value = isSuccess ? 880 : 300;
+                gain.gain.value = 0.15;
+                
+                osc.start();
+                osc.stop(ctx.currentTime + (isSuccess ? 0.25 : 0.4));
+
+                if (navigator.vibrate) {
+                    navigator.vibrate(isSuccess ? [100, 50, 100] : [300]);
+                }
+            } catch (e) {
+                console.log('Audio feedback not supported:', e);
+            }
+        }
+
+        // Process Scan payload
+        function processCode(codeStr) {
+            if (isProcessing) return;
+            isProcessing = true;
+
+            const host = getBackendHost();
+            const apiUrl = `${host}/admin-panel/api/verify-ticket/?code=${encodeURIComponent(codeStr)}`;
+
+            fetch(apiUrl, {
+                method: 'GET',
+                mode: 'cors'
+            })
+                .then(res => res.json())
+                .then(data => {
+                    displayResult(data);
+                })
+                .catch(err => {
+                    console.error('Fetch error:', err);
+                    displayResult({
+                        valid: false,
+                        message: `Cannot reach backend server at ${host}.<br><br><small style="color:#A09CB0;">Make sure your Django server (<code>python manage.py runserver 8000</code>) is running, or click "⚙️ Target Backend API Host" above to set your live domain URL.</small>`
+                    });
+                });
+        }
+
+        function displayResult(data) {
+            const resultCard = document.getElementById('resultCard');
+            const resultIcon = document.getElementById('resultIcon');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultPassId = document.getElementById('resultPassId');
+            const resultDetails = document.getElementById('resultDetails');
+            const scannerCard = document.getElementById('scannerCard');
+
+            scannerCard.style.display = 'none';
+            resultCard.style.display = 'block';
+
+            if (data.valid) {
+                if (data.already_used) {
+                    resultCard.className = 'result-card already-used';
+                    resultIcon.innerText = '⚠️';
+                    resultTitle.innerText = 'ALREADY SCANNED PREVIOUSLY';
+                    playBeep(false);
+                } else {
+                    resultCard.className = 'result-card valid';
+                    resultIcon.innerText = '✓';
+                    resultTitle.innerText = 'TICKET VALID & CHECKED-IN';
+                    playBeep(true);
+                }
+
+                const t = data.ticket;
+                resultPassId.innerText = '#' + t.booking_id;
+                resultDetails.innerHTML = `
+                    <div class="info-row"><span class="info-label">Guest Name</span><span class="info-val">${t.customer_name}</span></div>
+                    <div class="info-row"><span class="info-label">Movie</span><span class="info-val">${t.movie_title}</span></div>
+                    <div class="info-row"><span class="info-label">Cinema</span><span class="info-val">${t.cinema_name}</span></div>
+                    <div class="info-row"><span class="info-label">Showtime</span><span class="info-val">${t.show_date} • ${t.show_time}</span></div>
+                    <div class="info-row"><span class="info-label">Seats (${t.seat_tier})</span><span class="info-val highlight-seats">${t.seats}</span></div>
+                    <div class="info-row"><span class="info-label">Total Amount</span><span class="info-val">₹${t.total_amount}</span></div>
+                `;
+            } else {
+                resultCard.className = 'result-card invalid';
+                resultIcon.innerText = '✕';
+                resultTitle.innerText = 'VERIFICATION ERROR';
+                resultPassId.innerText = 'FAIL';
+                playBeep(false);
+                resultDetails.innerHTML = `
+                    <div style="color: #FF5269; font-weight: 600; text-align: center; padding: 10px 0; font-size: 13.5px; line-height: 1.5;">
+                        ${data.message || 'The scanned QR code is invalid or not registered in MovieMate database.'}
+                    </div>
+                `;
+            }
+        }
+
+        function verifyManualCode() {
+            const input = document.getElementById('manualCodeInput');
+            const val = input.value.trim();
+            if (val) {
+                processCode(val);
+            }
+        }
+
+        function resetScanner() {
+            isProcessing = false;
+            document.getElementById('manualCodeInput').value = '';
+            document.getElementById('resultCard').style.display = 'none';
+            document.getElementById('scannerCard').style.display = 'block';
+        }
+
+        // Initialize QR Scanner
+        function initScanner() {
+            html5QrcodeScanner = new Html5QrcodeScanner(
+                "reader",
+                { 
+                    fps: 10, 
+                    qrbox: { width: 250, height: 250 },
+                    rememberLastUsedCamera: true,
+                    aspectRatio: 1.0
+                },
+                /* verbose= */ false
+            );
+
+            html5QrcodeScanner.render((decodedText, decodedResult) => {
+                processCode(decodedText);
+            }, (error) => {
+                // Ignore silent frame scan errors
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', initScanner);
+    </script>
+</body>
+</html>

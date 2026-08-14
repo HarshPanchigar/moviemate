@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Ticket Bookings | MovieMate{% endblock %}
+
+{% block content %}
+<main class="container" style="padding-top: 40px; padding-bottom: 60px;">
+    <div style="margin-bottom: 28px;">
+        <span class="eyebrow">Ticket Pass History</span>
+        <h1 style="font-family: 'Bebas Neue'; font-size: 36px;">My Movie Bookings</h1>
+    </div>
+
+    {% if bookings %}
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+            {% for b in bookings %}
+            <div style="background: var(--bg-surface); border: 1px solid var(--stroke); border-radius: var(--radius); padding: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    {% if b.showtime.movie.poster_url %}
+                        <img src="{{ b.showtime.movie.poster_url }}" alt="{{ b.showtime.movie.title }}" style="width: 60px; height: 85px; object-fit: cover; border-radius: 6px;">
+                    {% endif %}
+                    <div>
+                        <h3 style="font-size: 20px; font-weight: 700; color: var(--text);">{{ b.showtime.movie.title }}</h3>
+                        <p style="color: var(--text-muted); font-size: 13.5px; margin-top: 4px;">{{ b.showtime.cinema.name }} ({{ b.showtime.cinema.city }})</p>
+                        <div style="font-size: 13px; color: var(--text-faint); margin-top: 6px;">
+                            Show Date: <b>{{ b.showtime.show_date }} at {{ b.showtime.start_time|time:"h:i A" }}</b>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 10px;">
+                    <div style="text-align: right;">
+                        <span style="font-family: 'Space Mono', monospace; font-size: 12px; color: var(--gold); font-weight: 700;">#{{ b.booking_id|stringformat:".8s" }}</span>
+                        <div style="font-size: 14px; font-weight: 700; color: var(--text); margin-top: 2px;">{{ b.seats }} ({{ b.seat_tier|upper }})</div>
+                    </div>
+                    <a href="{% url 'booking_confirmation' b.booking_id %}" class="btn btn-gold" style="padding: 8px 16px; font-size: 13px;">
+                        View Ticket & QR Code
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div style="background: var(--bg-surface); border: 1px dashed var(--stroke); border-radius: var(--radius); padding: 40px; text-align: center;">
+            <p style="color: var(--text-muted); font-size: 15px; margin-bottom: 16px;">You haven't booked any movie tickets yet!</p>
+            <a href="{% url 'dashboard' %}" class="btn btn-gold">Explore Movies Now</a>
+        </div>
+    {% endif %}
+</main>
+{% endblock %}

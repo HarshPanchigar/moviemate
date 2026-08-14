@@ -1,0 +1,452 @@
+/* =========================================================
+   MOVIEMATE - CINEMA & SHOWTIME SELECTION PAGE
+========================================================= */
+
+.cinema-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 42px 24px 70px;
+}
+
+/* ---------- Movie Header ---------- */
+
+.movie-hero {
+    position: relative;
+    display: flex;
+    gap: 28px;
+    padding: 24px;
+    margin-bottom: 38px;
+    border: 1px solid #302d3d;
+    border-radius: 18px;
+    background:
+        radial-gradient(
+            circle at 10% 20%,
+            rgba(237, 29, 55, 0.10),
+            transparent 35%
+        ),
+        #191821;
+    overflow: hidden;
+}
+
+.movie-hero::after {
+    content: "";
+    position: absolute;
+    width: 250px;
+    height: 250px;
+    right: -100px;
+    top: -120px;
+    background: rgba(237, 29, 55, 0.08);
+    filter: blur(50px);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.movie-poster {
+    width: 115px;
+    height: 165px;
+    flex-shrink: 0;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 1px solid #3a3748;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+}
+
+.movie-info {
+    position: relative;
+    z-index: 1;
+    padding-top: 4px;
+}
+
+.step-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #ff334f;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 7px;
+}
+
+.step-label::before {
+    content: "";
+    width: 24px;
+    height: 2px;
+    background: #ff334f;
+    border-radius: 10px;
+}
+
+.movie-title {
+    margin: 0 0 10px;
+    color: #fff;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(30px, 4vw, 42px);
+    line-height: 1;
+    letter-spacing: 0.4px;
+}
+
+.movie-description {
+    max-width: 700px;
+    margin: 0 0 16px;
+    color: #9995aa;
+    font-size: 13.5px;
+    line-height: 1.6;
+}
+
+.movie-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.meta-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 11px;
+    border: 1px solid #393645;
+    border-radius: 999px;
+    background: #211f29;
+    color: #e9e7ef;
+    font-size: 11.5px;
+    font-weight: 700;
+}
+
+.rating-pill {
+    color: #fff;
+}
+
+.rating-star {
+    color: #ffca28;
+}
+
+
+/* ---------- Section Heading ---------- */
+
+.section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
+
+.section-title {
+    margin: 0;
+    color: #fff;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 27px;
+    letter-spacing: 0.5px;
+}
+
+.section-label {
+    margin: 0 0 13px;
+    color: #858193;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+}
+
+
+/* ---------- Date Selector (Shows 7 days visible then scroll) ---------- */
+
+.date-section {
+    margin-bottom: 42px;
+}
+
+.date-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.date-scroll {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    flex: 1;
+    padding: 3px 2px 9px;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+}
+
+.date-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.date-card {
+    flex: 0 0 calc((100% - 60px) / 7);
+    min-width: 85px;
+    padding: 14px 8px;
+    flex-shrink: 0;
+    text-decoration: none;
+    text-align: center;
+    border: 1px solid #302d3d;
+    border-radius: 12px;
+    background: #191821;
+    color: #b4b0bf;
+    transition: all 0.2s ease;
+}
+
+.date-card:hover {
+    border-color: #555061;
+    background: #211f29;
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+.date-card.active {
+    border-color: #ff304d;
+    background: linear-gradient(
+        145deg,
+        #ed1d39,
+        #c91530
+    );
+    color: #fff;
+    box-shadow: 0 8px 22px rgba(237, 29, 55, 0.22);
+}
+
+.date-day {
+    display: block;
+    font-size: 10.5px;
+    font-weight: 800;
+    text-transform: uppercase;
+    opacity: 0.85;
+    margin-bottom: 4px;
+}
+
+.date-number {
+    display: block;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    line-height: 1;
+}
+
+.date-arrow {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    border: 1px solid #343141;
+    border-radius: 50%;
+    background: #191821;
+    color: #fff;
+    cursor: pointer;
+    font-size: 22px;
+    transition: all 0.2s ease;
+}
+
+.date-arrow:hover {
+    border-color: #ff304d;
+    background: #211f29;
+    color: #ff304d;
+}
+
+
+/* ---------- Theater List with Embedded Showtimes ---------- */
+
+.theater-section {
+    margin-top: 5px;
+}
+
+.theater-list {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.theater-card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 24px;
+    border: 1px solid #302d3d;
+    border-radius: 16px;
+    background: #191821;
+    transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+}
+
+.theater-card:hover {
+    border-color: #454151;
+    background: #1d1b25;
+}
+
+.theater-header-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.theater-left {
+    display: flex;
+    align-items: center;
+    gap: 17px;
+    min-width: 0;
+}
+
+.theater-icon {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    border: 1px solid #383545;
+    border-radius: 12px;
+    background: #211f29;
+    color: #ff304d;
+    font-size: 20px;
+}
+
+.theater-details {
+    min-width: 0;
+}
+
+.theater-name {
+    margin: 0 0 4px;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 750;
+}
+
+.theater-address {
+    margin: 0;
+    color: #898596;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* Showtimes directly under each theater */
+.theater-showtimes {
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    padding-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.showtimes-header-label {
+    color: #858193;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+}
+
+.showtimes-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.showtime-pill {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 18px;
+    border: 1.5px solid #343142;
+    border-radius: 10px;
+    background: #211f2a;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.showtime-pill:hover {
+    border-color: #ff304d;
+    background: #ed1d39;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(237, 29, 55, 0.3);
+}
+
+.showtime-pill .pill-time {
+    color: #fff;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    line-height: 1;
+}
+
+.showtime-pill .pill-price {
+    color: #a09cb0;
+    font-size: 11px;
+    margin-top: 3px;
+    font-weight: 600;
+}
+
+.showtime-pill:hover .pill-price {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+
+/* ---------- Empty State ---------- */
+
+.empty-state {
+    padding: 45px 20px;
+    text-align: center;
+    border: 1px dashed #393646;
+    border-radius: 15px;
+    background: #191821;
+}
+
+.empty-icon {
+    font-size: 32px;
+    margin-bottom: 10px;
+    opacity: 0.6;
+}
+
+.empty-state p {
+    margin: 0;
+    color: #858193;
+    font-size: 14px;
+}
+
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 900px) {
+    .date-card {
+        flex: 0 0 90px;
+    }
+}
+
+@media (max-width: 700px) {
+
+    .cinema-page {
+        padding: 25px 15px 50px;
+    }
+
+    .movie-hero {
+        gap: 17px;
+        padding: 17px;
+        align-items: flex-start;
+    }
+
+    .movie-poster {
+        width: 82px;
+        height: 120px;
+    }
+
+    .movie-title {
+        font-size: 28px;
+    }
+
+    .movie-description {
+        font-size: 12px;
+    }
+
+    .theater-card {
+        padding: 18px;
+    }
+
+    .date-arrow {
+        display: none;
+    }
+
+    .date-card {
+        flex: 0 0 75px;
+        min-width: 75px;
+    }
+}

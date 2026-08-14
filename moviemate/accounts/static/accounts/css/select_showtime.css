@@ -1,0 +1,347 @@
+/* =========================================================
+   MOVIEMATE - SHOWTIME SELECTION PAGE
+========================================================= */
+
+.showtime-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 42px 24px 70px;
+}
+
+/* ---------- Header ---------- */
+
+.showtime-hero {
+    position: relative;
+    padding: 27px 30px;
+    margin-bottom: 42px;
+    overflow: hidden;
+
+    background:
+        radial-gradient(
+            circle at 8% 50%,
+            rgba(237, 29, 55, 0.12),
+            transparent 32%
+        ),
+        #191821;
+
+    border: 1px solid #302d3d;
+    border-radius: 18px;
+}
+
+.showtime-hero::after {
+    content: "";
+    position: absolute;
+    width: 260px;
+    height: 260px;
+    right: -120px;
+    top: -140px;
+
+    background: rgba(237, 29, 55, 0.08);
+    filter: blur(55px);
+    border-radius: 50%;
+
+    pointer-events: none;
+}
+
+.step-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    margin-bottom: 7px;
+
+    color: #ff304d;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.step-label::before {
+    content: "";
+    width: 24px;
+    height: 2px;
+
+    background: #ff304d;
+    border-radius: 10px;
+}
+
+.cinema-name {
+    position: relative;
+    z-index: 1;
+
+    margin: 0 0 7px;
+
+    color: #fff;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(32px, 4vw, 42px);
+    line-height: 1;
+    letter-spacing: 0.5px;
+}
+
+.movie-date {
+    position: relative;
+    z-index: 1;
+
+    margin: 0;
+
+    color: #9793a4;
+    font-size: 13.5px;
+    line-height: 1.6;
+}
+
+.movie-date strong {
+    color: #fff;
+    font-weight: 700;
+}
+
+
+/* ---------- Section Heading ---------- */
+
+.section-heading {
+    margin-bottom: 18px;
+}
+
+.section-label {
+    margin: 0 0 5px;
+
+    color: #858193;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+}
+
+.section-title {
+    margin: 0;
+
+    color: #fff;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 29px;
+    letter-spacing: 0.5px;
+}
+
+
+/* ---------- Showtime Grid ---------- */
+
+.showtime-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fill,
+        minmax(220px, 1fr)
+    );
+    gap: 15px;
+}
+
+.showtime-card {
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+
+    min-height: 145px;
+    padding: 20px;
+
+    text-decoration: none;
+
+    background: #191821;
+    border: 1px solid #302d3d;
+    border-radius: 15px;
+
+    overflow: hidden;
+
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.showtime-card::before {
+    content: "";
+
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+
+    width: 3px;
+
+    background: #f32645;
+
+    transform: scaleY(0);
+    transform-origin: center;
+
+    transition: transform 0.2s ease;
+}
+
+.showtime-card:hover {
+    transform: translateY(-4px);
+
+    border-color: #f32645;
+
+    background:
+        linear-gradient(
+            145deg,
+            #211d27,
+            #191821
+        );
+
+    box-shadow:
+        0 12px 30px rgba(0, 0, 0, 0.28),
+        0 0 20px rgba(243, 38, 69, 0.07);
+}
+
+.showtime-card:hover::before {
+    transform: scaleY(1);
+}
+
+
+/* ---------- Time ---------- */
+
+.showtime-time {
+    color: #fff;
+
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 31px;
+    line-height: 1;
+
+    letter-spacing: 0.4px;
+}
+
+.showtime-time span {
+    color: #ff304d;
+}
+
+
+/* ---------- Price ---------- */
+
+.showtime-price {
+    margin-top: 9px;
+
+    color: #9995a8;
+    font-size: 12px;
+}
+
+.showtime-price strong {
+    color: #eee;
+    font-weight: 700;
+}
+
+
+/* ---------- Bottom ---------- */
+
+.showtime-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-top: auto;
+    padding-top: 17px;
+}
+
+.seat-label {
+    color: #858193;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.seat-arrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    color: #ff304d;
+
+    font-size: 11px;
+    font-weight: 800;
+
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.seat-arrow span {
+    font-size: 16px;
+    transition: transform 0.2s ease;
+}
+
+.showtime-card:hover .seat-arrow span {
+    transform: translateX(4px);
+}
+
+
+/* ---------- Empty State ---------- */
+
+.empty-state {
+    padding: 55px 20px;
+
+    text-align: center;
+
+    background: #191821;
+
+    border: 1px dashed #393646;
+    border-radius: 15px;
+}
+
+.empty-icon {
+    width: 55px;
+    height: 55px;
+
+    display: grid;
+    place-items: center;
+
+    margin: 0 auto 14px;
+
+    border: 1px solid #383545;
+    border-radius: 50%;
+
+    background: #211f29;
+
+    font-size: 23px;
+}
+
+.empty-title {
+    margin: 0 0 5px;
+
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.empty-description {
+    margin: 0;
+
+    color: #858193;
+    font-size: 13px;
+}
+
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 650px) {
+
+    .showtime-page {
+        padding: 25px 15px 50px;
+    }
+
+    .showtime-hero {
+        padding: 22px 19px;
+        margin-bottom: 32px;
+    }
+
+    .cinema-name {
+        font-size: 32px;
+    }
+
+    .showtime-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .showtime-card {
+        min-height: 135px;
+    }
+}

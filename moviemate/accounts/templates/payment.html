@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payment Gateway | MovieMate{% endblock %}
+
+{% block content %}
+<main class="container" style="padding-top: 40px; padding-bottom: 60px;">
+    <div style="max-width: 540px; margin: 0 auto; background: var(--bg-surface); border: 1px solid var(--stroke); border-radius: var(--radius); padding: 32px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+        <div style="text-align: center; margin-bottom: 24px;">
+            <span class="eyebrow" style="justify-content: center;">Instant Payment & Booking</span>
+            <h1 style="font-family: 'Bebas Neue'; font-size: 32px; margin-top: 4px;">Confirm Ticket Booking</h1>
+        </div>
+
+        <div style="background: var(--bg-elevated); padding: 20px; border-radius: var(--radius); margin-bottom: 24px; font-size: 14px; display: flex; flex-direction: column; gap: 8px;">
+            <div><span style="color: var(--text-muted);">Movie:</span> <b>{{ showtime.movie.title }}</b></div>
+            <div><span style="color: var(--text-muted);">Cinema:</span> <b>{{ showtime.cinema.name }} ({{ showtime.cinema.city }})</b></div>
+            <div><span style="color: var(--text-muted);">Date & Time:</span> <b>{{ showtime.show_date }} at {{ showtime.start_time|time:"h:i A" }}</b></div>
+            <div><span style="color: var(--text-muted);">Selected Seats:</span> <b style="color: var(--gold); text-transform: uppercase;">{{ tier }} Tier ({{ seats }})</b></div>
+            <div style="border-top: 1px solid var(--stroke); padding-top: 8px; margin-top: 4px; display: flex; justify-content: space-between; font-size: 16px;">
+                <span>Total Amount Payable:</span>
+                <b style="color: var(--gold);">₹{{ total_amount }}</b>
+            </div>
+        </div>
+
+        <!-- Real Scannable UPI QR Payment Code -->
+        <div style="text-align: center; margin-bottom: 28px;">
+            <div style="width: 200px; height: 200px; margin: 0 auto 12px auto; background: #ffffff; padding: 14px; border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=moviemate@upi%26pn=MovieMate%26am={{ total_amount }}%26cu=INR" alt="Real UPI QR Payment Code" style="width: 170px; height: 170px; display: block;">
+            </div>
+            <p style="font-size: 13px; color: var(--text-muted);">Scan QR Code with GPay, PhonePe, or Paytm to pay ₹{{ total_amount }}</p>
+        </div>
+
+        <form action="{% url 'process_payment' showtime.id %}" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="seat_tier" value="{{ tier }}">
+            <input type="hidden" name="seats" value="{{ seats }}">
+            <button type="submit" class="btn btn-gold btn-block" style="padding: 14px; font-size: 16px; justify-content: center;">
+                Payment & Confirm Ticket &rarr;
+            </button>
+        </form>
+    </div>
+</main>
+{% endblock %}

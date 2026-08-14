@@ -1,0 +1,352 @@
+{% extends 'admin_panel/base_admin.html' %}
+
+{% block title %}Show Allocations | MovieMate Admin{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+    <div>
+        <h1 style="font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 0.02em; margin: 0;">Show Allocations Management</h1>
+        <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">Clean, organized movie scheduling & venue showtime allocations.</p>
+    </div>
+    <button class="btn-blue" onclick="document.getElementById('addAllocationModal').style.display='flex'">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"></path></svg>
+        Allocate Movie Showtimes
+    </button>
+</div>
+
+<!-- Search & Cinema Filter Toolbar -->
+<div class="panel-card" style="padding: 16px; margin-bottom: 24px;">
+    <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+        <div style="position: relative; flex: 1; min-width: 240px;">
+            <input type="text" id="allocSearchInput" class="form-control" placeholder="Search by Movie title, Cinema name, or City..." onkeyup="filterAllocations()">
+        </div>
+        <select id="allocCinemaFilter" class="form-control" style="width: 220px;" onchange="filterAllocations()">
+            <option value="">All Cinema Halls</option>
+            {% for c in cinemas %}
+                <option value="{{ c.name|lower }}">{{ c.name }} ({{ c.city }})</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>
+
+<!-- Clean & Structured Allocation Cards List -->
+<div id="allocationsContainer" style="display: flex; flex-direction: column; gap: 16px;">
+    {% for item in grouped_allocations %}
+    <div class="allocation-card panel-card" data-movie="{{ item.movie.title|lower }}" data-cinema="{{ item.cinema.name|lower }}" data-city="{{ item.cinema.city|lower }}"
+         style="padding: 20px; display: grid; grid-template-columns: minmax(220px, 1.2fr) minmax(280px, 2fr) minmax(180px, 1fr) minmax(140px, auto); gap: 20px; align-items: center;">
+        
+        <!-- Column 1: Movie Details -->
+        <div style="display: flex; gap: 14px; align-items: center;">
+            {% if item.movie.poster_url %}
+                <img src="{{ item.movie.poster_url }}" alt="{{ item.movie.title }}" style="width: 48px; height: 68px; object-fit: cover; border-radius: 6px; border: 1px solid var(--stroke); flex-shrink: 0;">
+            {% else %}
+                <div style="width: 48px; height: 68px; background: var(--bg-elevated); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0;">No Pic</div>
+            {% endif %}
+            <div>
+                <div style="font-size: 16px; font-weight: 800; color: #fff;">{{ item.movie.title }}</div>
+                <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">{{ item.movie.genre }} • {{ item.movie.duration_minutes }} mins</div>
+                <span class="badge badge-active" style="text-transform: uppercase; font-size: 10px; margin-top: 6px; display: inline-block;">{{ item.movie.get_display_tag_display }}</span>
+            </div>
+        </div>
+
+        <!-- Column 2: Cinema & Schedule Details -->
+        <div>
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                <span style="font-weight: 700; color: var(--text); font-size: 15px;">{{ item.cinema.name }}</span>
+                <span style="background: var(--blue-primary); color: #fff; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700;">{{ item.cinema.city }}</span>
+            </div>
+            
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 8px;">
+                <span style="background: rgba(59, 130, 246, 0.12); color: var(--blue-light); border: 1px solid rgba(59, 130, 246, 0.25); padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 12px;">
+                    📅 {{ item.start_date|date:"d M" }} — {{ item.end_date|date:"d M Y" }} ({{ item.total_days }} Days)
+                </span>
+                <span style="background: rgba(16, 185, 129, 0.12); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.25); padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 12px;">
+                    🎬 {{ item.total_shows }} Total Shows
+                </span>
+            </div>
+
+            <!-- Daily Showtimes Pills -->
+            <div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
+                <span style="font-size: 11px; color: var(--text-muted); font-weight: 600;">Daily Times:</span>
+                {% for t in item.times %}
+                    <span style="background: var(--bg-elevated); color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 11.5px; font-weight: 600; border: 1px solid var(--stroke);">{{ t }}</span>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Column 3: Seat Tier Pricing & Revenue -->
+        <div style="background: var(--bg-elevated); padding: 12px; border-radius: 8px; border: 1px solid var(--stroke);">
+            <div style="font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 6px;">Seat Tier Prices</div>
+            <div style="font-family: 'Space Mono', monospace; font-size: 12px; display: flex; flex-direction: column; gap: 2px;">
+                <div><span style="color: #E2E8F0;">Plat:</span> <b style="color: #60A5FA;">₹{{ item.platinum_price }}</b></div>
+                <div><span style="color: #E2E8F0;">Gold:</span> <b style="color: #FBBF24;">₹{{ item.gold_price }}</b></div>
+                <div><span style="color: #E2E8F0;">Silv:</span> <b style="color: #9CA3AF;">₹{{ item.silver_price }}</b></div>
+            </div>
+        </div>
+
+        <!-- Column 4: Action Buttons -->
+        <div style="display: flex; flex-direction: column; gap: 8px; justify-content: center;">
+            <button class="btn-blue" style="padding: 6px 12px; font-size: 12px; width: 100%; text-align: center;"
+                    onclick="openViewFullAllocModal('{{ item.movie.title|escapejs }}', '{{ item.cinema.name|escapejs }}', '{{ item.cinema.city|escapejs }}', '{{ item.start_date|date:"d M Y" }}', '{{ item.end_date|date:"d M Y" }}', '{{ item.total_days }}', '{{ item.total_shows }}', '{{ item.platinum_price }}', '{{ item.gold_price }}', '{{ item.silver_price }}', '{{ item.total_bookings }}', '{{ item.total_revenue }}', '{{ item.movie.poster_url|escapejs }}')">
+                View Full
+            </button>
+
+            <button class="btn-blue" style="padding: 6px 12px; font-size: 12px; background: rgba(255,255,255,0.08); border: 1px solid var(--stroke); width: 100%; text-align: center;"
+                    onclick="openEditAllocModal({{ item.movie.id }}, {{ item.cinema.id }}, '{{ item.movie.title|escapejs }}', '{{ item.cinema.name|escapejs }}', '{{ item.start_date_str }}', '{{ item.end_date_str }}', '{{ item.raw_times_str }}', '{{ item.platinum_price }}', '{{ item.gold_price }}', '{{ item.silver_price }}')">
+                Edit Schedule
+            </button>
+
+            <a href="{% url 'admin_panel:delete_allocation_group' item.movie.id item.cinema.id %}" class="btn-danger-sm" style="padding: 5px 12px; font-size: 11.5px; text-align: center;" onclick="return confirm('Delete ALL {{ item.total_shows }} showtimes for {{ item.movie.title }} at {{ item.cinema.name }}?')">
+                Delete
+            </a>
+        </div>
+    </div>
+    {% empty %}
+    <div class="panel-card" style="text-align: center; color: var(--text-muted); padding: 48px;">
+        No showtimes allocated yet. Click "Allocate Movie Showtimes" above to schedule shows.
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Modal: View Full Allocation Breakdown -->
+<div id="viewFullAllocModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 250; align-items: center; justify-content: center; padding: 20px;">
+    <div style="background: var(--bg-surface); border: 1px solid var(--stroke); border-radius: var(--radius); width: 100%; max-width: 620px; padding: 28px; max-height: 90vh; overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="font-size: 20px; font-weight: 700; color: var(--text); margin: 0;">Show Allocation Full Details</h3>
+            <button onclick="document.getElementById('viewFullAllocModal').style.display='none'" style="background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer;">&times;</button>
+        </div>
+
+        <div style="display: flex; gap: 16px; margin-bottom: 20px;">
+            <img id="vfaPoster" src="" alt="" style="width: 80px; height: 115px; object-fit: cover; border-radius: 8px; border: 1px solid var(--stroke);">
+            <div>
+                <h2 id="vfaMovieTitle" style="font-size: 20px; font-weight: 800; color: #fff; margin: 0 0 4px 0;"></h2>
+                <div id="vfaCinemaName" style="font-size: 14px; font-weight: 600; color: var(--blue-light);"></div>
+                <div id="vfaDates" style="font-size: 13px; color: var(--text-muted); margin-top: 4px;"></div>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+            <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); padding: 12px; border-radius: 8px; text-align: center;">
+                <div style="font-size: 11px; color: var(--text-muted);">Total Shows</div>
+                <div id="vfaTotalShows" style="font-size: 18px; font-weight: 800; color: var(--blue-light);"></div>
+            </div>
+            <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); padding: 12px; border-radius: 8px; text-align: center;">
+                <div style="font-size: 11px; color: var(--text-muted);">Bookings Count</div>
+                <div id="vfaBookings" style="font-size: 18px; font-weight: 800; color: #10B981;"></div>
+            </div>
+            <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.2); padding: 12px; border-radius: 8px; text-align: center;">
+                <div style="font-size: 11px; color: var(--text-muted);">Revenue Generated</div>
+                <div id="vfaRevenue" style="font-size: 18px; font-weight: 800; color: #F59E0B;"></div>
+            </div>
+        </div>
+
+        <div style="background: var(--bg-elevated); padding: 16px; border-radius: 8px; margin-bottom: 20px; border: 1px solid var(--stroke);">
+            <div style="font-size: 12px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">Tier Seat Pricing Structure</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; font-family: 'Space Mono', monospace; font-size: 13px;">
+                <div>Platinum: <b id="vfaPlat" style="color: #60A5FA;"></b></div>
+                <div>Gold: <b id="vfaGold" style="color: #FBBF24;"></b></div>
+                <div>Silver: <b id="vfaSilv" style="color: #9CA3AF;"></b></div>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end;">
+            <button onclick="document.getElementById('viewFullAllocModal').style.display='none'" class="btn-blue">Close Full View</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Edit Show Allocation -->
+<div id="editAllocModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 200; align-items: center; justify-content: center; padding: 20px;">
+    <div style="background: var(--bg-surface); border: 1px solid var(--stroke); border-radius: var(--radius); width: 100%; max-width: 540px; padding: 28px; max-height: 90vh; overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div>
+                <h3 style="font-size: 20px; font-weight: 700; color: var(--text); margin: 0;">Edit Show Allocation</h3>
+                <div id="editAllocSubtitle" style="font-size: 12px; color: var(--blue-light); font-weight: 600; margin-top: 2px;"></div>
+            </div>
+            <button onclick="document.getElementById('editAllocModal').style.display='none'" style="background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer;">&times;</button>
+        </div>
+
+        <form id="editAllocForm" method="POST">
+            {% csrf_token %}
+            <!-- Date Range -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div class="form-group">
+                    <label>Start Date</label>
+                    <input type="date" name="start_date" id="editStartDate" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>End Date</label>
+                    <input type="date" name="end_date" id="editEndDate" class="form-control" required>
+                </div>
+            </div>
+
+            <!-- Multiple Showtimes -->
+            <div class="form-group">
+                <label>Daily Showtimes (Multiple Shows Per Day)</label>
+                <div id="editTimesContainer" style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="display: flex; gap: 10px;">
+                        <input type="time" name="show_times" id="editTime1" class="form-control" value="10:00" required>
+                        <input type="time" name="show_times" id="editTime2" class="form-control" value="14:30">
+                        <input type="time" name="show_times" id="editTime3" class="form-control" value="18:00">
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="time" name="show_times" id="editTime4" class="form-control" value="21:30">
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+                <div class="form-group">
+                    <label>Platinum (₹)</label>
+                    <input type="number" name="platinum_price" id="editPlat" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Gold (₹)</label>
+                    <input type="number" name="gold_price" id="editGold" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Silver (₹)</label>
+                    <input type="number" name="silver_price" id="editSilv" class="form-control" required>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+                <button type="button" onclick="document.getElementById('editAllocModal').style.display='none'" class="btn-danger-sm" style="background: transparent;">Cancel</button>
+                <button type="submit" class="btn-blue">Update Allocations</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal: Add Show Allocation -->
+<div id="addAllocationModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 200; align-items: center; justify-content: center; padding: 20px;">
+    <div style="background: var(--bg-surface); border: 1px solid var(--stroke); border-radius: var(--radius); width: 100%; max-width: 540px; padding: 28px; max-height: 90vh; overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="font-size: 20px; font-weight: 700; color: var(--text); margin: 0;">Allocate Movie Showtimes</h3>
+            <button onclick="document.getElementById('addAllocationModal').style.display='none'" style="background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer;">&times;</button>
+        </div>
+        <form action="{% url 'admin_panel:add_allocation' %}" method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Select Movie</label>
+                <select name="movie_id" class="form-control" required>
+                    {% for m in movies %}
+                        <option value="{{ m.id }}">{{ m.title }} ({{ m.genre }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Select Cinema Hall</label>
+                <select name="cinema_id" class="form-control" required>
+                    {% for c in cinemas %}
+                        <option value="{{ c.id }}">{{ c.name }} - {{ c.city }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Date Range -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div class="form-group">
+                    <label>Start Date</label>
+                    <input type="date" name="start_date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>End Date</label>
+                    <input type="date" name="end_date" class="form-control" required>
+                </div>
+            </div>
+
+            <!-- Multiple Showtimes Container -->
+            <div class="form-group">
+                <label>Daily Showtimes (Multiple Shows Per Day)</label>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="display: flex; gap: 10px;">
+                        <input type="time" name="show_times" class="form-control" value="10:00" required>
+                        <input type="time" name="show_times" class="form-control" value="14:30">
+                        <input type="time" name="show_times" class="form-control" value="18:00">
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="time" name="show_times" class="form-control" value="21:30">
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+                <div class="form-group">
+                    <label>Platinum (₹)</label>
+                    <input type="number" name="platinum_price" class="form-control" value="350" required>
+                </div>
+                <div class="form-group">
+                    <label>Gold (₹)</label>
+                    <input type="number" name="gold_price" class="form-control" value="250" required>
+                </div>
+                <div class="form-group">
+                    <label>Silver (₹)</label>
+                    <input type="number" name="silver_price" class="form-control" value="180" required>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+                <button type="button" onclick="document.getElementById('addAllocationModal').style.display='none'" class="btn-danger-sm" style="background: transparent;">Cancel</button>
+                <button type="submit" class="btn-blue">Generate Allocations</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openViewFullAllocModal(movie, cinema, city, startDate, endDate, totalDays, totalShows, plat, gold, silv, bookings, revenue, poster) {
+    document.getElementById('vfaMovieTitle').innerText = movie;
+    document.getElementById('vfaCinemaName').innerText = cinema + ' (' + city + ')';
+    document.getElementById('vfaDates').innerText = 'Active: ' + startDate + ' — ' + endDate + ' (' + totalDays + ' Days)';
+    document.getElementById('vfaTotalShows').innerText = totalShows;
+    document.getElementById('vfaBookings').innerText = bookings;
+    document.getElementById('vfaRevenue').innerText = '₹' + revenue;
+    document.getElementById('vfaPlat').innerText = '₹' + plat;
+    document.getElementById('vfaGold').innerText = '₹' + gold;
+    document.getElementById('vfaSilv').innerText = '₹' + silv;
+    document.getElementById('vfaPoster').src = poster || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba';
+
+    document.getElementById('viewFullAllocModal').style.display = 'flex';
+}
+
+function openEditAllocModal(movieId, cinemaId, movieTitle, cinemaName, startDate, endDate, rawTimesStr, plat, gold, silv) {
+    document.getElementById('editAllocForm').action = `/admin-panel/allocations/edit-group/${movieId}/${cinemaId}/`;
+    document.getElementById('editAllocSubtitle').innerText = `${movieTitle} at ${cinemaName}`;
+    document.getElementById('editStartDate').value = startDate;
+    document.getElementById('editEndDate').value = endDate;
+    document.getElementById('editPlat').value = plat;
+    document.getElementById('editGold').value = gold;
+    document.getElementById('editSilv').value = silv;
+
+    const timesArray = rawTimesStr ? rawTimesStr.split(',') : ['10:00', '14:30', '18:00', '21:30'];
+    document.getElementById('editTime1').value = timesArray[0] || '10:00';
+    document.getElementById('editTime2').value = timesArray[1] || '';
+    document.getElementById('editTime3').value = timesArray[2] || '';
+    document.getElementById('editTime4').value = timesArray[3] || '';
+
+    document.getElementById('editAllocModal').style.display = 'flex';
+}
+
+function filterAllocations() {
+    const q = document.getElementById('allocSearchInput').value.toLowerCase();
+    const cinemaFilter = document.getElementById('allocCinemaFilter').value;
+    const cards = document.querySelectorAll('.allocation-card');
+
+    cards.forEach(card => {
+        const movie = card.getAttribute('data-movie') || '';
+        const cinema = card.getAttribute('data-cinema') || '';
+        const city = card.getAttribute('data-city') || '';
+
+        const matchesSearch = !q || movie.includes(q) || cinema.includes(q) || city.includes(q);
+        const matchesCinema = !cinemaFilter || cinema === cinemaFilter;
+
+        if (matchesSearch && matchesCinema) {
+            card.style.display = 'grid';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+</script>
+{% endblock %}

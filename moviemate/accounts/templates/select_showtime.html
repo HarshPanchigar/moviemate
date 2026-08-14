@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Select Showtime | {{ cinema.name }}{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'accounts/css/select_showtime.css' %}" />
+{% endblock %}
+
+{% block content %}
+
+<main class="showtime-page">
+
+    <!-- =====================================================
+         STEP HEADER
+    ====================================================== -->
+
+    <section class="showtime-hero">
+
+        <div class="step-label">
+            Step 2: Select Show Time
+        </div>
+
+        <h1 class="cinema-name">
+            {{ cinema.name }}
+        </h1>
+
+        <p class="movie-date">
+            Showing
+            <strong>{{ movie.title }}</strong>
+            <span> · </span>
+            Date:
+            <strong>{{ selected_date_str }}</strong>
+        </p>
+
+    </section>
+
+
+    <!-- =====================================================
+         SHOWTIMES
+    ====================================================== -->
+
+    <section>
+
+        <div class="section-heading">
+
+            <p class="section-label">
+                Choose your preferred timing
+            </p>
+
+            <h2 class="section-title">
+                Available Show Time Slots
+            </h2>
+
+        </div>
+
+
+        {% if showtimes %}
+
+            <div class="showtime-grid">
+
+                {% for st in showtimes %}
+
+                    <a
+                        href="{% url 'select_seats' st.id %}"
+                        class="showtime-card"
+                    >
+
+                        <!-- Time -->
+
+                        <div class="showtime-time">
+                            {{ st.start_time|time:"h:i" }}
+                            <span>{{ st.start_time|time:"A" }}</span>
+                        </div>
+
+
+                        <!-- Price -->
+
+                        <div class="showtime-price">
+                            Starts at
+                            <strong>₹{{ st.silver_price }}</strong>
+                        </div>
+
+
+                        <!-- Bottom -->
+
+                        <div class="showtime-bottom">
+
+                            <span class="seat-label">
+                                Select your seats
+                            </span>
+
+                            <span class="seat-arrow">
+                                Continue
+                                <span>→</span>
+                            </span>
+
+                        </div>
+
+                    </a>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    🎬
+                </div>
+
+                <h3 class="empty-title">
+                    No Showtimes Available
+                </h3>
+
+                <p class="empty-description">
+                    No showtimes are available at
+                    {{ cinema.name }}
+                    for this date.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+</main>
+
+{% endblock %}
