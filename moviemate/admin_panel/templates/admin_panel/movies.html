@@ -43,11 +43,8 @@
             <tr>
                 <th>Poster</th>
                 <th>Title</th>
-                <th>Genre</th>
                 <th>Display Tag</th>
                 <th>Hero Banner</th>
-                <th>Rating</th>
-                <th>Duration</th>
                 <th>Allocated Shows</th>
                 <th>Actions</th>
             </tr>
@@ -57,16 +54,15 @@
             <tr data-title="{{ item.movie.title|lower }}" data-genre="{{ item.movie.genre|lower }}" data-tag="{{ item.movie.display_tag }}">
                 <td>
                     {% if item.movie.poster_url %}
-                        <img src="{{ item.movie.poster_url }}" alt="{{ item.movie.title }}" style="width: 42px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid var(--stroke);">
+                        <img src="{{ item.movie.poster_url }}" alt="{{ item.movie.title }}" style="width: 42px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border-light);">
                     {% else %}
-                        <div style="width: 42px; height: 60px; background: var(--bg-elevated); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 10px;">No Pic</div>
+                        <div style="width: 42px; height: 60px; background: var(--surface-2); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 10px;">No Pic</div>
                     {% endif %}
                 </td>
                 <td style="font-weight: 700; color: var(--text);">
                     {{ item.movie.title }}
-                    <div style="font-size: 11px; color: var(--text-faint);">Released: {{ item.movie.release_year }}</div>
+                    <div style="font-size: 11px; color: var(--text-dim);">Released: {{ item.movie.release_year }}</div>
                 </td>
-                <td><span style="background: var(--bg-elevated); padding: 4px 10px; border-radius: 6px; font-size: 12px;">{{ item.movie.genre }}</span></td>
                 <td><span class="badge badge-active" style="text-transform: uppercase;">{{ item.movie.get_display_tag_display }}</span></td>
                 <td>
                     {% if item.movie.is_hero %}
@@ -74,13 +70,11 @@
                             ★ HERO ACTIVE
                         </a>
                     {% else %}
-                        <a href="{% url 'admin_panel:toggle_hero_movie' item.movie.id %}" style="background: var(--bg-elevated); color: var(--text-muted); border: 1px solid var(--stroke); padding: 4px 8px; border-radius: 6px; font-weight: 600; font-size: 11px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;" title="Click to set as Hero Banner">
+                        <a href="{% url 'admin_panel:toggle_hero_movie' item.movie.id %}" style="background: var(--surface-2); color: var(--text-muted); border: 1px solid var(--border-light); padding: 4px 8px; border-radius: 6px; font-weight: 600; font-size: 11px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;" title="Click to set as Hero Banner">
                             + Set as Hero
                         </a>
                     {% endif %}
                 </td>
-                <td style="color: #FBBF24; font-weight: 700;">★ {{ item.movie.rating }}</td>
-                <td>{{ item.movie.duration_minutes }} mins</td>
                 <td>
                     <span style="font-weight: 700; color: var(--blue-light);">{{ item.show_count }} Shows</span>
                 </td>
@@ -91,7 +85,7 @@
                             View Full
                         </button>
 
-                        <button class="btn-blue" style="padding: 5px 10px; font-size: 11.5px; background: rgba(255,255,255,0.08); border: 1px solid var(--stroke);" 
+                        <button class="btn-blue" style="padding: 5px 10px; font-size: 11.5px; background: rgba(255,255,255,0.08); border: 1px solid var(--border-light);" 
                                 onclick="openEditMovieModal({{ item.movie.id }}, '{{ item.movie.title|escapejs }}', '{{ item.movie.genre|escapejs }}', '{{ item.movie.duration_minutes }}', '{{ item.movie.release_year }}', '{{ item.movie.rating }}', '{{ item.movie.display_tag }}', '{{ item.movie.poster_url|escapejs }}', '{{ item.movie.backdrop_url|escapejs }}', '{{ item.movie.plot|escapejs }}', '{{ item.movie.status }}', {% if item.movie.is_hero %}true{% else %}false{% endif %})">
                             Edit
                         </button>
@@ -102,7 +96,7 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 32px;">No movies found in catalog. Add or import one above.</td>
+                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 32px;">No movies found in catalog. Add or import one above.</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -111,52 +105,65 @@
 
 <!-- Modal: View Full Movie Details -->
 <div id="viewFullMovieModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 250; align-items: center; justify-content: center; padding: 20px;">
-    <div style="background: var(--bg-surface); border: 1px solid var(--stroke); border-radius: var(--radius); width: 100%; max-width: 680px; overflow: hidden; max-height: 90vh; display: flex; flex-direction: column;">
+    <div style="background: var(--surface-1); border: 1px solid var(--border-light); border-radius: var(--radius); width: 100%; max-width: 680px; overflow: hidden; max-height: 90vh; display: flex; flex-direction: column;">
         <!-- Backdrop Banner -->
         <div id="vfmBackdrop" style="height: 180px; background-size: cover; background-position: center; position: relative;">
-            <div style="position: absolute; inset: 0; background: linear-gradient(to top, var(--bg-surface), transparent);"></div>
+            <div style="position: absolute; inset: 0; background: linear-gradient(to top, var(--surface-1), transparent);"></div>
             <button onclick="document.getElementById('viewFullMovieModal').style.display='none'" style="position: absolute; top: 16px; right: 16px; background: rgba(0,0,0,0.6); border: none; color: #fff; width: 32px; height: 32px; border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;">&times;</button>
         </div>
 
         <div style="padding: 24px; overflow-y: auto; display: flex; gap: 20px; flex-direction: row; margin-top: -60px; position: relative;">
-            <img id="vfmPoster" src="" alt="" style="width: 130px; height: 185px; object-fit: cover; border-radius: 8px; border: 2px solid var(--stroke); box-shadow: 0 10px 25px rgba(0,0,0,0.5); flex-shrink: 0;">
+            <img id="vfmPoster" src="" alt="" style="width: 130px; height: 185px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-light); box-shadow: 0 10px 25px rgba(0,0,0,0.5); flex-shrink: 0;">
             
             <div style="flex: 1; margin-top: 50px;">
-                <h2 id="vfmTitle" style="font-size: 24px; font-weight: 800; color: #fff; margin: 0 0 6px 0;"></h2>
-                <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; align-items: center;">
-                    <span id="vfmTag" class="badge badge-active" style="text-transform: uppercase;"></span>
-                    <span id="vfmGenre" style="background: var(--bg-elevated); padding: 3px 10px; border-radius: 6px; font-size: 12px;"></span>
-                    <span id="vfmRating" style="color: #FBBF24; font-weight: 700; font-size: 13px;"></span>
-                    <span id="vfmDuration" style="color: var(--text-muted); font-size: 13px;"></span>
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; flex-wrap: wrap;">
+                    <h2 id="vfmTitle" style="font-size: 24px; font-weight: 800; color: #fff; margin: 0;"></h2>
+                    <span id="vfmTag" class="badge badge-active" style="text-transform: uppercase; font-size: 11px; flex-shrink: 0;"></span>
                 </div>
 
-                <div style="background: var(--bg-elevated); padding: 12px; border-radius: 8px; margin-bottom: 16px;">
-                    <div style="font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 4px;">Plot Summary</div>
+                <!-- Structured Metadata Cards for Genre, Rating, Duration -->
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px;">
+                    <div style="background: var(--surface-2); border: 1px solid var(--border-light); padding: 10px 12px; border-radius: 8px;">
+                        <div style="font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 3px;">Genre</div>
+                        <div id="vfmGenre" style="font-size: 13px; font-weight: 700; color: #fff;"></div>
+                    </div>
+                    <div style="background: var(--surface-2); border: 1px solid var(--border-light); padding: 10px 12px; border-radius: 8px;">
+                        <div style="font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 3px;">Rating</div>
+                        <div id="vfmRating" style="font-size: 13px; font-weight: 800; color: #FBBF24;"></div>
+                    </div>
+                    <div style="background: var(--surface-2); border: 1px solid var(--border-light); padding: 10px 12px; border-radius: 8px;">
+                        <div style="font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 3px;">Duration</div>
+                        <div id="vfmDuration" style="font-size: 13px; font-weight: 700; color: var(--blue-light);"></div>
+                    </div>
+                </div>
+
+                <div style="background: var(--surface-2); border: 1px solid var(--border-light); padding: 14px; border-radius: 8px; margin-bottom: 16px;">
+                    <div style="font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 6px;">Plot Summary</div>
                     <div id="vfmPlot" style="font-size: 13px; color: var(--text); line-height: 1.5;"></div>
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                    <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); padding: 10px; border-radius: 8px; text-align: center;">
-                        <div style="font-size: 11px; color: var(--text-muted);">Allocated Shows</div>
-                        <div id="vfmShows" style="font-size: 18px; font-weight: 800; color: var(--blue-light);"></div>
+                    <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); padding: 12px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 11px; color: var(--text-muted); font-weight: 600;">Allocated Shows</div>
+                        <div id="vfmShows" style="font-size: 20px; font-weight: 800; color: var(--blue-light); margin-top: 2px;"></div>
                     </div>
-                    <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); padding: 10px; border-radius: 8px; text-align: center;">
-                        <div style="font-size: 11px; color: var(--text-muted);">Total Tickets Sold</div>
-                        <div id="vfmBookings" style="font-size: 18px; font-weight: 800; color: #10B981;"></div>
+                    <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); padding: 12px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 11px; color: var(--text-muted); font-weight: 600;">Total Tickets Sold</div>
+                        <div id="vfmBookings" style="font-size: 20px; font-weight: 800; color: #10B981; margin-top: 2px;"></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div style="padding: 16px 24px; background: var(--bg-base); border-top: 1px solid var(--stroke); display: flex; justify-content: flex-end;">
-            <button onclick="document.getElementById('viewFullMovieModal').style.display='none'" class="btn-blue">Close Full View</button>
+        <div style="padding: 16px 24px; background: var(--bg-page); border-top: 1px solid var(--border-light); display: flex; justify-content: flex-end;">
+            <button onclick="document.getElementById('viewFullMovieModal').style.display='none'" class="btn-blue">Close Details</button>
         </div>
     </div>
 </div>
 
 <!-- Modal: Add Custom Manual Movie -->
 <div id="addManualMovieModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 200; align-items: center; justify-content: center; padding: 20px;">
-    <div style="background: var(--bg-surface); border: 1px solid var(--stroke); border-radius: var(--radius); width: 100%; max-width: 580px; padding: 28px; max-height: 90vh; overflow-y: auto;">
+    <div style="background: var(--surface-1); border: 1px solid var(--border-light); border-radius: var(--radius); width: 100%; max-width: 580px; padding: 28px; max-height: 90vh; overflow-y: auto;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <h3 style="font-size: 20px; font-weight: 700; color: var(--text); margin: 0;">Add Custom Movie</h3>
             <button onclick="document.getElementById('addManualMovieModal').style.display='none'" style="background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer;">&times;</button>
@@ -218,7 +225,7 @@
 
 <!-- Modal: Edit Movie Details -->
 <div id="editMovieModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 200; align-items: center; justify-content: center; padding: 20px;">
-    <div style="background: var(--bg-surface); border: 1px solid var(--stroke); border-radius: var(--radius); width: 100%; max-width: 580px; padding: 28px; max-height: 90vh; overflow-y: auto;">
+    <div style="background: var(--surface-1); border: 1px solid var(--border-light); border-radius: var(--radius); width: 100%; max-width: 580px; padding: 28px; max-height: 90vh; overflow-y: auto;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <h3 style="font-size: 20px; font-weight: 700; color: var(--text); margin: 0;">Edit Movie</h3>
             <button onclick="document.getElementById('editMovieModal').style.display='none'" style="background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer;">&times;</button>
@@ -280,14 +287,14 @@
 
 <!-- Modal: OMDb Search & Import -->
 <div id="omdbModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 200; align-items: center; justify-content: center;">
-    <div style="background: var(--bg-surface); border: 1px solid var(--stroke); border-radius: var(--radius); width: 100%; max-width: 600px; padding: 28px;">
+    <div style="background: var(--surface-1); border: 1px solid var(--border-light); border-radius: var(--radius); width: 100%; max-width: 600px; padding: 28px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <h3 style="font-size: 20px; font-weight: 700; color: var(--text); margin: 0;">Search & Import via OMDb API</h3>
             <button onclick="document.getElementById('omdbModal').style.display='none'" style="background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer;">&times;</button>
         </div>
 
         <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-            <input type="text" id="omdbQuery" class="form-control" placeholder="Enter movie title e.g. Batman, Avatar, Inception..." onkeydown="if(event.key === 'Enter'){ searchOMDb(); event.preventDefault(); }">
+            <input type="text" id="omdbQuery" class="form-control" placeholder="Enter movie title" onkeydown="if(event.key === 'Enter'){ searchOMDb(); event.preventDefault(); }">
             <button class="btn-blue" type="button" onclick="searchOMDb()">Search</button>
         </div>
 
@@ -297,11 +304,36 @@
     </div>
 </div>
 
+
+
+<style>
+/* Movie Catalog popup overrides */
+#viewFullMovieModal, #addManualMovieModal, #editMovieModal, #omdbModal { background: rgba(2,5,10,.86) !important; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+#viewFullMovieModal > div, #addManualMovieModal > div, #editMovieModal > div, #omdbModal > div { background: #101722 !important; border: 1px solid rgba(255,255,255,.12) !important; border-radius: 14px !important; box-shadow: 0 30px 80px rgba(0,0,0,.65); color:#e5e7eb !important; }
+#addManualMovieModal input, #addManualMovieModal select, #addManualMovieModal textarea, #editMovieModal input, #editMovieModal select, #editMovieModal textarea, #omdbModal input, #omdbModal select { background:#080d14 !important; color:#f8fafc !important; border-color:rgba(255,255,255,.11) !important; }
+#addManualMovieModal label, #editMovieModal label { color:#cbd5e1 !important; }
+#addManualMovieModal h3, #editMovieModal h3, #omdbModal h3 { color:#f8fafc !important; }
+#addManualMovieModal > div > div:first-child, #editMovieModal > div > div:first-child, #omdbModal > div > div:first-child { border-bottom:1px solid rgba(255,255,255,.08); }
+#addManualMovieModal .btn-blue, #editMovieModal .btn-blue, #omdbModal .btn-blue { background:#dc2626 !important; border-color:rgba(239,68,68,.35) !important; color:#fff !important; }
+#addManualMovieModal .btn-danger-sm, #editMovieModal .btn-danger-sm { background:#182131 !important; border-color:rgba(255,255,255,.10) !important; color:#cbd5e1 !important; }
+#omdbResults > div { background:#151e2b !important; border:1px solid rgba(255,255,255,.08) !important; color:#e5e7eb; }
+@media(max-width:650px){ #addManualMovieModal > div, #editMovieModal > div, #omdbModal > div { max-height:94vh !important; overflow-y:auto !important; } }
+</style>
+
 <script>
+function formatDuration(minutes) {
+    const total = parseInt(minutes, 10) || 0;
+    const hours = Math.floor(total / 60);
+    const mins = total % 60;
+    if (hours > 0 && mins > 0) return `${hours}h ${mins}m`;
+    if (hours > 0) return `${hours}h`;
+    return `${mins}m`;
+}
+
 function openViewFullMovieModal(title, genre, duration, rating, year, tag, poster, backdrop, plot, shows, bookings) {
     document.getElementById('vfmTitle').innerText = title + ' (' + year + ')';
     document.getElementById('vfmGenre').innerText = genre;
-    document.getElementById('vfmDuration').innerText = duration + ' mins';
+    document.getElementById('vfmDuration').innerText = formatDuration(duration);
     document.getElementById('vfmRating').innerText = '★ ' + rating;
     document.getElementById('vfmTag').innerText = tag;
     document.getElementById('vfmPlot').innerText = plot;
@@ -361,18 +393,18 @@ function searchOMDb() {
         .then(data => {
             if (data.movies && data.movies.length > 0) {
                 container.innerHTML = data.movies.map(m => `
-                    <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-elevated); padding: 12px; border-radius: 8px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; background: var(--surface-2); padding: 12px; border-radius: 8px;">
                         <div style="display: flex; align-items: center; gap: 12px;">
                             <img src="${m.Poster !== 'N/A' ? m.Poster : 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba'}" style="width: 36px; height: 50px; object-fit: cover; border-radius: 4px;">
                             <div>
                                 <div style="font-weight: 700; font-size: 14px;">${m.Title} (${m.Year})</div>
-                                <div style="font-size: 11px; color: var(--text-faint);">${m.imdbID}</div>
+                                <div style="font-size: 11px; color: var(--text-dim);">${m.imdbID}</div>
                             </div>
                         </div>
                         <form action="{% url 'admin_panel:import_omdb' %}" method="POST" style="display: flex; gap: 8px; align-items: center;">
                             {% csrf_token %}
                             <input type="hidden" name="imdb_id" value="${m.imdbID}">
-                            <select name="display_tag" style="background: var(--bg-base); color: #fff; border: 1px solid var(--stroke); padding: 6px; border-radius: 6px; font-size: 12px;">
+                            <select name="display_tag" style="background: var(--bg-page); color: #fff; border: 1px solid var(--border-light); padding: 6px; border-radius: 6px; font-size: 12px;">
                                 <option value="hot">Hot</option>
                                 <option value="trending" selected>Trending</option>
                                 <option value="top_rated">Top Rated</option>

@@ -24,5 +24,7 @@ urlpatterns = [
     path('allocations/delete/<int:showtime_id>/', views.delete_allocation, name='delete_allocation'),
     path('allocations/delete-group/<int:movie_id>/<int:cinema_id>/', views.delete_allocation_group, name='delete_allocation_group'),
     path('verifier/', views.ticket_verifier, name='verifier'),
+    path('activity-logs/', views.activity_logs_list, name='activity_logs'),
+    path('activity-logs/clear/', views.clear_activity_logs, name='clear_activity_logs'),
     path('api/verify-ticket/', views.api_verify_ticket, name='api_verify_ticket'),
 ]

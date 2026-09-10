@@ -31,7 +31,7 @@
             <div class="hero-tags">
               <span class="tag">★ {{ movie.rating }}</span>
               <span class="tag">{{ movie.genre }}</span>
-              <span class="tag">{{ movie.duration_minutes }}m</span>
+              <span class="tag">{{ movie.duration_formatted }}</span>
               {% if movie.is_hero %}
                 <span class="tag" style="background: rgba(232, 40, 63, 0.2); border-color: var(--gold); color: #fff;">FEATURED HERO</span>
               {% endif %}
@@ -49,7 +49,7 @@
             </span>
             <div class="hero-poster-label">
               <div class="film">{{ movie.title|upper }}</div>
-              <div class="meta">★ {{ movie.rating }} · {{ movie.genre|upper }} · {{ movie.duration_minutes }}M</div>
+              <div class="meta">★ {{ movie.rating }} · {{ movie.genre|upper }} · {{ movie.duration_formatted }}</div>
             </div>
           </div>
         </div>
@@ -103,7 +103,7 @@
           </div>
           <div class="stub-divider"></div>
           <div class="stub-info" style="padding: 12px 14px 14px;">
-            <div class="genre" style="font-size: 12px; color: var(--text-muted); font-weight: 500;">{{ movie.genre }} • {{ movie.duration_minutes }}m</div>
+            <div class="genre" style="font-size: 12px; color: var(--text-muted); font-weight: 500;">{{ movie.genre }} • {{ movie.duration_formatted }}</div>
             <a href="{% url 'select_theater' movie.id %}" class="btn btn-gold btn-block" style="margin-top: 10px; font-size: 12.5px; padding: 9px; border-radius: 8px;">Book Tickets</a>
           </div>
         </article>
@@ -150,7 +150,7 @@
           </div>
           <div class="stub-divider"></div>
           <div class="stub-info" style="padding: 12px 14px 14px;">
-            <div class="genre" style="font-size: 12px; color: var(--text-muted); font-weight: 500;">{{ movie.genre }} • {{ movie.duration_minutes }}m</div>
+            <div class="genre" style="font-size: 12px; color: var(--text-muted); font-weight: 500;">{{ movie.genre }} • {{ movie.duration_formatted }}</div>
             <a href="{% url 'select_theater' movie.id %}" class="btn btn-gold btn-block" style="margin-top: 10px; font-size: 12.5px; padding: 9px; border-radius: 8px;">Book Tickets</a>
           </div>
         </article>

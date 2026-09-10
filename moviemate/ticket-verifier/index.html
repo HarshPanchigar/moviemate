@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -7,7 +8,9 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Space+Mono:wght@700&display=swap"
+        rel="stylesheet">
     <!-- html5-qrcode scanner library -->
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
@@ -189,8 +192,15 @@
         }
 
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .result-card.valid {
@@ -249,9 +259,17 @@
             line-height: 1.2;
         }
 
-        .valid .status-title { color: #34D399; }
-        .already-used .status-title { color: #FBBF24; }
-        .invalid .status-title { color: #FF5269; }
+        .valid .status-title {
+            color: #34D399;
+        }
+
+        .already-used .status-title {
+            color: #FBBF24;
+        }
+
+        .invalid .status-title {
+            color: #FF5269;
+        }
 
         .ticket-info-grid {
             display: flex;
@@ -302,6 +320,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <div class="verifier-container">
@@ -319,7 +338,8 @@
                 <span id="configToggleArrow">▼</span>
             </div>
             <div class="server-input-group" id="serverConfigBody" style="display: none;">
-                <input type="text" id="serverHostInput" class="server-input" value="http://127.0.0.1:8000" placeholder="e.g. http://127.0.0.1:8000 or https://moviemate.com">
+                <input type="text" id="serverHostInput" class="server-input" value="http://127.0.0.1:8000"
+                    placeholder="e.g. http://127.0.0.1:8000 or https://moviemate.com">
                 <button class="server-save-btn" onclick="saveServerHost()">Save</button>
             </div>
         </div>
@@ -329,7 +349,9 @@
             <div id="reader"></div>
 
             <div class="manual-entry-card">
-                <input type="text" id="manualCodeInput" class="manual-input" placeholder="Enter hash e.g. 8064B8DDC6D56514" onkeydown="if(event.key==='Enter') verifyManualCode()">
+                <input type="text" id="manualCodeInput" class="manual-input"
+                    placeholder="Enter hash e.g. 8064B8DDC6D56514"
+                    onkeydown="if(event.key==='Enter') verifyManualCode()">
                 <button class="verify-btn" onclick="verifyManualCode()">Verify</button>
             </div>
         </div>
@@ -340,7 +362,8 @@
                 <div class="status-icon-circle" id="resultIcon">✓</div>
                 <div>
                     <div class="status-title" id="resultTitle">TICKET VERIFIED</div>
-                    <div style="font-size: 11px; color: #858193; font-family: 'Space Mono', monospace;" id="resultPassId">#8064B8DD</div>
+                    <div style="font-size: 11px; color: #858193; font-family: 'Space Mono', monospace;"
+                        id="resultPassId">#8064B8DD</div>
                 </div>
             </div>
 
@@ -402,11 +425,11 @@
                 const gain = ctx.createGain();
                 osc.connect(gain);
                 gain.connect(ctx.destination);
-                
+
                 osc.type = 'sine';
                 osc.frequency.value = isSuccess ? 880 : 300;
                 gain.gain.value = 0.15;
-                
+
                 osc.start();
                 osc.stop(ctx.currentTime + (isSuccess ? 0.25 : 0.4));
 
@@ -455,7 +478,12 @@
             resultCard.style.display = 'block';
 
             if (data.valid) {
-                if (data.already_used) {
+                if (data.is_expired) {
+                    resultCard.className = 'result-card already-used';
+                    resultIcon.innerText = '⌛';
+                    resultTitle.innerText = 'EXPIRED TICKET (SHOWTIME ENDED)';
+                    playBeep(false);
+                } else if (data.already_used) {
                     resultCard.className = 'result-card already-used';
                     resultIcon.innerText = '⚠️';
                     resultTitle.innerText = 'ALREADY SCANNED PREVIOUSLY';
@@ -510,8 +538,8 @@
         function initScanner() {
             html5QrcodeScanner = new Html5QrcodeScanner(
                 "reader",
-                { 
-                    fps: 10, 
+                {
+                    fps: 10,
                     qrbox: { width: 250, height: 250 },
                     rememberLastUsedCamera: true,
                     aspectRatio: 1.0
@@ -529,4 +557,5 @@
         window.addEventListener('DOMContentLoaded', initScanner);
     </script>
 </body>
+
 </html>

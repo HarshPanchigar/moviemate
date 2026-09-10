@@ -2,6 +2,10 @@ from functools import wraps
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.http import JsonResponse
+from django.utils import timezone
+from datetime import timedelta
+from django.db.models import Q
+from django.core.paginator import Paginator
 from accounts.models import Customer
 from .models import Movie, Category, Cinema, Showtime, Booking, AdminActivityLog
 from .omdb_service import search_movies_omdb, get_movie_details_omdb
@@ -585,14 +589,15 @@ def ticket_verifier(request):
     if qr_hash:
         try:
             booking = Booking.objects.get(qr_code_hash=qr_hash)
-            if booking.is_verified:
+            scanned_booking = booking
+            if booking.is_past:
+                message_text = f"EXPIRED TICKET: Showtime for Ticket #{str(booking.booking_id)[:8]} was on {booking.showtime.show_date} at {booking.showtime.start_time.strftime('%I:%M %p')}. Movie showtime has passed!"
+            elif booking.is_verified:
                 message_text = f"WARNING: Ticket #{str(booking.booking_id)[:8]} has ALREADY been used/scanned!"
-                scanned_booking = booking
             else:
                 booking.is_verified = True
                 booking.save()
                 message_text = f"SUCCESS: Ticket #{str(booking.booking_id)[:8]} Verified & Checked-In!"
-                scanned_booking = booking
                 
                 AdminActivityLog.objects.create(
                     action=f"Scanned & Verified Ticket #{str(booking.booking_id)[:8]} at gate",
@@ -655,10 +660,16 @@ def api_verify_ticket(request):
     try:
         booking = Booking.objects.select_related('customer', 'showtime__movie', 'showtime__cinema').get(qr_code_hash=code)
         already_used = booking.is_verified
+        is_expired = booking.is_past
         
-        if not booking.is_verified:
+        if is_expired:
+            msg = f"EXPIRED TICKET: Showtime was on {booking.showtime.show_date} at {booking.showtime.start_time.strftime('%I:%M %p')}. Movie showtime has passed!"
+        elif already_used:
+            msg = "WARNING: Ticket Already Scanned Previously!"
+        else:
             booking.is_verified = True
             booking.save()
+            msg = "SUCCESS: Ticket Verified & Checked-In!"
             
             AdminActivityLog.objects.create(
                 action=f"Scanned & Verified Ticket #{str(booking.booking_id)[:8]} via App",
@@ -668,7 +679,8 @@ def api_verify_ticket(request):
         return make_response({
             'valid': True,
             'already_used': already_used,
-            'message': 'WARNING: Ticket Already Scanned Previously!' if already_used else 'SUCCESS: Ticket Verified & Checked-In!',
+            'is_expired': is_expired,
+            'message': msg,
             'ticket': {
                 'booking_id': str(booking.booking_id)[:8],
                 'customer_name': booking.customer.full_name,
@@ -683,4 +695,70 @@ def api_verify_ticket(request):
             }
         })
     except Booking.DoesNotExist:
-        return make_response({'valid': False, 'message': 'INVALID TICKET! No matching booking found.'})
+        return make_response({'valid': False, 'message': 'INVALID TICKET: No matching booking found in database.'})
+
+
+@admin_required
+def activity_logs_list(request):
+    logs = AdminActivityLog.objects.all().order_by('-timestamp')
+
+    query = request.GET.get('q', '').strip()
+    if query:
+        logs = logs.filter(Q(action__icontains=query) | Q(performed_by__icontains=query) | Q(details__icontains=query))
+
+    performer = request.GET.get('performer', '').strip()
+    if performer:
+        logs = logs.filter(performed_by__iexact=performer)
+
+    performers = AdminActivityLog.objects.values_list('performed_by', flat=True).distinct()
+
+    paginator = Paginator(logs, 12)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'page_obj': page_obj,
+        'query': query,
+        'performer': performer,
+        'performers': performers,
+        'total_logs': paginator.count,
+        'active_page': 'activity_logs',
+    }
+    return render(request, 'admin_panel/activity_logs.html', context)
+
+
+@admin_required
+def clear_activity_logs(request):
+    if request.method == 'POST':
+        duration = request.POST.get('duration', 'all')
+        now = timezone.now()
+
+        if duration == '7_days':
+            threshold = now - timedelta(days=7)
+            logs_to_delete = AdminActivityLog.objects.filter(timestamp__lt=threshold)
+            count = logs_to_delete.count()
+            logs_to_delete.delete()
+            duration_label = "older than 7 days"
+        elif duration == '30_days':
+            threshold = now - timedelta(days=30)
+            logs_to_delete = AdminActivityLog.objects.filter(timestamp__lt=threshold)
+            count = logs_to_delete.count()
+            logs_to_delete.delete()
+            duration_label = "older than 30 days"
+        elif duration == '90_days':
+            threshold = now - timedelta(days=90)
+            logs_to_delete = AdminActivityLog.objects.filter(timestamp__lt=threshold)
+            count = logs_to_delete.count()
+            logs_to_delete.delete()
+            duration_label = "older than 90 days"
+        else:
+            count = AdminActivityLog.objects.count()
+            AdminActivityLog.objects.all().delete()
+            duration_label = "all historical logs"
+
+        AdminActivityLog.objects.create(
+            action=f"Cleared {count} activity audit logs ({duration_label})",
+            performed_by="System Admin"
+        )
+        messages.success(request, f"Successfully cleared {count} activity log entries ({duration_label}).")
+    return redirect('admin_panel:activity_logs')

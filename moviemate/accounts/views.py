@@ -333,8 +333,17 @@ def my_bookings(request):
         return redirect("login")
     
     customer = get_object_or_404(Customer, id=customer_id)
-    bookings = Booking.objects.filter(customer=customer).select_related('showtime__movie', 'showtime__cinema').order_by('-created_at')
-    return render(request, "my_bookings.html", {"bookings": bookings, "customer": customer})
+    all_bookings = Booking.objects.filter(customer=customer).select_related('showtime__movie', 'showtime__cinema').order_by('-created_at')
+    
+    upcoming_bookings = [b for b in all_bookings if not b.is_past]
+    past_bookings = [b for b in all_bookings if b.is_past]
+
+    return render(request, "my_bookings.html", {
+        "upcoming_bookings": upcoming_bookings,
+        "past_bookings": past_bookings,
+        "all_bookings": all_bookings,
+        "customer": customer
+    })
 
 # --- Profile Management ---
 

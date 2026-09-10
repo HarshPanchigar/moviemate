@@ -35,7 +35,7 @@ class AdminPanelTestCase(TestCase):
     def test_dashboard_view(self):
         response = self.client.get('/admin-panel/')
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "System Dashboard")
+        self.assertContains(response, "Dashboard")
 
     def test_movies_view(self):
         response = self.client.get('/admin-panel/movies/')
@@ -51,3 +51,12 @@ class AdminPanelTestCase(TestCase):
         response = self.client.get('/admin-panel/allocations/')
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Show Allocations")
+
+    def test_activity_logs_view(self):
+        response = self.client.get('/admin-panel/activity-logs/')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "System Activity & Audit Logs")
+
+    def test_clear_activity_logs(self):
+        response = self.client.post('/admin-panel/activity-logs/clear/', {'duration': 'all'})
+        self.assertEqual(response.status_code, 302)

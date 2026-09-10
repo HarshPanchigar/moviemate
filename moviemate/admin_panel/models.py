@@ -1,5 +1,7 @@
 import uuid
+import datetime
 from django.db import models
+from django.utils import timezone
 from accounts.models import Customer
 
 class Category(models.Model):
@@ -43,6 +45,17 @@ class Movie(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
     created_at = models.DateTimeField(auto_now_add=True)
 
+    @property
+    def duration_formatted(self):
+        hours = self.duration_minutes // 60
+        minutes = self.duration_minutes % 60
+        if hours > 0 and minutes > 0:
+            return f"{hours}h {minutes}m"
+        elif hours > 0:
+            return f"{hours}h"
+        else:
+            return f"{minutes}m"
+
     def __str__(self):
         return self.title
 
@@ -71,6 +84,16 @@ class Showtime(models.Model):
     def __str__(self):
         return f"{self.movie.title} at {self.cinema.name} - {self.show_date} {self.start_time}"
 
+    @property
+    def show_datetime(self):
+        return datetime.datetime.combine(self.show_date, self.start_time)
+
+    @property
+    def is_past(self):
+        now = timezone.localtime(timezone.now()).replace(tzinfo=None)
+        st_dt = self.show_datetime
+        return st_dt < now
+
 
 class Booking(models.Model):
     booking_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
@@ -86,6 +109,10 @@ class Booking(models.Model):
 
     def __str__(self):
         return f"Booking #{str(self.booking_id)[:8]} - {self.customer.full_name}"
+
+    @property
+    def is_past(self):
+        return self.showtime.is_past
 
 
 class AdminActivityLog(models.Model):

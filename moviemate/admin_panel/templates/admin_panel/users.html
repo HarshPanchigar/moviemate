@@ -3,43 +3,394 @@
 {% block title %}User Management | MovieMate Admin{% endblock %}
 
 {% block content %}
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px;">
-    <div>
-        <h1 style="font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 0.02em;">User Accounts Management</h1>
-        <p style="color: var(--text-muted); font-size: 14px;">Manage client user accounts registered on MovieMate.</p>
+
+<style>
+/* =========================================================
+   MOVIEMATE — USER MANAGEMENT
+   Professional dark / red admin theme
+   ========================================================= */
+
+.users-page {
+    width: 100%;
+}
+
+.users-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 20px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.users-title {
+    margin: 0;
+    color: #f8fafc;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -.025em;
+}
+
+.users-subtitle {
+    margin: 7px 0 0;
+    color: #94a3b8;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.users-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 38px;
+    padding: 0 13px;
+    background: rgba(59,130,246,.09);
+    border: 1px solid rgba(59,130,246,.18);
+    border-radius: 8px;
+    color: #60a5fa;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* Table */
+
+.users-table-card {
+    overflow: hidden;
+    background: #111722;
+    border: 1px solid rgba(255,255,255,.075);
+    border-radius: 13px;
+}
+
+.users-table-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 15px 18px;
+    background: #182131;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.users-table-heading {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: #f8fafc;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.users-table-heading i {
+    color: #ef4444;
+}
+
+.users-table-note {
+    color: #64748b;
+    font-size: 11px;
+}
+
+.users-table-wrap {
+    overflow-x: auto;
+}
+
+.users-table {
+    width: 100%;
+    min-width: 850px;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.users-table th {
+    padding: 13px 16px;
+    background: #192334;
+    color: #94a3b8;
+    border-bottom: 1px solid rgba(255,255,255,.09);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    text-align: left;
+}
+
+.users-table td {
+    padding: 15px 16px;
+    background: #101722;
+    color: #cbd5e1;
+    border-bottom: 1px solid rgba(255,255,255,.055);
+    font-size: 12.5px;
+    vertical-align: middle;
+}
+
+.users-table tbody tr:nth-child(even) td {
+    background: #141e2b;
+}
+
+.users-table tbody tr:hover td {
+    background: #1b2635;
+}
+
+.users-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.user-id {
+    color: #60a5fa !important;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.user-name-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-avatar {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 8px;
+    background: rgba(239,68,68,.10);
+    border: 1px solid rgba(239,68,68,.18);
+    color: #f87171;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.user-name {
+    color: #f8fafc;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.user-email {
+    color: #cbd5e1;
+}
+
+.user-mobile {
+    color: #94a3b8;
+    white-space: nowrap;
+}
+
+.user-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 9px;
+    background: rgba(16,185,129,.08);
+    border: 1px solid rgba(16,185,129,.17);
+    border-radius: 6px;
+    color: #34d399;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.user-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #34d399;
+}
+
+.user-delete {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 32px;
+    padding: 0 10px;
+    border-radius: 7px;
+    border: 1px solid rgba(239,68,68,.16);
+    background: rgba(239,68,68,.06);
+    color: #f87171;
+    font-size: 11px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: .18s ease;
+}
+
+.user-delete:hover {
+    background: rgba(239,68,68,.13);
+    border-color: rgba(239,68,68,.30);
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.users-empty {
+    padding: 48px !important;
+    text-align: center !important;
+    color: #64748b !important;
+}
+
+.users-empty i {
+    display: block;
+    margin-bottom: 10px;
+    color: #334155;
+    font-size: 30px;
+}
+
+/* Mobile */
+
+@media (max-width: 700px) {
+    .users-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .users-count {
+        align-self: flex-start;
+    }
+}
+</style>
+
+<div class="users-page">
+
+    <div class="users-header">
+
+        <div>
+            <h1 class="users-title">User Accounts Management</h1>
+
+            <p class="users-subtitle">
+                Manage client user accounts registered on MovieMate.
+            </p>
+        </div>
+
+        <div class="users-count">
+            <i class="fa-solid fa-users"></i>
+            {{ customers|length }} Registered Users
+        </div>
+
     </div>
+
+
+    <div class="users-table-card">
+
+        <div class="users-table-header">
+
+            <div class="users-table-heading">
+                <i class="fa-solid fa-user-group"></i>
+                Registered Client Accounts
+            </div>
+
+            <div class="users-table-note">
+                Account management
+            </div>
+
+        </div>
+
+
+        <div class="users-table-wrap">
+
+            <table class="users-table">
+
+                <thead>
+
+                    <tr>
+                        <th>ID</th>
+                        <th>Full Name</th>
+                        <th>Email Address</th>
+                        <th>Mobile Number</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for customer in customers %}
+
+                    <tr>
+
+                        <td class="user-id">
+                            #{{ customer.id }}
+                        </td>
+
+
+                        <td>
+
+                            <div class="user-name-wrap">
+
+                                <div class="user-avatar">
+                                    {{ customer.full_name|first|upper }}
+                                </div>
+
+                                <div class="user-name">
+                                    {{ customer.full_name }}
+                                </div>
+
+                            </div>
+
+                        </td>
+
+
+                        <td class="user-email">
+                            {{ customer.email }}
+                        </td>
+
+
+                        <td class="user-mobile">
+                            {{ customer.mobile }}
+                        </td>
+
+
+                        <td>
+
+                            <span class="user-status">
+
+                                <span class="user-status-dot"></span>
+
+                                Active
+
+                            </span>
+
+                        </td>
+
+
+                        <td>
+
+                            <a href="{% url 'admin_panel:delete_user' customer.id %}"
+                               class="user-delete"
+                               onclick="return confirm('Are you sure you want to remove user {{ customer.full_name }}?')">
+
+                                <i class="fa-regular fa-trash-can"></i>
+
+                                Delete User
+
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+
+                        <td colspan="6" class="users-empty">
+
+                            <i class="fa-solid fa-users-slash"></i>
+
+                            No registered accounts found.
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
 </div>
 
-<div class="panel-card">
-    <table class="admin-table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Full Name</th>
-                <th>Email Address</th>
-                <th>Mobile Number</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for customer in customers %}
-            <tr>
-                <td style="color: var(--blue-primary); font-weight: 700;">#{{ customer.id }}</td>
-                <td style="font-weight: 700;">{{ customer.full_name }}</td>
-                <td>{{ customer.email }}</td>
-                <td>{{ customer.mobile }}</td>
-                <td><span class="badge badge-active">Active</span></td>
-                <td>
-                    <a href="{% url 'admin_panel:delete_user' customer.id %}" class="btn-danger-sm" onclick="return confirm('Are you sure you want to remove user {{ customer.full_name }}?')">Delete User</a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 32px;">No registered accounts found.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
 {% endblock %}

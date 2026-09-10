@@ -1,0 +1,425 @@
+{% extends 'admin_panel/base_admin.html' %}
+{% load static %}
+
+{% block title %}Activity Audit Logs | MovieMate Admin{% endblock %}
+
+{% block content %}
+
+<style>
+/* =========================================================
+   MOVIEMATE — ACTIVITY AUDIT LOGS
+   Professional dark / red admin theme
+   ========================================================= */
+
+.audit-page{width:100%}
+.audit-header{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:24px;flex-wrap:wrap}
+.audit-title{margin:0;color:#f8fafc;font-size:28px;font-weight:700;letter-spacing:-.025em}
+.audit-subtitle{margin:7px 0 0;color:#94a3b8;font-size:14px;line-height:1.5;max-width:720px}
+.audit-header-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.audit-danger,.audit-total,.audit-filter-btn,.audit-clear-btn,.audit-page-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:38px;padding:0 13px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;cursor:pointer;transition:.18s}
+.audit-danger{background:#dc2626;border:1px solid rgba(239,68,68,.35);color:#fff}
+.audit-danger:hover{background:#b91c1c;transform:translateY(-1px)}
+.audit-total{background:rgba(59,130,246,.09);border:1px solid rgba(59,130,246,.20);color:#60a5fa}
+.audit-filter-card{padding:14px;background:#111722;border:1px solid rgba(255,255,255,.075);border-radius:12px;margin-bottom:18px}
+.audit-filter-form{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.audit-search{flex:1;min-width:260px}
+.audit-control{width:100%;min-height:42px;padding:0 12px;background:#080d14!important;border:1px solid rgba(255,255,255,.11)!important;border-radius:8px!important;color:#f8fafc!important;outline:none;font-size:13px}
+.audit-control:focus{border-color:rgba(239,68,68,.50)!important;box-shadow:0 0 0 3px rgba(239,68,68,.07)}
+.audit-control option{background:#101722;color:#fff}
+.audit-performer{width:220px}
+.audit-filter-btn{background:#dc2626;border:1px solid rgba(239,68,68,.35);color:#fff}
+.audit-filter-btn:hover{background:#b91c1c}
+.audit-clear-btn{background:#182131;border:1px solid rgba(255,255,255,.10);color:#cbd5e1}
+.audit-clear-btn:hover{background:#202b3a;color:#fff}
+.audit-table-card{overflow:hidden;background:#111722;border:1px solid rgba(255,255,255,.075);border-radius:12px;margin-bottom:18px}
+.audit-table-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:15px 18px;background:#182131;border-bottom:1px solid rgba(255,255,255,.08)}
+.audit-feed-title{color:#f8fafc;font-size:13px;font-weight:700}
+.audit-feed-title i{color:#ef4444;margin-right:8px}
+.audit-feed-count{color:#64748b;font-size:11px}
+.audit-table-wrap{overflow-x:auto}
+.audit-table{width:100%;min-width:760px;border-collapse:separate;border-spacing:0}
+.audit-table th{padding:13px 15px;background:#192334;color:#94a3b8;border-bottom:1px solid rgba(255,255,255,.09);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;text-align:left}
+.audit-table td{padding:14px 15px;background:#101722;color:#cbd5e1;border-bottom:1px solid rgba(255,255,255,.055);font-size:12px;vertical-align:middle}
+.audit-table tbody tr:nth-child(even) td{background:#141e2b}
+.audit-table tbody tr:hover td{background:#1b2635}
+.audit-table tbody tr:last-child td{border-bottom:0}
+.audit-number{text-align:center!important;color:#64748b!important;font-weight:700!important}
+.audit-user{display:inline-flex;align-items:center;gap:7px;padding:5px 9px;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.16);border-radius:6px;color:#60a5fa;font-size:11px;font-weight:700}
+.audit-action{color:#f1f5f9;font-size:13px;font-weight:600;line-height:1.4}
+.audit-details{margin-top:4px;color:#64748b;font-size:11px;font-weight:400;line-height:1.4}
+.audit-time{white-space:nowrap;text-align:right!important;color:#94a3b8!important;font-size:11px!important}
+.audit-empty{padding:45px!important;text-align:center;color:#64748b!important}
+.audit-empty i{display:block;margin-bottom:10px;color:#334155;font-size:28px}
+.audit-pagination{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-top:20px}
+.audit-page-info{color:#64748b;font-size:12px}
+.audit-page-info b{color:#cbd5e1}
+.audit-pages{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+.audit-page-btn{min-width:36px;padding:0 11px;background:#182131;border:1px solid rgba(255,255,255,.09);color:#cbd5e1}
+.audit-page-btn:hover{background:#202b3a;color:#fff}
+.audit-page-btn.active{background:#dc2626;border-color:rgba(239,68,68,.35);color:#fff}
+.audit-page-btn.disabled{opacity:.35;cursor:not-allowed}
+
+/* Clear logs modal */
+.audit-modal{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(2,5,10,.85);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px)}
+.audit-modal-box{width:100%;max-width:480px;overflow:hidden;background:#101722!important;border:1px solid rgba(255,255,255,.12);border-radius:14px;box-shadow:0 30px 90px rgba(0,0,0,.70);animation:auditModalIn .18s ease-out}
+@keyframes auditModalIn{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+.audit-modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;background:#182131!important;border-bottom:1px solid rgba(255,255,255,.09)}
+.audit-modal-title-wrap{display:flex;align-items:center;gap:10px;color:#f87171}
+.audit-modal-icon{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:9px;background:rgba(239,68,68,.10);border:1px solid rgba(239,68,68,.18);color:#ef4444}
+.audit-modal-title{margin:0;color:#f8fafc;font-size:16px;font-weight:700}
+.audit-modal-close{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.10);border-radius:7px;background:rgba(255,255,255,.04);color:#94a3b8;cursor:pointer}
+.audit-modal-close:hover{background:rgba(239,68,68,.12);color:#ef4444}
+.audit-modal-body{padding:21px;background:#101722!important}
+.audit-warning{margin:0 0 18px;padding:12px 13px;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.15);border-radius:8px;color:#cbd5e1;font-size:12px;line-height:1.55}
+.audit-form-label{display:block;margin-bottom:7px;color:#cbd5e1;font-size:12px;font-weight:700}
+.audit-modal-footer{display:flex;justify-content:flex-end;gap:9px;margin-top:20px}
+.audit-cancel{min-height:38px;padding:0 14px;background:#182131;border:1px solid rgba(255,255,255,.10);border-radius:8px;color:#cbd5e1;font-size:12px;font-weight:700;cursor:pointer}
+.audit-confirm{min-height:38px;padding:0 14px;background:#dc2626;border:1px solid rgba(239,68,68,.35);border-radius:8px;color:#fff;font-size:12px;font-weight:700;cursor:pointer}
+.audit-confirm:hover{background:#b91c1c}
+@media(max-width:700px){
+    .audit-header{align-items:stretch;flex-direction:column}
+    .audit-header-actions{align-self:flex-start}
+    .audit-performer{width:100%}
+    .audit-filter-form{align-items:stretch}
+    .audit-filter-btn,.audit-clear-btn{min-width:110px}
+}
+</style>
+
+
+<div class="audit-page">
+
+    <div class="audit-header">
+
+        <div>
+            <h1 class="audit-title">System Activity & Audit Logs</h1>
+            <p class="audit-subtitle">
+                Comprehensive history of administrative operations, ticket verifications and system events.
+            </p>
+        </div>
+
+        <div class="audit-header-actions">
+
+            <button type="button"
+                    class="audit-danger"
+                    onclick="document.getElementById('clearLogsModal').style.display='flex'">
+                <i class="fa-solid fa-trash-can"></i>
+                Clear Activity Logs
+            </button>
+
+            <span class="audit-total">
+                <i class="fa-solid fa-database"></i>
+                Total Logs: {{ total_logs }}
+            </span>
+
+        </div>
+
+    </div>
+
+    <div class="audit-filter-card">
+
+        <form method="GET"
+              action="{% url 'admin_panel:activity_logs' %}"
+              class="audit-filter-form">
+
+            <div class="audit-search">
+                <input type="text"
+                       name="q"
+                       value="{{ query }}"
+                       class="audit-control"
+                       placeholder="Search by action description or performed by...">
+            </div>
+
+            <div class="audit-performer">
+                <select name="performer" class="audit-control">
+                    <option value="">All Performers / Admins</option>
+
+                    {% for p in performers %}
+                        <option value="{{ p }}"
+                                {% if performer == p %}selected{% endif %}>
+                            {{ p }}
+                        </option>
+                    {% endfor %}
+
+                </select>
+            </div>
+
+            <button type="submit" class="audit-filter-btn">
+                <i class="fa-solid fa-filter"></i>
+                Filter Logs
+            </button>
+
+            {% if query or performer %}
+
+                <a href="{% url 'admin_panel:activity_logs' %}"
+                   class="audit-clear-btn">
+                    <i class="fa-solid fa-xmark"></i>
+                    Clear Filters
+                </a>
+
+            {% endif %}
+
+        </form>
+
+    </div>
+
+    <div class="audit-table-card">
+
+        <div class="audit-table-head">
+
+            <div class="audit-feed-title">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                Audit Feed History
+            </div>
+
+            <div class="audit-feed-count">
+                Showing {{ page_obj.start_index }}–{{ page_obj.end_index }}
+                of {{ total_logs }} entries
+            </div>
+
+        </div>
+
+        <div class="audit-table-wrap">
+
+            <table class="audit-table">
+
+                <thead>
+                    <tr>
+                        <th style="width:60px;text-align:center;">#</th>
+                        <th style="width:190px;">Performed By</th>
+                        <th>Action Details</th>
+                        <th style="width:220px;text-align:right;">Timestamp</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for log in page_obj %}
+
+                    <tr>
+
+                        <td class="audit-number">
+                            {{ forloop.counter0|add:page_obj.start_index }}
+                        </td>
+
+                        <td>
+
+                            <span class="audit-user">
+                                <i class="fa-solid fa-user-shield"></i>
+                                {{ log.performed_by }}
+                            </span>
+
+                        </td>
+
+                        <td>
+
+                            <div class="audit-action">
+                                {{ log.action }}
+                            </div>
+
+                            {% if log.details %}
+
+                                <div class="audit-details">
+                                    {{ log.details }}
+                                </div>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td class="audit-time">
+
+                            <i class="fa-regular fa-clock"></i>
+                            {{ log.timestamp|date:"M d, Y — h:i A" }}
+
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+                        <td colspan="4" class="audit-empty">
+                            <i class="fa-solid fa-inbox"></i>
+                            No activity logs found matching your criteria.
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    {% if page_obj.has_other_pages %}
+
+    <div class="audit-pagination">
+
+        <div class="audit-page-info">
+            Page <b>{{ page_obj.number }}</b>
+            of <b>{{ page_obj.paginator.num_pages }}</b>
+        </div>
+
+        <div class="audit-pages">
+
+            {% if page_obj.has_previous %}
+
+                <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if performer %}&performer={{ performer }}{% endif %}"
+                   class="audit-page-btn">
+                    <i class="fa-solid fa-chevron-left"></i>
+                    Previous
+                </a>
+
+            {% else %}
+
+                <span class="audit-page-btn disabled">
+                    <i class="fa-solid fa-chevron-left"></i>
+                    Previous
+                </span>
+
+            {% endif %}
+
+            {% for page_num in page_obj.paginator.page_range %}
+
+                {% if page_num == page_obj.number %}
+
+                    <span class="audit-page-btn active">
+                        {{ page_num }}
+                    </span>
+
+                {% elif page_num > page_obj.number|add:"-3" and page_num < page_obj.number|add:"3" %}
+
+                    <a href="?page={{ page_num }}{% if query %}&q={{ query }}{% endif %}{% if performer %}&performer={{ performer }}{% endif %}"
+                       class="audit-page-btn">
+                        {{ page_num }}
+                    </a>
+
+                {% endif %}
+
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+
+                <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if performer %}&performer={{ performer }}{% endif %}"
+                   class="audit-page-btn">
+                    Next
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
+
+            {% else %}
+
+                <span class="audit-page-btn disabled">
+                    Next
+                    <i class="fa-solid fa-chevron-right"></i>
+                </span>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+<!-- Clear Activity Logs Modal -->
+<div id="clearLogsModal" class="audit-modal">
+
+    <div class="audit-modal-box">
+
+        <div class="audit-modal-head">
+
+            <div class="audit-modal-title-wrap">
+
+                <div class="audit-modal-icon">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+
+                <h3 class="audit-modal-title">
+                    Clear Activity Audit Logs
+                </h3>
+
+            </div>
+
+            <button type="button"
+                    class="audit-modal-close"
+                    onclick="document.getElementById('clearLogsModal').style.display='none'">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+        </div>
+
+        <div class="audit-modal-body">
+
+            <form action="{% url 'admin_panel:clear_activity_logs' %}"
+                  method="POST">
+
+                {% csrf_token %}
+
+                <div class="audit-warning">
+                    <strong style="color:#fbbf24;">Warning:</strong>
+                    Select a timeframe for log cleanup. Logs created before
+                    the selected timeframe will be permanently removed.
+                </div>
+
+                <label class="audit-form-label">
+                    Select Duration Timeframe
+                </label>
+
+                <select name="duration"
+                        class="audit-control">
+
+                    <option value="7_days">7 Days</option>
+                    <option value="30_days" selected>30 Days</option>
+                    <option value="90_days">90 Days</option>
+                    <option value="all">ALL</option>
+
+                </select>
+
+                <div class="audit-modal-footer">
+
+                    <button type="button"
+                            class="audit-cancel"
+                            onclick="document.getElementById('clearLogsModal').style.display='none'">
+                        Cancel
+                    </button>
+
+                    <button type="submit"
+                            class="audit-confirm"
+                            onclick="return confirm('Are you sure you want to delete these log entries?')">
+                        <i class="fa-solid fa-trash-can"></i>
+                        Confirm & Clear Logs
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+document.getElementById('clearLogsModal').addEventListener('click', function(event) {
+    if (event.target === this) {
+        this.style.display = 'none';
+    }
+});
+
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        const modal = document.getElementById('clearLogsModal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    }
+});
+</script>
+
+{% endblock %}

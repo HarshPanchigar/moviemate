@@ -3,184 +3,920 @@
 {% block title %}Cinemas & Halls | MovieMate Admin{% endblock %}
 
 {% block content %}
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
-    <div>
-        <h1 style="font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 0.02em; margin: 0;">Cinema Halls Management</h1>
-        <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">Register, edit, view full hall details, or delete theater venues across cities.</p>
+
+<style>
+/* =========================================================
+   CINEMA MANAGEMENT — MOVIEMATE ADMIN
+   ========================================================= */
+
+.cinema-page {
+    width: 100%;
+}
+
+.cinema-page-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.cinema-page-title {
+    margin: 0;
+    color: #f8fafc;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -.025em;
+}
+
+.cinema-page-subtitle {
+    margin: 7px 0 0;
+    color: #94a3b8;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.cinema-primary-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    min-height: 42px;
+    padding: 0 16px;
+    border: 1px solid rgba(239,68,68,.35);
+    border-radius: 8px;
+    background: #dc2626;
+    color: #fff !important;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: .18s ease;
+}
+
+.cinema-primary-btn:hover {
+    background: #b91c1c;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 22px rgba(239,68,68,.18);
+}
+
+.cinema-filter {
+    margin-bottom: 18px;
+    padding: 14px;
+    background: #111722;
+    border: 1px solid rgba(255,255,255,.075);
+    border-radius: 12px;
+}
+
+.cinema-filter .form-control {
+    min-height: 42px;
+    background: #080d14 !important;
+}
+
+.cinema-table-card {
+    overflow: hidden;
+    padding: 0;
+    background: #111722;
+    border: 1px solid rgba(255,255,255,.075);
+    border-radius: 13px;
+}
+
+.cinema-table-wrap {
+    overflow-x: auto;
+}
+
+.cinema-table {
+    width: 100%;
+    min-width: 820px;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.cinema-table th {
+    padding: 14px 16px;
+    background: #192334;
+    color: #aebbd0;
+    border-bottom: 1px solid rgba(255,255,255,.11);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    text-align: left;
+}
+
+.cinema-table td {
+    padding: 15px 16px;
+    background: #101722;
+    color: #cbd5e1;
+    border-bottom: 1px solid rgba(255,255,255,.055);
+    font-size: 13px;
+    vertical-align: middle;
+}
+
+.cinema-table tbody tr:nth-child(even) td {
+    background: #141e2b;
+}
+
+.cinema-table tbody tr:hover td {
+    background: #1c2736;
+}
+
+.cinema-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.cinema-name {
+    color: #f8fafc;
+    font-weight: 700;
+}
+
+.cinema-address {
+    max-width: 280px;
+    color: #94a3b8;
+    line-height: 1.45;
+}
+
+.cinema-city-badge,
+.cinema-show-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 9px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.cinema-city-badge {
+    background: rgba(59,130,246,.10);
+    border: 1px solid rgba(59,130,246,.18);
+    color: #60a5fa;
+}
+
+.cinema-show-badge {
+    background: rgba(16,185,129,.10);
+    border: 1px solid rgba(16,185,129,.18);
+    color: #34d399;
+}
+
+.cinema-actions {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.cinema-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px;
+    padding: 0 10px;
+    border-radius: 7px;
+    border: 1px solid rgba(255,255,255,.10);
+    background: rgba(255,255,255,.035);
+    color: #cbd5e1;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    transition: .16s ease;
+}
+
+.cinema-action:hover {
+    background: #202b3a;
+    color: #fff;
+}
+
+.cinema-action.view:hover {
+    color: #60a5fa;
+    border-color: rgba(59,130,246,.28);
+}
+
+.cinema-action.edit:hover {
+    color: #fbbf24;
+    border-color: rgba(245,158,11,.28);
+}
+
+.cinema-action.delete:hover {
+    color: #f87171;
+    border-color: rgba(239,68,68,.30);
+}
+
+/* =========================================================
+   MODALS
+   ========================================================= */
+
+.cinema-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(2,5,10,.84);
+    backdrop-filter: blur(9px);
+    -webkit-backdrop-filter: blur(9px);
+}
+
+.cinema-modal-box {
+    width: 100%;
+    max-width: 540px;
+    max-height: calc(100vh - 40px);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background: #101722 !important;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 14px;
+    box-shadow: 0 30px 90px rgba(0,0,0,.70);
+    animation: cinemaModalIn .18s ease-out;
+}
+
+.cinema-modal-box.wide {
+    max-width: 620px;
+}
+
+@keyframes cinemaModalIn {
+    from { opacity: 0; transform: translateY(10px) scale(.985); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.cinema-modal-header {
+    min-height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 15px 20px;
+    background: #182131 !important;
+    border-bottom: 1px solid rgba(255,255,255,.09);
+}
+
+.cinema-modal-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+
+.cinema-modal-icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 9px;
+    background: rgba(239,68,68,.10);
+    border: 1px solid rgba(239,68,68,.18);
+    color: #ef4444;
+}
+
+.cinema-modal-title {
+    margin: 0;
+    color: #f8fafc;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.cinema-modal-subtitle {
+    margin-top: 3px;
+    color: #64748b;
+    font-size: 11px;
+}
+
+.cinema-modal-close {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 1px solid rgba(255,255,255,.10);
+    border-radius: 7px;
+    background: rgba(255,255,255,.04);
+    color: #94a3b8;
+    font-size: 15px;
+    cursor: pointer;
+    transition: .18s ease;
+}
+
+.cinema-modal-close:hover {
+    background: rgba(239,68,68,.12);
+    border-color: rgba(239,68,68,.28);
+    color: #ef4444;
+}
+
+.cinema-modal-body {
+    overflow-y: auto;
+    padding: 22px;
+    background: #101722 !important;
+    color: #cbd5e1;
+}
+
+.cinema-form-group {
+    margin-bottom: 17px;
+}
+
+.cinema-form-group label {
+    display: block;
+    margin-bottom: 7px;
+    color: #cbd5e1;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.cinema-input,
+.cinema-select,
+.cinema-textarea {
+    width: 100%;
+    min-height: 43px;
+    padding: 10px 12px;
+    background: #080d14 !important;
+    border: 1px solid rgba(255,255,255,.11);
+    border-radius: 8px;
+    outline: none;
+    color: #f8fafc !important;
+    font-size: 13px;
+    transition: .18s ease;
+}
+
+.cinema-input:focus,
+.cinema-select:focus,
+.cinema-textarea:focus {
+    border-color: rgba(239,68,68,.50);
+    box-shadow: 0 0 0 3px rgba(239,68,68,.07);
+}
+
+.cinema-input::placeholder,
+.cinema-textarea::placeholder {
+    color: #526075;
+}
+
+.cinema-select option {
+    background: #101722;
+    color: #f8fafc;
+}
+
+.cinema-textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.cinema-modal-footer {
+    min-height: 66px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 9px;
+    padding: 13px 20px;
+    background: #0c121b !important;
+    border-top: 1px solid rgba(255,255,255,.08);
+}
+
+.cinema-cancel-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 38px;
+    padding: 0 14px;
+    background: #182131;
+    border: 1px solid rgba(255,255,255,.10);
+    border-radius: 8px;
+    color: #cbd5e1;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.cinema-save-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 38px;
+    padding: 0 15px;
+    background: #dc2626;
+    border: 1px solid rgba(239,68,68,.35);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.cinema-save-btn:hover {
+    background: #b91c1c;
+}
+
+.cinema-detail-box {
+    padding: 14px;
+    background: #151e2b !important;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 9px;
+}
+
+.cinema-detail-label {
+    margin-bottom: 5px;
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+}
+
+.cinema-detail-value {
+    color: #f8fafc;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.cinema-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 10px;
+}
+
+.cinema-stat {
+    padding: 13px 10px;
+    text-align: center;
+    border-radius: 9px;
+}
+
+.cinema-stat.blue {
+    background: rgba(59,130,246,.08);
+    border: 1px solid rgba(59,130,246,.18);
+}
+.cinema-stat.green {
+    background: rgba(16,185,129,.08);
+    border: 1px solid rgba(16,185,129,.18);
+}
+.cinema-stat.amber {
+    background: rgba(245,158,11,.08);
+    border: 1px solid rgba(245,158,11,.18);
+}
+
+.cinema-stat-label {
+    color: #94a3b8;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.cinema-stat-value {
+    margin-top: 4px;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.cinema-stat.blue .cinema-stat-value { color: #60a5fa; }
+.cinema-stat.green .cinema-stat-value { color: #34d399; }
+.cinema-stat.amber .cinema-stat-value { color: #fbbf24; }
+
+.cinema-movie-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 9px;
+    background: rgba(59,130,246,.09);
+    border: 1px solid rgba(59,130,246,.18);
+    border-radius: 6px;
+    color: #93c5fd;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+@media (max-width: 700px) {
+    .cinema-page-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .cinema-primary-btn {
+        align-self: flex-start;
+    }
+
+    .cinema-stat-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<div class="cinema-page">
+
+    <div class="cinema-page-header">
+
+        <div>
+            <h1 class="cinema-page-title">Cinema Halls Management</h1>
+            <p class="cinema-page-subtitle">
+                Register, edit, view and manage cinema venues across cities.
+            </p>
+        </div>
+
+        <button class="cinema-primary-btn"
+                onclick="document.getElementById('addCinemaModal').style.display='flex'">
+            <i class="fa-solid fa-plus"></i>
+            Add New Cinema
+        </button>
+
     </div>
-    <button class="btn-blue" onclick="document.getElementById('addCinemaModal').style.display='flex'">
-        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"></path></svg>
-        Add New Cinema
-    </button>
+
+    <div class="cinema-filter">
+
+        <input type="text"
+               id="cinemaSearchInput"
+               class="form-control"
+               placeholder="Search by cinema name or city..."
+               onkeyup="filterCinemasTable()">
+
+    </div>
+
+    <div class="cinema-table-card">
+
+        <div class="cinema-table-wrap">
+
+            <table class="cinema-table" id="cinemasTable">
+
+                <thead>
+                    <tr>
+                        <th>Cinema Name</th>
+                        <th>City</th>
+                        <th>Address</th>
+                        <th>Total Screens</th>
+                        <th>Active Showtimes</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for item in cinemas_data %}
+
+                    <tr data-name="{{ item.cinema.name|lower }}"
+                        data-city="{{ item.cinema.city|lower }}">
+
+                        <td>
+                            <div class="cinema-name">
+                                {{ item.cinema.name }}
+                            </div>
+                        </td>
+
+                        <td>
+                            <span class="cinema-city-badge">
+                                {{ item.cinema.city }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <div class="cinema-address">
+                                {{ item.cinema.address }}
+                            </div>
+                        </td>
+
+                        <td>
+                            <strong style="color:#e5e7eb;">
+                                {{ item.cinema.total_screens }}
+                            </strong>
+                            <span style="color:#64748b;">Screens</span>
+                        </td>
+
+                        <td>
+                            <span class="cinema-show-badge">
+                                {{ item.total_shows }} Shows
+                            </span>
+                        </td>
+
+                        <td>
+
+                            <div class="cinema-actions">
+
+                                <button
+                                    onclick="openViewFullCinemaModal('{{ item.cinema.name|escapejs }}', '{{ item.cinema.city|escapejs }}', '{{ item.cinema.address|escapejs }}', {{ item.cinema.total_screens }}, '{{ item.cinema.facilities|escapejs }}', '{{ item.total_shows }}', '{{ item.bookings_count }}', [{% for m in item.movies_active %}'{{ m.title|escapejs }}'{% if not forloop.last %},{% endif %}{% endfor %}])"
+                                    class="cinema-action view">
+                                    <i class="fa-regular fa-eye"></i>
+                                    View
+                                </button>
+
+                                <button
+                                    onclick="editCinema({{ item.cinema.id }}, '{{ item.cinema.name|escapejs }}', '{{ item.cinema.city|escapejs }}', '{{ item.cinema.address|escapejs }}', {{ item.cinema.total_screens }})"
+                                    class="cinema-action edit">
+                                    <i class="fa-solid fa-pen"></i>
+                                    Edit
+                                </button>
+
+                                <a
+                                    href="{% url 'admin_panel:delete_cinema' item.cinema.id %}"
+                                    class="cinema-action delete"
+                                    onclick="return confirm('Delete Cinema {{ item.cinema.name }}?')">
+                                    <i class="fa-regular fa-trash-can"></i>
+                                    Delete
+                                </a>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+                        <td colspan="6"
+                            style="text-align:center;color:#64748b;padding:40px;">
+                            <i class="fa-solid fa-building"
+                               style="display:block;font-size:24px;margin-bottom:10px;color:#334155;"></i>
+                            No cinemas registered yet.
+                            Click "Add New Cinema" above to add one.
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
 </div>
 
-<!-- Search Filter -->
-<div class="panel-card" style="padding: 16px; margin-bottom: 20px;">
-    <input type="text" id="cinemaSearchInput" class="form-control" placeholder="Search by cinema name or city..." onkeyup="filterCinemasTable()">
-</div>
+<!-- View Full Cinema Modal -->
+<div id="viewFullCinemaModal" class="cinema-modal">
 
-<div class="panel-card">
-    <table class="admin-table" id="cinemasTable">
-        <thead>
-            <tr>
-                <th>Cinema Name</th>
-                <th>City</th>
-                <th>Address</th>
-                <th>Total Screens</th>
-                <th>Active Showtimes</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in cinemas_data %}
-            <tr data-name="{{ item.cinema.name|lower }}" data-city="{{ item.cinema.city|lower }}">
-                <td style="font-weight: 700; color: var(--text);">{{ item.cinema.name }}</td>
-                <td><span style="background: var(--blue-primary); color: #fff; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 700;">{{ item.cinema.city }}</span></td>
-                <td style="color: var(--text-muted); max-width: 280px;">{{ item.cinema.address }}</td>
-                <td style="font-weight: 600;">{{ item.cinema.total_screens }} Screens</td>
-                <td>
-                    <span style="background: rgba(16, 185, 129, 0.15); color: #10B981; padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 12px;">
-                        {{ item.total_shows }} Shows
-                    </span>
-                </td>
-                <td>
-                    <div style="display: flex; gap: 6px; align-items: center;">
-                        <button onclick="openViewFullCinemaModal('{{ item.cinema.name|escapejs }}', '{{ item.cinema.city|escapejs }}', '{{ item.cinema.address|escapejs }}', {{ item.cinema.total_screens }}, '{{ item.cinema.facilities|escapejs }}', '{{ item.total_shows }}', '{{ item.bookings_count }}', [{% for m in item.movies_active %}'{{ m.title|escapejs }}'{% if not forloop.last %},{% endif %}{% endfor %}])" 
-                                class="btn-blue" style="padding: 5px 10px; font-size: 11.5px;">
-                            View Full
-                        </button>
+    <div class="cinema-modal-box wide">
 
-                        <button onclick="editCinema({{ item.cinema.id }}, '{{ item.cinema.name|escapejs }}', '{{ item.cinema.city|escapejs }}', '{{ item.cinema.address|escapejs }}', {{ item.cinema.total_screens }})" 
-                                class="btn-blue" style="padding: 5px 10px; font-size: 11.5px; background: rgba(255,255,255,0.08); border: 1px solid var(--stroke);">
-                            Edit
-                        </button>
+        <div class="cinema-modal-header">
 
-                        <a href="{% url 'admin_panel:delete_cinema' item.cinema.id %}" class="btn-danger-sm" style="padding: 5px 10px; font-size: 11.5px;" onclick="return confirm('Delete Cinema {{ item.cinema.name }}?')">Delete</a>
+            <div class="cinema-modal-title-wrap">
+
+                <div class="cinema-modal-icon">
+                    <i class="fa-solid fa-building"></i>
+                </div>
+
+                <div>
+                    <h3 id="vfcName" class="cinema-modal-title"></h3>
+                    <div id="vfcCity" class="cinema-modal-subtitle"></div>
+                </div>
+
+            </div>
+
+            <button type="button"
+                    class="cinema-modal-close"
+                    onclick="document.getElementById('viewFullCinemaModal').style.display='none'">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+        </div>
+
+        <div class="cinema-modal-body">
+
+            <div style="display:flex;flex-direction:column;gap:12px;">
+
+                <div class="cinema-detail-box">
+                    <div class="cinema-detail-label">Venue Location Address</div>
+                    <div id="vfcAddress" class="cinema-detail-value"></div>
+                </div>
+
+                <div class="cinema-stat-grid">
+
+                    <div class="cinema-stat blue">
+                        <div class="cinema-stat-label">Total Screens</div>
+                        <div id="vfcScreens" class="cinema-stat-value"></div>
                     </div>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 32px;">No cinemas registered yet. Click "Add New Cinema" above to add one.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+
+                    <div class="cinema-stat green">
+                        <div class="cinema-stat-label">Active Shows</div>
+                        <div id="vfcShows" class="cinema-stat-value"></div>
+                    </div>
+
+                    <div class="cinema-stat amber">
+                        <div class="cinema-stat-label">Total Bookings</div>
+                        <div id="vfcBookings" class="cinema-stat-value"></div>
+                    </div>
+
+                </div>
+
+                <div class="cinema-detail-box">
+                    <div class="cinema-detail-label">Facilities & Features</div>
+                    <div id="vfcFacilities" class="cinema-detail-value"></div>
+                </div>
+
+                <div class="cinema-detail-box">
+                    <div class="cinema-detail-label">Currently Screening Movies</div>
+                    <div id="vfcMoviesList"
+                         style="display:flex;gap:7px;flex-wrap:wrap;"></div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="cinema-modal-footer">
+
+            <button type="button"
+                    class="cinema-cancel-btn"
+                    onclick="document.getElementById('viewFullCinemaModal').style.display='none'">
+                Close
+            </button>
+
+        </div>
+
+    </div>
+
 </div>
 
-<!-- Modal: View Full Cinema Venue Details -->
-<div id="viewFullCinemaModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 250; align-items: center; justify-content: center; padding: 20px;">
-    <div style="background: var(--bg-surface); border: 1px solid var(--stroke); border-radius: var(--radius); width: 100%; max-width: 580px; padding: 28px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <div>
-                <h3 id="vfcName" style="font-size: 22px; font-weight: 800; color: var(--text); margin: 0;"></h3>
-                <span id="vfcCity" style="background: var(--blue-primary); color: #fff; padding: 2px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; display: inline-block; margin-top: 6px;"></span>
+<!-- Add Cinema Modal -->
+<div id="addCinemaModal" class="cinema-modal">
+
+    <div class="cinema-modal-box">
+
+        <div class="cinema-modal-header">
+
+            <div class="cinema-modal-title-wrap">
+
+                <div class="cinema-modal-icon">
+                    <i class="fa-solid fa-building-circle-plus"></i>
+                </div>
+
+                <div>
+                    <h3 class="cinema-modal-title">Add Cinema Hall</h3>
+                    <div class="cinema-modal-subtitle">
+                        Register a new cinema venue
+                    </div>
+                </div>
+
             </div>
-            <button onclick="document.getElementById('viewFullCinemaModal').style.display='none'" style="background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer;">&times;</button>
+
+            <button type="button"
+                    class="cinema-modal-close"
+                    onclick="document.getElementById('addCinemaModal').style.display='none'">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
         </div>
 
-        <div style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px;">
-            <div style="background: var(--bg-elevated); padding: 14px; border-radius: 8px;">
-                <div style="font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 4px;">Venue Location Address</div>
-                <div id="vfcAddress" style="font-size: 14px; color: var(--text); line-height: 1.4;"></div>
-            </div>
+        <div class="cinema-modal-body">
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
-                <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); padding: 12px; border-radius: 8px; text-align: center;">
-                    <div style="font-size: 11px; color: var(--text-muted);">Total Screens</div>
-                    <div id="vfcScreens" style="font-size: 18px; font-weight: 800; color: var(--blue-light);"></div>
-                </div>
-                <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); padding: 12px; border-radius: 8px; text-align: center;">
-                    <div style="font-size: 11px; color: var(--text-muted);">Active Shows</div>
-                    <div id="vfcShows" style="font-size: 18px; font-weight: 800; color: #10B981;"></div>
-                </div>
-                <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.2); padding: 12px; border-radius: 8px; text-align: center;">
-                    <div style="font-size: 11px; color: var(--text-muted);">Total Bookings</div>
-                    <div id="vfcBookings" style="font-size: 18px; font-weight: 800; color: #F59E0B;"></div>
-                </div>
-            </div>
+            <form action="{% url 'admin_panel:add_cinema' %}" method="POST">
 
-            <div style="background: var(--bg-elevated); padding: 14px; border-radius: 8px;">
-                <div style="font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 6px;">Facilities & Features</div>
-                <div id="vfcFacilities" style="font-size: 13px; color: var(--text);"></div>
-            </div>
+                {% csrf_token %}
 
-            <div style="background: var(--bg-elevated); padding: 14px; border-radius: 8px;">
-                <div style="font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">Currently Screening Movies</div>
-                <div id="vfcMoviesList" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
-            </div>
+                <div class="cinema-form-group">
+                    <label>Cinema Name</label>
+                    <input type="text"
+                           name="name"
+                           class="cinema-input"
+                           placeholder="e.g. PVR Acropolis"
+                           required>
+                </div>
+
+                <div class="cinema-form-group">
+                    <label>City</label>
+                    <input type="text"
+                           name="city"
+                           class="cinema-input"
+                           placeholder="e.g. Ahmedabad"
+                           value="Ahmedabad"
+                           required>
+                </div>
+
+                <div class="cinema-form-group">
+                    <label>Address</label>
+                    <textarea name="address"
+                              class="cinema-textarea"
+                              rows="3"
+                              placeholder="Full cinema location address..."
+                              required></textarea>
+                </div>
+
+                <div class="cinema-form-group" style="margin-bottom:0;">
+                    <label>Total Screens</label>
+                    <input type="number"
+                           name="screens"
+                           class="cinema-input"
+                           value="4"
+                           min="1"
+                           required>
+                </div>
+
+                <div class="cinema-modal-footer"
+                     style="margin:22px -22px -22px;">
+
+                    <button type="button"
+                            class="cinema-cancel-btn"
+                            onclick="document.getElementById('addCinemaModal').style.display='none'">
+                        Cancel
+                    </button>
+
+                    <button type="submit" class="cinema-save-btn">
+                        <i class="fa-solid fa-plus"></i>
+                        Save Cinema
+                    </button>
+
+                </div>
+
+            </form>
+
         </div>
 
-        <div style="display: flex; justify-content: flex-end;">
-            <button onclick="document.getElementById('viewFullCinemaModal').style.display='none'" class="btn-blue">Close</button>
-        </div>
     </div>
+
 </div>
 
-<!-- Modal: Add Cinema -->
-<div id="addCinemaModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 200; align-items: center; justify-content: center;">
-    <div style="background: var(--bg-surface); border: 1px solid var(--stroke); border-radius: var(--radius); width: 100%; max-width: 500px; padding: 28px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h3 style="font-size: 20px; font-weight: 700; color: var(--text); margin: 0;">Add Cinema Hall</h3>
-            <button onclick="document.getElementById('addCinemaModal').style.display='none'" style="background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer;">&times;</button>
-        </div>
-        <form action="{% url 'admin_panel:add_cinema' %}" method="POST">
-            {% csrf_token %}
-            <div class="form-group">
-                <label>Cinema Name</label>
-                <input type="text" name="name" class="form-control" placeholder="e.g. PVR Acropolis" required>
-            </div>
-            <div class="form-group">
-                <label>City</label>
-                <input type="text" name="city" class="form-control" placeholder="e.g. Ahmedabad" value="Ahmedabad" required>
-            </div>
-            <div class="form-group">
-                <label>Address</label>
-                <textarea name="address" class="form-control" rows="3" placeholder="Full cinema location address..." required></textarea>
-            </div>
-            <div class="form-group">
-                <label>Total Screens</label>
-                <input type="number" name="screens" class="form-control" value="4" required>
-            </div>
-            <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
-                <button type="button" onclick="document.getElementById('addCinemaModal').style.display='none'" class="btn-danger-sm" style="background: transparent;">Cancel</button>
-                <button type="submit" class="btn-blue">Save Cinema</button>
-            </div>
-        </form>
-    </div>
-</div>
+<!-- Edit Cinema Modal -->
+<div id="editCinemaModal" class="cinema-modal">
 
-<!-- Modal: Edit Cinema -->
-<div id="editCinemaModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 200; align-items: center; justify-content: center;">
-    <div style="background: var(--bg-surface); border: 1px solid var(--stroke); border-radius: var(--radius); width: 100%; max-width: 500px; padding: 28px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h3 style="font-size: 20px; font-weight: 700; color: var(--text); margin: 0;">Edit Cinema Hall</h3>
-            <button onclick="document.getElementById('editCinemaModal').style.display='none'" style="background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer;">&times;</button>
+    <div class="cinema-modal-box">
+
+        <div class="cinema-modal-header">
+
+            <div class="cinema-modal-title-wrap">
+
+                <div class="cinema-modal-icon">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                </div>
+
+                <div>
+                    <h3 class="cinema-modal-title">Edit Cinema Hall</h3>
+                    <div class="cinema-modal-subtitle">
+                        Update cinema venue information
+                    </div>
+                </div>
+
+            </div>
+
+            <button type="button"
+                    class="cinema-modal-close"
+                    onclick="document.getElementById('editCinemaModal').style.display='none'">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
         </div>
-        <form id="editCinemaForm" method="POST">
-            {% csrf_token %}
-            <div class="form-group">
-                <label>Cinema Name</label>
-                <input type="text" name="name" id="editName" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label>City</label>
-                <input type="text" name="city" id="editCity" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label>Address</label>
-                <textarea name="address" id="editAddress" class="form-control" rows="3" required></textarea>
-            </div>
-            <div class="form-group">
-                <label>Total Screens</label>
-                <input type="number" name="screens" id="editScreens" class="form-control" required>
-            </div>
-            <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
-                <button type="button" onclick="document.getElementById('editCinemaModal').style.display='none'" class="btn-danger-sm" style="background: transparent;">Cancel</button>
-                <button type="submit" class="btn-blue">Update Cinema</button>
-            </div>
-        </form>
+
+        <div class="cinema-modal-body">
+
+            <form id="editCinemaForm" method="POST">
+
+                {% csrf_token %}
+
+                <div class="cinema-form-group">
+                    <label>Cinema Name</label>
+                    <input type="text"
+                           name="name"
+                           id="editName"
+                           class="cinema-input"
+                           required>
+                </div>
+
+                <div class="cinema-form-group">
+                    <label>City</label>
+                    <input type="text"
+                           name="city"
+                           id="editCity"
+                           class="cinema-input"
+                           required>
+                </div>
+
+                <div class="cinema-form-group">
+                    <label>Address</label>
+                    <textarea name="address"
+                              id="editAddress"
+                              class="cinema-textarea"
+                              rows="3"
+                              required></textarea>
+                </div>
+
+                <div class="cinema-form-group" style="margin-bottom:0;">
+                    <label>Total Screens</label>
+                    <input type="number"
+                           name="screens"
+                           id="editScreens"
+                           class="cinema-input"
+                           min="1"
+                           required>
+                </div>
+
+                <div class="cinema-modal-footer"
+                     style="margin:22px -22px -22px;">
+
+                    <button type="button"
+                            class="cinema-cancel-btn"
+                            onclick="document.getElementById('editCinemaModal').style.display='none'">
+                        Cancel
+                    </button>
+
+                    <button type="submit" class="cinema-save-btn">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        Update Cinema
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
     </div>
+
 </div>
 
 <script>
@@ -196,7 +932,7 @@ function openViewFullCinemaModal(name, city, address, screens, facilities, shows
     const moviesContainer = document.getElementById('vfcMoviesList');
     if (activeMovies && activeMovies.length > 0) {
         moviesContainer.innerHTML = activeMovies.map(m => `
-            <span style="background: rgba(59, 130, 246, 0.15); color: var(--blue-light); padding: 4px 10px; border-radius: 6px; font-weight: 600; font-size: 12px;">${m}</span>
+            <span class="cinema-movie-chip">${m}</span>
         `).join('');
     } else {
         moviesContainer.innerHTML = '<span style="color: var(--text-muted); font-size: 12px;">No movies currently scheduled.</span>';

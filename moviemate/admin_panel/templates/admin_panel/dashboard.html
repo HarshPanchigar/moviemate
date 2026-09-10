@@ -1,283 +1,1497 @@
 {% extends 'admin_panel/base_admin.html' %}
+{% load static %}
 
-{% block title %}Dashboard & Analytics | MovieMate Admin{% endblock %}
+{% block title %}Dashboard | MovieMate{% endblock %}
 
 {% block content %}
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px;">
-    <div>
-        <h1 style="font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 0.02em; margin: 0;">System Dashboard & Analytics</h1>
-        <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">Real-time business operational statistics, analytics, and show allocation metrics.</p>
-    </div>
-    <div style="display: flex; gap: 10px;">
-        <span style="background: rgba(59, 130, 246, 0.15); border: 1px solid var(--blue-primary); color: var(--blue-light); padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 13px; display: flex; align-items: center; gap: 8px;">
-            <span style="width: 8px; height: 8px; background: #10B981; border-radius: 50%; display: inline-block;"></span> Live System Active
-        </span>
-    </div>
-</div>
 
-<!-- Key Performance Metrics Grid -->
-<div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px;">
-    <div class="stat-card">
-        <div class="stat-info">
-            <div class="label">Registered Clients</div>
-            <div class="value">{{ total_customers }}</div>
-        </div>
-        <div class="stat-icon">
-            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-        </div>
-    </div>
+<style>
 
-    <div class="stat-card">
-        <div class="stat-info">
-            <div class="label">Catalog Movies</div>
-            <div class="value">{{ total_movies }}</div>
-        </div>
-        <div class="stat-icon">
-            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"></path></svg>
-        </div>
-    </div>
+/* =========================================================
+   MOVIEMATE ADMIN DASHBOARD
+   PAGE-SPECIFIC CSS
+   ========================================================= */
 
-    <div class="stat-card">
-        <div class="stat-info">
-            <div class="label">Cinema Venues</div>
-            <div class="value">{{ total_cinemas }}</div>
-        </div>
-        <div class="stat-icon">
-            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h4m-4 0v-4a2 2 0 012-2h2a2 2 0 012 2v4"></path></svg>
-        </div>
-    </div>
+.mm-dashboard {
+    width: 100%;
+}
 
-    <div class="stat-card">
-        <div class="stat-info">
-            <div class="label">Total Shows Scheduled</div>
-            <div class="value">{{ total_shows }}</div>
-        </div>
-        <div class="stat-icon">
-            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-        </div>
-    </div>
 
-    <div class="stat-card">
-        <div class="stat-info">
-            <div class="label">Total Revenue</div>
-            <div class="value" style="color: #10B981;">₹{{ total_revenue }}</div>
-        </div>
-        <div class="stat-icon">
-            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V6m0 8v2m0-8c-1.11 0-2.08.402-2.599 1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-        </div>
-    </div>
-</div>
+/* =========================================================
+   HEADER
+   ========================================================= */
 
-<!-- Interactive Analytics Charts Grid -->
-<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 28px;">
-    <!-- Chart 1: Shows & Booking Performance per Movie -->
-    <div class="panel-card" style="padding: 24px;">
-        <div class="panel-header" style="margin-bottom: 20px;">
-            <div class="panel-title" style="font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 10px;">
-                <svg width="20" height="20" fill="none" stroke="var(--blue-light)" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                Movie Catalog Allocations & Ticket Bookings
+.mm-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    margin-bottom: 26px;
+}
+
+.mm-header-left {
+    min-width: 0;
+}
+
+.mm-header-label {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    margin-bottom: 7px;
+
+    color: #f87171;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+    letter-spacing: .07em;
+}
+
+.mm-header-label i {
+    font-size: 13px;
+}
+
+.mm-header h1 {
+    margin: 0;
+
+    color: #f8fafc;
+
+    font-size: 28px;
+    font-weight: 700;
+
+    letter-spacing: -.025em;
+}
+
+.mm-header-description {
+    margin: 7px 0 0;
+
+    color: #94a3b8;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+}
+
+.mm-system-status {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 8px;
+
+    min-height: 34px;
+
+    padding: 0 11px;
+
+    background: rgba(16,185,129,.07);
+
+    border: 1px solid rgba(16,185,129,.16);
+
+    border-radius: 7px;
+
+    color: #34d399;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+.mm-status-dot {
+    width: 6px;
+    height: 6px;
+
+    border-radius: 50%;
+
+    background: #34d399;
+
+    box-shadow: 0 0 0 3px rgba(52,211,153,.08);
+}
+
+
+/* =========================================================
+   STATISTICS
+   ========================================================= */
+
+.mm-stats {
+    display: grid;
+
+    grid-template-columns:
+        repeat(5, minmax(0, 1fr));
+
+    gap: 12px;
+
+    margin-bottom: 18px;
+}
+
+.mm-stat {
+    position: relative;
+
+    min-height: 130px;
+
+    padding: 16px;
+
+    background: #111722;
+
+    border: 1px solid rgba(255,255,255,.075);
+
+    border-radius: 11px;
+
+    overflow: hidden;
+}
+
+.mm-stat::after {
+    content: "";
+
+    position: absolute;
+
+    right: -35px;
+    bottom: -45px;
+
+    width: 110px;
+    height: 110px;
+
+    border-radius: 50%;
+
+    background: rgba(255,255,255,.025);
+}
+
+.mm-stat.mm-blue {
+    border-top: 2px solid #3b82f6;
+}
+
+.mm-stat.mm-red {
+    border-top: 2px solid #dc2626;
+}
+
+.mm-stat.mm-neutral {
+    border-top: 2px solid #64748b;
+}
+
+.mm-stat-top {
+    display: flex;
+
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 12px;
+}
+
+.mm-stat-label {
+    color: #94a3b8;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: .055em;
+}
+
+.mm-stat-icon {
+    width: 32px;
+    height: 32px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 7px;
+
+    background: rgba(255,255,255,.035);
+
+    color: #94a3b8;
+
+    font-size: 13px;
+}
+
+.mm-blue .mm-stat-icon {
+    color: #60a5fa;
+
+    background: rgba(59,130,246,.08);
+}
+
+.mm-red .mm-stat-icon {
+    color: #f87171;
+
+    background: rgba(239,68,68,.08);
+}
+
+.mm-stat-value {
+    margin-top: 15px;
+
+    color: #f8fafc;
+
+    font-size: 25px;
+    font-weight: 700;
+
+    letter-spacing: -.025em;
+
+    line-height: 1;
+}
+
+.mm-stat-caption {
+    margin-top: 8px;
+
+    color: #64748b;
+
+    font-size: 10px;
+}
+
+
+/* =========================================================
+   MAIN GRID
+   ========================================================= */
+
+.mm-main {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1.1fr)
+        minmax(0, .9fr);
+
+    gap: 18px;
+}
+
+.mm-column {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 18px;
+
+    min-width: 0;
+}
+
+
+/* =========================================================
+   PANELS
+   ========================================================= */
+
+.mm-panel {
+    background: #111722;
+
+    border: 1px solid rgba(255,255,255,.075);
+
+    border-radius: 11px;
+
+    overflow: hidden;
+}
+
+.mm-panel-header {
+    min-height: 56px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    padding: 0 17px;
+
+    background: #182131;
+
+    border-bottom: 1px solid rgba(255,255,255,.075);
+}
+
+.mm-panel-title {
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    color: #f8fafc;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.mm-panel-title i {
+    color: #f87171;
+
+    font-size: 13px;
+}
+
+.mm-panel-link {
+    color: #94a3b8;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    transition: color .18s ease;
+}
+
+.mm-panel-link:hover {
+    color: #f87171;
+}
+
+.mm-panel-body {
+    padding: 17px;
+}
+
+
+/* =========================================================
+   CHART
+   ========================================================= */
+
+.mm-chart {
+    position: relative;
+
+    width: 100%;
+
+    height: 260px;
+}
+
+.mm-chart canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+
+/* =========================================================
+   MOVIE LIST
+   ========================================================= */
+
+.mm-movie-list {
+    display: flex;
+
+    flex-direction: column;
+}
+
+.mm-movie {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 11px 0;
+
+    border-bottom: 1px solid rgba(255,255,255,.055);
+}
+
+.mm-movie:first-child {
+    padding-top: 0;
+}
+
+.mm-movie:last-child {
+    padding-bottom: 0;
+
+    border-bottom: 0;
+}
+
+.mm-poster {
+    width: 43px;
+    height: 58px;
+
+    flex-shrink: 0;
+
+    object-fit: cover;
+
+    border-radius: 6px;
+
+    background: #080d14;
+
+    border: 1px solid rgba(255,255,255,.08);
+}
+
+.mm-movie-info {
+    min-width: 0;
+
+    flex: 1;
+}
+
+.mm-movie-title {
+    color: #f8fafc;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+.mm-movie-meta {
+    margin-top: 3px;
+
+    color: #64748b;
+
+    font-size: 10px;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+.mm-movie-bottom {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    margin-top: 7px;
+}
+
+.mm-rating {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 4px;
+
+    color: #fbbf24;
+
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.mm-rating i {
+    font-size: 9px;
+}
+
+.mm-tag {
+    display: inline-flex;
+
+    align-items: center;
+
+    padding: 3px 6px;
+
+    background: rgba(59,130,246,.07);
+
+    border: 1px solid rgba(59,130,246,.12);
+
+    border-radius: 4px;
+
+    color: #60a5fa;
+
+    font-size: 8px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+}
+
+.mm-empty {
+    padding: 30px 10px;
+
+    color: #64748b;
+
+    font-size: 11px;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   ACTIVITY
+   ========================================================= */
+
+.mm-activity {
+    display: flex;
+
+    flex-direction: column;
+}
+
+.mm-activity-item {
+    display: flex;
+
+    gap: 11px;
+
+    padding: 11px 0;
+
+    border-bottom: 1px solid rgba(255,255,255,.055);
+}
+
+.mm-activity-item:first-child {
+    padding-top: 0;
+}
+
+.mm-activity-item:last-child {
+    padding-bottom: 0;
+
+    border-bottom: 0;
+}
+
+.mm-activity-marker {
+    width: 18px;
+
+    display: flex;
+
+    justify-content: center;
+
+    padding-top: 5px;
+
+    flex-shrink: 0;
+}
+
+.mm-activity-dot {
+    width: 7px;
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: #ef4444;
+
+    box-shadow:
+        0 0 0 3px rgba(239,68,68,.08);
+}
+
+.mm-activity-action {
+    color: #cbd5e1;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    line-height: 1.45;
+}
+
+.mm-activity-meta {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    margin-top: 5px;
+
+    color: #64748b;
+
+    font-size: 9px;
+}
+
+.mm-activity-user {
+    color: #60a5fa;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   CUSTOMERS TABLE
+   ========================================================= */
+
+.mm-table-wrapper {
+    width: 100%;
+
+    overflow-x: auto;
+}
+
+.mm-table {
+    width: 100%;
+
+    border-collapse: separate;
+
+    border-spacing: 0;
+}
+
+.mm-table th {
+    padding: 9px 10px;
+
+    background: #192334;
+
+    border-bottom: 1px solid rgba(255,255,255,.08);
+
+    color: #64748b;
+
+    font-size: 9px;
+
+    font-weight: 700;
+
+    text-align: left;
+
+    text-transform: uppercase;
+
+    letter-spacing: .05em;
+}
+
+.mm-table td {
+    padding: 11px 10px;
+
+    background: #111722;
+
+    border-bottom: 1px solid rgba(255,255,255,.05);
+
+    color: #cbd5e1;
+
+    font-size: 10px;
+
+    vertical-align: middle;
+}
+
+.mm-table tbody tr:nth-child(even) td {
+    background: #141e2b;
+}
+
+.mm-table tbody tr:hover td {
+    background: #1b2635;
+}
+
+.mm-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.mm-user-name {
+    color: #f8fafc;
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.mm-user-email {
+    color: #64748b;
+
+    font-size: 10px;
+}
+
+.mm-remove {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 6px;
+
+    min-height: 27px;
+
+    padding: 0 8px;
+
+    background: rgba(239,68,68,.06);
+
+    border: 1px solid rgba(239,68,68,.15);
+
+    border-radius: 6px;
+
+    color: #f87171;
+
+    font-size: 9px;
+
+    font-weight: 700;
+
+    transition: .18s ease;
+}
+
+.mm-remove:hover {
+    background: rgba(239,68,68,.13);
+
+    border-color: rgba(239,68,68,.28);
+
+    color: #fff;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1200px) {
+
+    .mm-stats {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+    }
+
+    .mm-main {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+@media (max-width: 800px) {
+
+    .mm-header {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+    .mm-stats {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+}
+
+
+@media (max-width: 520px) {
+
+    .mm-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .mm-header h1 {
+        font-size: 24px;
+    }
+
+    .mm-panel-header {
+        padding: 0 14px;
+    }
+
+    .mm-panel-body {
+        padding: 14px;
+    }
+
+    .mm-chart {
+        height: 220px;
+    }
+}
+
+</style>
+
+
+<!-- =========================================================
+     DASHBOARD
+     ========================================================= -->
+
+<div class="mm-dashboard">
+
+
+    <!-- HEADER -->
+
+    <section class="mm-header">
+
+        <div class="mm-header-left">
+
+            <div class="mm-header-label">
+
+                <i class="fa-solid fa-gauge-high"></i>
+
+                Dashboard
+
             </div>
-            <span style="font-size: 12px; color: var(--text-muted);">Allocated Shows vs Bookings</span>
-        </div>
-        <div style="position: relative; height: 260px; width: 100%;">
-            <canvas id="movieAnalyticsChart"></canvas>
-        </div>
-    </div>
 
-    <!-- Chart 2: Revenue Distribution by Genre -->
-    <div class="panel-card" style="padding: 24px;">
-        <div class="panel-header" style="margin-bottom: 20px;">
-            <div class="panel-title" style="font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 10px;">
-                <svg width="20" height="20" fill="none" stroke="#F59E0B" stroke-width="2" viewBox="0 0 24 24"><path d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg>
-                Revenue by Genre
-            </div>
-            <span style="font-size: 12px; color: var(--text-muted);">Category Share</span>
-        </div>
-        <div style="position: relative; height: 260px; width: 100%; display: flex; align-items: center; justify-content: center;">
-            <canvas id="genreRevenueChart"></canvas>
-        </div>
-    </div>
-</div>
+            <h1>
+                Welcome back, Admin
+            </h1>
 
-<!-- Row 2: Cinema Allocations & Recent Activity -->
-<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 28px;">
-    <!-- Chart 3: Show Allocations per Cinema Venue -->
-    <div class="panel-card" style="padding: 24px;">
-        <div class="panel-header" style="margin-bottom: 20px;">
-            <div class="panel-title" style="font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 10px;">
-                <svg width="20" height="20" fill="none" stroke="#10B981" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h4m-4 0v-4a2 2 0 012-2h2a2 2 0 012 2v4"></path></svg>
-                Cinema Venue Show Allocations
-            </div>
-            <a href="{% url 'admin_panel:allocations' %}" style="font-size: 13px; color: var(--blue-primary); font-weight: 700;">Manage Allocations &rarr;</a>
-        </div>
-        <div style="position: relative; height: 220px; width: 100%;">
-            <canvas id="cinemaDistributionChart"></canvas>
-        </div>
-    </div>
+            <p class="mm-header-description">
+                Here's what's happening across your MovieMate cinema network today.
+            </p>
 
-    <!-- Admin Activity Feed -->
-    <div class="panel-card" style="padding: 24px;">
-        <div class="panel-header" style="margin-bottom: 16px;">
-            <div class="panel-title" style="font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 10px;">
-                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                Admin Activity Audit Feed
-            </div>
         </div>
-        <div style="display: flex; flex-direction: column; gap: 12px; max-height: 220px; overflow-y: auto;">
-            {% for log in recent_logs %}
-            <div style="padding: 10px 12px; background: var(--bg-elevated); border-radius: 8px; border-left: 3px solid var(--blue-primary);">
-                <div style="font-size: 13px; font-weight: 600; color: var(--text);">{{ log.action }}</div>
-                <div style="font-size: 11px; color: var(--text-faint); margin-top: 4px; display: flex; justify-content: space-between;">
-                    <span>By {{ log.performed_by }}</span>
-                    <span>{{ log.timestamp|date:"M d, H:i" }}</span>
+
+
+        <div class="mm-system-status">
+
+            <span class="mm-status-dot"></span>
+
+            All systems operational
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         STATISTICS
+         ===================================================== -->
+
+    <section class="mm-stats">
+
+
+        <!-- CUSTOMERS -->
+
+        <div class="mm-stat mm-blue">
+
+            <div class="mm-stat-top">
+
+                <span class="mm-stat-label">
+                    Registered Customers
+                </span>
+
+                <div class="mm-stat-icon">
+
+                    <i class="fa-solid fa-users"></i>
+
                 </div>
+
             </div>
-            {% empty %}
-            <div style="color: var(--text-muted); font-size: 13px; text-align: center; padding: 20px;">No recent system logs.</div>
-            {% endfor %}
+
+            <div class="mm-stat-value">
+                {{ total_customers }}
+            </div>
+
+            <div class="mm-stat-caption">
+                Total registered clients
+            </div>
+
         </div>
-    </div>
+
+
+        <!-- MOVIES -->
+
+        <div class="mm-stat mm-red">
+
+            <div class="mm-stat-top">
+
+                <span class="mm-stat-label">
+                    Movies
+                </span>
+
+                <div class="mm-stat-icon">
+
+                    <i class="fa-solid fa-film"></i>
+
+                </div>
+
+            </div>
+
+            <div class="mm-stat-value">
+                {{ total_movies }}
+            </div>
+
+            <div class="mm-stat-caption">
+                Movies in catalog
+            </div>
+
+        </div>
+
+
+        <!-- CINEMAS -->
+
+        <div class="mm-stat mm-blue">
+
+            <div class="mm-stat-top">
+
+                <span class="mm-stat-label">
+                    Cinema Venues
+                </span>
+
+                <div class="mm-stat-icon">
+
+                    <i class="fa-solid fa-building"></i>
+
+                </div>
+
+            </div>
+
+            <div class="mm-stat-value">
+                {{ total_cinemas }}
+            </div>
+
+            <div class="mm-stat-caption">
+                Available cinema venues
+            </div>
+
+        </div>
+
+
+        <!-- SHOWS -->
+
+        <div class="mm-stat mm-red">
+
+            <div class="mm-stat-top">
+
+                <span class="mm-stat-label">
+                    Scheduled Shows
+                </span>
+
+                <div class="mm-stat-icon">
+
+                    <i class="fa-solid fa-calendar-days"></i>
+
+                </div>
+
+            </div>
+
+            <div class="mm-stat-value">
+                {{ total_shows }}
+            </div>
+
+            <div class="mm-stat-caption">
+                Active showtimes
+            </div>
+
+        </div>
+
+
+        <!-- REVENUE -->
+
+        <div class="mm-stat mm-neutral">
+
+            <div class="mm-stat-top">
+
+                <span class="mm-stat-label">
+                    Total Revenue
+                </span>
+
+                <div class="mm-stat-icon">
+
+                    <i class="fa-solid fa-indian-rupee-sign"></i>
+
+                </div>
+
+            </div>
+
+            <div class="mm-stat-value">
+                ₹{{ total_revenue }}
+            </div>
+
+            <div class="mm-stat-caption">
+                Overall platform revenue
+            </div>
+
+        </div>
+
+
+    </section>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+         ===================================================== -->
+
+    <section class="mm-main">
+
+
+        <!-- =================================================
+             LEFT COLUMN
+             ================================================= -->
+
+        <div class="mm-column">
+
+
+            <!-- SHOW DISTRIBUTION -->
+
+            <div class="mm-panel">
+
+                <div class="mm-panel-header">
+
+                    <div class="mm-panel-title">
+
+                        <i class="fa-solid fa-chart-column"></i>
+
+                        Cinema Show Distribution
+
+                    </div>
+
+                    <a href="{% url 'admin_panel:allocations' %}"
+                       class="mm-panel-link">
+
+                        Manage Shows →
+
+                    </a>
+
+                </div>
+
+
+                <div class="mm-panel-body">
+
+                    <div class="mm-chart">
+
+                        <canvas id="cinemaDistributionChart"></canvas>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- RECENT MOVIES -->
+
+            <div class="mm-panel">
+
+                <div class="mm-panel-header">
+
+                    <div class="mm-panel-title">
+
+                        <i class="fa-solid fa-film"></i>
+
+                        Latest Movies
+
+                    </div>
+
+                    <a href="{% url 'admin_panel:movies' %}"
+                       class="mm-panel-link">
+
+                        View Catalog →
+
+                    </a>
+
+                </div>
+
+
+                <div class="mm-panel-body">
+
+                    <div class="mm-movie-list">
+
+                        {% for movie in recent_movies %}
+
+                        <div class="mm-movie">
+
+
+                            {% if movie.poster_url %}
+
+                                <img src="{{ movie.poster_url }}"
+                                     alt="{{ movie.title }}"
+                                     class="mm-poster">
+
+                            {% else %}
+
+                                <div class="mm-poster"
+                                     style="display:flex;align-items:center;justify-content:center;color:#64748b;font-size:9px;">
+
+                                    No poster
+
+                                </div>
+
+                            {% endif %}
+
+
+                            <div class="mm-movie-info">
+
+                                <div class="mm-movie-title">
+                                    {{ movie.title }}
+                                </div>
+
+                                <div class="mm-movie-meta">
+                                    {{ movie.genre }} • {{ movie.duration_formatted }}
+                                </div>
+
+
+                                <div class="mm-movie-bottom">
+
+                                    <span class="mm-rating">
+
+                                        <i class="fa-solid fa-star"></i>
+
+                                        {{ movie.rating }}
+
+                                    </span>
+
+
+                                    <span class="mm-tag">
+
+                                        {{ movie.get_display_tag_display }}
+
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        {% empty %}
+
+                        <div class="mm-empty">
+                            No movies have been added yet.
+                        </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        <!-- =================================================
+             RIGHT COLUMN
+             ================================================= -->
+
+        <div class="mm-column">
+
+
+            <!-- RECENT ACTIVITY -->
+
+            <div class="mm-panel">
+
+                <div class="mm-panel-header">
+
+                    <div class="mm-panel-title">
+
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+
+                        Recent Activity
+
+                    </div>
+
+                    <a href="{% url 'admin_panel:activity_logs' %}"
+                       class="mm-panel-link">
+
+                        View All →
+
+                    </a>
+
+                </div>
+
+
+                <div class="mm-panel-body">
+
+                    <div class="mm-activity">
+
+                        {% for log in recent_logs %}
+
+                        <div class="mm-activity-item">
+
+                            <div class="mm-activity-marker">
+
+                                <div class="mm-activity-dot"></div>
+
+                            </div>
+
+
+                            <div style="flex:1;">
+
+                                <div class="mm-activity-action">
+                                    {{ log.action }}
+                                </div>
+
+                                <div class="mm-activity-meta">
+
+                                    <span class="mm-activity-user">
+                                        {{ log.performed_by }}
+                                    </span>
+
+                                    <span>
+                                        {{ log.timestamp|date:"M d, H:i" }}
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        {% empty %}
+
+                        <div class="mm-empty">
+                            No recent activity.
+                        </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- RECENT CUSTOMERS -->
+
+            <div class="mm-panel">
+
+                <div class="mm-panel-header">
+
+                    <div class="mm-panel-title">
+
+                        <i class="fa-solid fa-user-group"></i>
+
+                        Recent Customers
+
+                    </div>
+
+                    <a href="{% url 'admin_panel:users' %}"
+                       class="mm-panel-link">
+
+                        View All →
+
+                    </a>
+
+                </div>
+
+
+                <div class="mm-panel-body">
+
+                    <div class="mm-table-wrapper">
+
+                        <table class="mm-table">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        Customer
+                                    </th>
+
+                                    <th>
+                                        Email
+                                    </th>
+
+                                    <th style="text-align:right;">
+                                        Action
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+                                {% for customer in recent_customers %}
+
+                                <tr>
+
+                                    <td>
+
+                                        <div class="mm-user-name">
+                                            {{ customer.full_name }}
+                                        </div>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <div class="mm-user-email">
+                                            {{ customer.email }}
+                                        </div>
+
+                                    </td>
+
+
+                                    <td style="text-align:right;">
+
+                                        <a href="{% url 'admin_panel:delete_user' customer.id %}"
+                                           class="mm-remove"
+                                           onclick="return confirm('Remove user {{ customer.full_name }}?')">
+
+                                            <i class="fa-solid fa-trash"></i>
+
+                                            Remove
+
+                                        </a>
+
+                                    </td>
+
+                                </tr>
+
+
+                                {% empty %}
+
+                                <tr>
+
+                                    <td colspan="3">
+
+                                        <div class="mm-empty">
+                                            No customers registered.
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+
+                                {% endfor %}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
 </div>
 
-<!-- Table: Recent Users -->
-<div class="panel-card" style="padding: 24px;">
-    <div class="panel-header" style="margin-bottom: 16px;">
-        <div class="panel-title" style="font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 10px;">
-            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-            Recently Registered Client Accounts
-        </div>
-        <a href="{% url 'admin_panel:users' %}" style="font-size: 13px; color: var(--blue-primary); font-weight: 700;">View All Users &rarr;</a>
-    </div>
-    <table class="admin-table">
-        <thead>
-            <tr>
-                <th>Full Name</th>
-                <th>Email Address</th>
-                <th>Mobile</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for customer in recent_customers %}
-            <tr>
-                <td style="font-weight: 700;">{{ customer.full_name }}</td>
-                <td>{{ customer.email }}</td>
-                <td style="color: var(--text-muted);">{{ customer.mobile }}</td>
-                <td>
-                    <a href="{% url 'admin_panel:delete_user' customer.id %}" class="btn-danger-sm" onclick="return confirm('Remove user {{ customer.full_name }}?')">Remove</a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 24px;">No client users registered yet.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+
+<!-- =========================================================
+     CHART SCRIPT
+     ========================================================= -->
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // 1. Movie Analytics Bar Chart
-    const movieLabels = {{ movie_labels_json|safe }};
-    const movieShows = {{ movie_shows_json|safe }};
-    const movieBookings = {{ movie_bookings_json|safe }};
 
-    const ctxMovie = document.getElementById('movieAnalyticsChart').getContext('2d');
-    new Chart(ctxMovie, {
-        type: 'bar',
-        data: {
-            labels: movieLabels,
-            datasets: [
-                {
-                    label: 'Scheduled Shows',
-                    data: movieShows,
-                    backgroundColor: 'rgba(59, 130, 246, 0.75)',
-                    borderColor: '#3B82F6',
-                    borderWidth: 1,
-                    borderRadius: 4
-                },
-                {
-                    label: 'Tickets Booked',
-                    data: movieBookings,
-                    backgroundColor: 'rgba(16, 185, 129, 0.75)',
-                    borderColor: '#10B981',
-                    borderWidth: 1,
-                    borderRadius: 4
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { labels: { color: '#94A3B8', font: { family: 'Plus Jakarta Sans', size: 12 } } }
-            },
-            scales: {
-                x: { ticks: { color: '#94A3B8' }, grid: { color: 'rgba(255,255,255,0.05)' } },
-                y: { ticks: { color: '#94A3B8' }, grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true }
-            }
-        }
-    });
+document.addEventListener('DOMContentLoaded', function () {
 
-    // 2. Genre Revenue Doughnut Chart
-    const genreLabels = {{ genre_labels_json|safe }};
-    const genreRevenue = {{ genre_revenue_json|safe }};
-
-    const ctxGenre = document.getElementById('genreRevenueChart').getContext('2d');
-    new Chart(ctxGenre, {
-        type: 'doughnut',
-        data: {
-            labels: genreLabels,
-            datasets: [{
-                data: genreRevenue,
-                backgroundColor: [
-                    '#3B82F6', '#10B981', '#F59E0B', '#EC4899', '#8B5CF6', '#6366F1'
-                ],
-                borderWidth: 2,
-                borderColor: '#1E293B'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { position: 'right', labels: { color: '#94A3B8', font: { family: 'Plus Jakarta Sans', size: 11 } } }
-            }
-        }
-    });
-
-    // 3. Cinema Distribution Horizontal Bar Chart
     const cinemaLabels = {{ cinema_labels_json|safe }};
+
     const cinemaShows = {{ cinema_shows_json|safe }};
 
-    const ctxCinema = document.getElementById('cinemaDistributionChart').getContext('2d');
-    new Chart(ctxCinema, {
+
+    const canvas =
+        document.getElementById('cinemaDistributionChart');
+
+
+    if (!canvas) {
+        return;
+    }
+
+
+    const ctx = canvas.getContext('2d');
+
+
+    new Chart(ctx, {
+
         type: 'bar',
+
         data: {
+
             labels: cinemaLabels,
+
             datasets: [{
-                label: 'Showtimes Allocated',
+
+                label: 'Showtimes',
+
                 data: cinemaShows,
-                backgroundColor: 'rgba(139, 92, 246, 0.75)',
-                borderColor: '#8B5CF6',
+
+                backgroundColor: 'rgba(220, 38, 38, .72)',
+
+                borderColor: '#ef4444',
+
                 borderWidth: 1,
-                borderRadius: 4
+
+                borderRadius: 6,
+
+                borderSkipped: false,
+
+                barThickness: 22,
+
+                hoverBackgroundColor: '#ef4444'
+
             }]
+
         },
+
+
         options: {
+
             indexAxis: 'y',
+
             responsive: true,
+
             maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false }
+
+
+            animation: {
+
+                duration: 650,
+
+                easing: 'easeOutQuart'
+
             },
+
+
+            plugins: {
+
+                legend: {
+                    display: false
+                },
+
+
+                tooltip: {
+
+                    backgroundColor: '#0b0f15',
+
+                    titleColor: '#ffffff',
+
+                    bodyColor: '#cbd5e1',
+
+                    borderColor: 'rgba(239,68,68,.25)',
+
+                    borderWidth: 1,
+
+                    padding: 12,
+
+                    displayColors: false,
+
+
+                    callbacks: {
+
+                        label: function(context) {
+
+                            return ' '
+                                + context.raw
+                                + ' showtimes';
+
+                        }
+
+                    }
+
+                }
+
+            },
+
+
             scales: {
-                x: { ticks: { color: '#94A3B8' }, grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true },
-                y: { ticks: { color: '#94A3B8' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+
+                x: {
+
+                    beginAtZero: true,
+
+
+                    ticks: {
+
+                        color: '#64748b',
+
+                        font: {
+                            size: 11,
+                            weight: '500'
+                        },
+
+                        precision: 0
+
+                    },
+
+
+                    grid: {
+
+                        color: 'rgba(255,255,255,.05)',
+
+                        drawBorder: false
+
+                    }
+
+                },
+
+
+                y: {
+
+                    ticks: {
+
+                        color: '#cbd5e1',
+
+                        font: {
+                            size: 12,
+                            weight: '600'
+                        }
+
+                    },
+
+
+                    grid: {
+                        display: false
+                    }
+
+                }
+
             }
+
         }
+
     });
+
 });
+
 </script>
+
 {% endblock %}

@@ -106,6 +106,12 @@
         display: inline-block;
     }
 
+    .status-badge.expired {
+        background: rgba(239, 68, 68, 0.2);
+        color: #F87171;
+        border: 1px solid #EF4444;
+    }
+
     .ticket-divider {
         height: 1px;
         background: rgba(255, 255, 255, 0.12);
@@ -261,6 +267,15 @@
 {% block content %}
 <main class="ticket-page-container">
 
+    {% if booking.is_past %}
+    <div class="success-banner" style="background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3);">
+        <div class="success-icon" style="background: rgba(239, 68, 68, 0.2); color: #F87171; font-size: 20px; font-weight: bold;">
+            ⌛
+        </div>
+        <span class="eyebrow" style="justify-content: center; color: #F87171;">Showtime Ended • Ticket Expired</span>
+        <h1 style="font-family: 'Bebas Neue'; font-size: 38px; margin: 4px 0 0;">{{ booking.showtime.movie.title }}</h1>
+    </div>
+    {% else %}
     <div class="success-banner">
         <div class="success-icon">
             <svg width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
@@ -268,6 +283,7 @@
         <span class="eyebrow" style="justify-content: center; color: #34D399;">Booking Confirmed!</span>
         <h1 style="font-family: 'Bebas Neue'; font-size: 38px; margin: 4px 0 0;">{{ booking.showtime.movie.title }}</h1>
     </div>
+    {% endif %}
 
     <!-- FULL PRINTABLE & DOWNLOADABLE PDF TICKET AREA -->
     <div id="printablePdfArea" class="printable-pdf-area">
@@ -282,7 +298,13 @@
         </div>
 
         <!-- TICKET PASS CARD (Exact Match to Screenshot) -->
-        <div class="ticket-pass-card">
+        <div class="ticket-pass-card" {% if booking.is_past %}style="border-color: rgba(239, 68, 68, 0.6);"{% endif %}>
+            {% if booking.is_past %}
+            <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid #EF4444; color: #F87171; padding: 10px 14px; border-radius: 8px; font-weight: 700; font-size: 13px; margin-bottom: 18px; text-align: center;">
+                ⚠️ TICKET EXPIRED: Movie showtime was on {{ booking.showtime.show_date|date:"M. d, Y" }} at {{ booking.showtime.start_time|time:"h:i A" }}. This pass is no longer valid for gate check-in.
+            </div>
+            {% endif %}
+
             <div class="ticket-header">
                 <div>
                     <div class="pass-id-label">BOOKING PASS ID</div>
@@ -290,7 +312,11 @@
                 </div>
                 <div style="text-align: right;">
                     <div class="status-label">STATUS</div>
-                    <span class="status-badge">CONFIRMED</span>
+                    {% if booking.is_past %}
+                        <span class="status-badge expired">EXPIRED</span>
+                    {% else %}
+                        <span class="status-badge">CONFIRMED</span>
+                    {% endif %}
                 </div>
             </div>
 
