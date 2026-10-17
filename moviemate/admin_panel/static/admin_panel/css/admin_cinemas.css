@@ -1,0 +1,83 @@
+/* =========================================================
+   MOVIEMATE ADMIN CINEMAS STYLESHEET
+   Conversion-Optimized Royal Blue Theme
+   ========================================================= */
+
+.cinema-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.cinema-page-title {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+}
+
+.cinema-page-subtitle {
+    margin: 6px 0 0;
+    color: var(--text-muted);
+    font-size: 13.5px;
+}
+
+/* Filter Card */
+.cinema-filter-card {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-card);
+}
+
+.cinema-search-wrap {
+    position: relative;
+    width: 100%;
+}
+
+.cinema-search-wrap i {
+    position: absolute;
+    top: 50%;
+    left: 12px;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+.cinema-search-wrap input {
+    padding-left: 36px;
+}
+
+/* Table items */
+.cinema-name-text {
+    font-weight: 700;
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
+.cinema-address-text {
+    color: var(--text-muted);
+    font-size: 12.5px;
+    max-width: 320px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cinema-movie-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #1d4ed8;
+    font-size: 11.5px;
+    font-weight: 600;
+}

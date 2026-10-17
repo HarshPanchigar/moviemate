@@ -141,26 +141,35 @@ def select_theater(request, movie_id):
         messages.info(request, "Please log in to book tickets.")
         return redirect("login")
     
-    from datetime import date
-    today = date.today()
+    from django.utils import timezone
+    now = timezone.localtime()
+    current_date = now.date()
+    current_time = now.time()
 
     movie = get_object_or_404(Movie, id=movie_id)
-    all_showtimes = Showtime.objects.filter(movie=movie, show_date__gte=today).select_related('cinema').order_by('show_date', 'start_time')
+    # Fetch all showtimes from today onwards
+    raw_showtimes = Showtime.objects.filter(movie=movie, show_date__gte=current_date).select_related('cinema').order_by('show_date', 'start_time')
     
-    # Extract distinct show dates available (today & future only)
-    available_dates = sorted(list(set(st.show_date for st in all_showtimes)))
+    # Filter out shows that have already ended today (or in the past)
+    upcoming_showtimes = [
+        st for st in raw_showtimes
+        if st.show_date > current_date or (st.show_date == current_date and st.start_time > current_time)
+    ]
+    
+    # Extract distinct show dates that have upcoming shows
+    available_dates = sorted(list(set(st.show_date for st in upcoming_showtimes)))
     
     selected_date_str = request.GET.get('date')
     if selected_date_str:
         from datetime import datetime
         try:
             sel_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date()
-            showtimes = all_showtimes.filter(show_date=sel_date)
+            showtimes = [st for st in upcoming_showtimes if st.show_date == sel_date]
         except ValueError:
-            showtimes = all_showtimes
+            showtimes = upcoming_showtimes
     else:
-        selected_date_str = str(available_dates[0]) if available_dates else None
-        showtimes = all_showtimes.filter(show_date=available_dates[0]) if available_dates else all_showtimes
+        selected_date_str = str(available_dates[0]) if available_dates else str(current_date)
+        showtimes = [st for st in upcoming_showtimes if str(st.show_date) == selected_date_str]
 
     # Extract unique cinemas available for this movie on the selected date
     unique_cinemas = []
@@ -176,7 +185,8 @@ def select_theater(request, movie_id):
         'movie': movie,
         'cinemas': unique_cinemas,
         'available_dates': available_dates,
-        'selected_date_str': selected_date_str
+        'selected_date_str': selected_date_str,
+        'has_ended_today': (selected_date_str == str(current_date) and len(showtimes) == 0)
     }
     return render(request, "select_theater.html", context)
 
@@ -188,13 +198,25 @@ def select_showtime(request, movie_id, cinema_id):
     movie = get_object_or_404(Movie, id=movie_id)
     cinema = get_object_or_404(Cinema, id=cinema_id)
     
+    from django.utils import timezone
+    now = timezone.localtime()
+    current_date = now.date()
+    current_time = now.time()
+
     selected_date_str = request.GET.get('date')
-    showtimes = Showtime.objects.filter(movie=movie, cinema=cinema).order_by('show_date', 'start_time')
+    raw_showtimes = Showtime.objects.filter(movie=movie, cinema=cinema, show_date__gte=current_date).order_by('show_date', 'start_time')
+    
+    # Filter out expired showtimes
+    showtimes = [
+        st for st in raw_showtimes
+        if st.show_date > current_date or (st.show_date == current_date and st.start_time > current_time)
+    ]
+    
     if selected_date_str:
         from datetime import datetime
         try:
             sel_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date()
-            showtimes = showtimes.filter(show_date=sel_date)
+            showtimes = [st for st in showtimes if st.show_date == sel_date]
         except ValueError:
             pass
 
@@ -213,25 +235,32 @@ def select_seats(request, showtime_id):
     
     showtime = get_object_or_404(Showtime, id=showtime_id)
     
+    # Block access if showtime has already ended or started
+    from django.utils import timezone
+    now = timezone.localtime()
+    if showtime.show_date < now.date() or (showtime.show_date == now.date() and showtime.start_time <= now.time()):
+        messages.error(request, "This showtime has already ended or started. Please choose an upcoming showtime.")
+        return redirect("select_theater", movie_id=showtime.movie.id)
+    
     # Existing booked seats for this showtime
     existing_bookings = Booking.objects.filter(showtime=showtime)
     booked_seats_list = []
     for b in existing_bookings:
         booked_seats_list.extend([s.strip() for s in b.seats.split(',') if s.strip()])
 
-    # Construct clean seat matrix data
+    # Construct clean, proportional, symmetric seat rows with center aisle
     platinum_rows = [
-        {'row': 'A', 'seats': [f'A{i}' for i in range(1, 11)]},
-        {'row': 'B', 'seats': [f'B{i}' for i in range(1, 11)]},
+        {'row': 'A', 'left_seats': ['A1', 'A2', 'A3', 'A4'], 'right_seats': ['A5', 'A6', 'A7', 'A8']},
+        {'row': 'B', 'left_seats': ['B1', 'B2', 'B3', 'B4'], 'right_seats': ['B5', 'B6', 'B7', 'B8']},
     ]
     gold_rows = [
-        {'row': 'C', 'seats': [f'C{i}' for i in range(1, 13)]},
-        {'row': 'D', 'seats': [f'D{i}' for i in range(1, 13)]},
-        {'row': 'E', 'seats': [f'E{i}' for i in range(1, 13)]},
+        {'row': 'C', 'left_seats': ['C1', 'C2', 'C3', 'C4', 'C5'], 'right_seats': ['C6', 'C7', 'C8', 'C9', 'C10']},
+        {'row': 'D', 'left_seats': ['D1', 'D2', 'D3', 'D4', 'D5'], 'right_seats': ['D6', 'D7', 'D8', 'D9', 'D10']},
+        {'row': 'E', 'left_seats': ['E1', 'E2', 'E3', 'E4', 'E5'], 'right_seats': ['E6', 'E7', 'E8', 'E9', 'E10']},
     ]
     silver_rows = [
-        {'row': 'F', 'seats': [f'F{i}' for i in range(1, 13)]},
-        {'row': 'G', 'seats': [f'G{i}' for i in range(1, 13)]},
+        {'row': 'F', 'left_seats': ['F1', 'F2', 'F3', 'F4', 'F5'], 'right_seats': ['F6', 'F7', 'F8', 'F9', 'F10']},
+        {'row': 'G', 'left_seats': ['G1', 'G2', 'G3', 'G4', 'G5'], 'right_seats': ['G6', 'G7', 'G8', 'G9', 'G10']},
     ]
 
     context = {

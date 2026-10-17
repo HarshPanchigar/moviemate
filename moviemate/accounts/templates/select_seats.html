@@ -4,7 +4,7 @@
 {% block title %}Select Seats | {{ showtime.movie.title }}{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'accounts/css/select_seats.css' %}" />
+<link rel="stylesheet" href="{% static 'accounts/css/select_seats.css' %}?v=3.2" />
 {% endblock %}
 
 {% block content %}
@@ -14,11 +14,10 @@
     <!-- =====================================================
          HEADER
     ====================================================== -->
-
     <header class="booking-header">
-
         <div class="step-label">
-            Step 2: Select Seats
+            <i class="fa-solid fa-circle-check" style="font-size: 11px;"></i>
+            Step 2: Choose Your Seats
         </div>
 
         <h1 class="booking-title">
@@ -27,395 +26,270 @@
 
         <p class="booking-info">
             <strong>{{ showtime.cinema.name }}</strong>
-            ·
-            {{ showtime.show_date }}
-            ·
-            {{ showtime.start_time|time:"h:i A" }}
+            · {{ showtime.show_date }}
+            · {{ showtime.start_time|time:"h:i A" }}
         </p>
-
     </header>
-
 
     <!-- =====================================================
          TIER SELECTOR
     ====================================================== -->
-
     <section class="tier-wrapper">
-
         <p class="tier-title">
             Choose your seating category
         </p>
 
         <div class="tier-grid">
-
             <!-- Platinum -->
-
             <label class="tier-option">
-
                 <input type="radio" name="seat_tier_radio" value="platinum" onclick="setTier('platinum')">
-
                 <div class="tier-content">
-
                     <div class="tier-radio"></div>
-
                     <div>
-                        <span class="tier-name" style="color:#60A5FA;">
-                            Platinum Recliners
-                        </span>
-
-                        <span class="tier-price">
-                            Rows A & B · ₹{{ showtime.platinum_price }} / seat
-                        </span>
+                        <span class="tier-name" style="color: #1d4ed8;">Platinum Recliners</span>
+                        <span class="tier-price">Rows A & B · ₹{{ showtime.platinum_price }} / seat</span>
                     </div>
-
                 </div>
-
             </label>
-
 
             <!-- Gold -->
-
             <label class="tier-option">
-
                 <input type="radio" name="seat_tier_radio" value="gold" checked onclick="setTier('gold')">
-
                 <div class="tier-content">
-
                     <div class="tier-radio"></div>
-
                     <div>
-                        <span class="tier-name" style="color:#FBBF24;">
-                            Gold Executive
-                        </span>
-
-                        <span class="tier-price">
-                            Rows C, D & E · ₹{{ showtime.gold_price }} / seat
-                        </span>
+                        <span class="tier-name" style="color: #b45309;">Gold Executive</span>
+                        <span class="tier-price">Rows C, D & E · ₹{{ showtime.gold_price }} / seat</span>
                     </div>
-
                 </div>
-
             </label>
-
 
             <!-- Silver -->
-
             <label class="tier-option">
-
                 <input type="radio" name="seat_tier_radio" value="silver" onclick="setTier('silver')">
-
                 <div class="tier-content">
-
                     <div class="tier-radio"></div>
-
                     <div>
-                        <span class="tier-name" style="color:#a1a1aa;">
-                            Silver Standard
-                        </span>
-
-                        <span class="tier-price">
-                            Rows F & G · ₹{{ showtime.silver_price }} / seat
-                        </span>
+                        <span class="tier-name" style="color: var(--text-primary);">Silver Standard</span>
+                        <span class="tier-price">Rows F & G · ₹{{ showtime.silver_price }} / seat</span>
                     </div>
-
                 </div>
-
             </label>
-
         </div>
-
     </section>
 
-
     <!-- =====================================================
-         SCREEN
+         SCREEN VISUAL
     ====================================================== -->
-
-    <div class="screen-wrapper">
-
-        <div class="screen"></div>
-
-        <div class="screen-label">
-            SCREEN THIS WAY
-        </div>
-
+    <div class="screen-container">
+        <div class="screen-arc"></div>
+        <span class="screen-label">CURVED CINEMA SCREEN THIS WAY</span>
     </div>
 
-
     <!-- =====================================================
-         SEAT MATRIX (Clean Loop from Context)
+         SEATING MATRIX
     ====================================================== -->
+    <section class="seating-matrix">
 
-    <section class="seat-area" id="seatGrid">
-
-
-        <!-- PLATINUM SECTION (Rows A & B - 10 seats each) -->
-
+        <!-- PLATINUM SECTION (Rows A & B) -->
         <div class="tier-section platinum" data-tier="platinum">
-
             <div class="tier-section-header">
-
-                <span class="section-name">
-                    Platinum Recliners Section
-                </span>
-
-                <span class="section-rows">
-                    Rows A — B (₹{{ showtime.platinum_price }})
-                </span>
-
+                <span class="section-name" style="color: #1d4ed8;">Platinum Recliners</span>
+                <span class="section-rows">Rows A — B (₹{{ showtime.platinum_price }} / seat)</span>
             </div>
 
-            <div class="seat-grid grid-10">
-
+            <div class="tier-rows-wrap">
                 {% for r in platinum_rows %}
-                    {% for seat_code in r.seats %}
-                        <button
-                            type="button"
-                            class="seat-btn platinum-seat {% if seat_code in booked_seats %}booked{% endif %}"
-                            data-seat="{{ seat_code }}"
-                            data-tier="platinum"
-                            onclick="toggleSeat(this, '{{ seat_code }}', 'platinum')"
-                            {% if seat_code in booked_seats %}disabled{% endif %}
-                        >
-                            {{ seat_code }}
-                        </button>
-                    {% endfor %}
+                    <div class="seat-row">
+                        <span class="row-indicator">{{ r.row }}</span>
+                        <div class="seat-block">
+                            {% for seat_code in r.left_seats %}
+                                <button
+                                    type="button"
+                                    class="seat-btn platinum-seat {% if seat_code in booked_seats %}booked{% endif %}"
+                                    data-seat="{{ seat_code }}"
+                                    data-tier="platinum"
+                                    onclick="toggleSeat(this, '{{ seat_code }}', 'platinum')"
+                                    {% if seat_code in booked_seats %}disabled{% endif %}
+                                >
+                                    {{ seat_code }}
+                                </button>
+                            {% endfor %}
+                        </div>
+                        <div class="aisle-spacer"><span>AISLE</span></div>
+                        <div class="seat-block">
+                            {% for seat_code in r.right_seats %}
+                                <button
+                                    type="button"
+                                    class="seat-btn platinum-seat {% if seat_code in booked_seats %}booked{% endif %}"
+                                    data-seat="{{ seat_code }}"
+                                    data-tier="platinum"
+                                    onclick="toggleSeat(this, '{{ seat_code }}', 'platinum')"
+                                    {% if seat_code in booked_seats %}disabled{% endif %}
+                                >
+                                    {{ seat_code }}
+                                </button>
+                            {% endfor %}
+                        </div>
+                        <span class="row-indicator">{{ r.row }}</span>
+                    </div>
                 {% endfor %}
-
             </div>
-
         </div>
 
-
-        <!-- GOLD SECTION (Rows C, D & E - 12 seats each) -->
-
+        <!-- GOLD SECTION (Rows C, D, E) -->
         <div class="tier-section gold" data-tier="gold">
-
             <div class="tier-section-header">
-
-                <span class="section-name">
-                    Gold Executive Section
-                </span>
-
-                <span class="section-rows">
-                    Rows C — E (₹{{ showtime.gold_price }})
-                </span>
-
+                <span class="section-name" style="color: #b45309;">Gold Executive Section</span>
+                <span class="section-rows">Rows C — E (₹{{ showtime.gold_price }} / seat)</span>
             </div>
 
-            <div class="seat-grid grid-12">
-
+            <div class="tier-rows-wrap">
                 {% for r in gold_rows %}
-                    {% for seat_code in r.seats %}
-                        <button
-                            type="button"
-                            class="seat-btn gold-seat {% if seat_code in booked_seats %}booked{% endif %}"
-                            data-seat="{{ seat_code }}"
-                            data-tier="gold"
-                            onclick="toggleSeat(this, '{{ seat_code }}', 'gold')"
-                            {% if seat_code in booked_seats %}disabled{% endif %}
-                        >
-                            {{ seat_code }}
-                        </button>
-                    {% endfor %}
+                    <div class="seat-row">
+                        <span class="row-indicator">{{ r.row }}</span>
+                        <div class="seat-block">
+                            {% for seat_code in r.left_seats %}
+                                <button
+                                    type="button"
+                                    class="seat-btn gold-seat {% if seat_code in booked_seats %}booked{% endif %}"
+                                    data-seat="{{ seat_code }}"
+                                    data-tier="gold"
+                                    onclick="toggleSeat(this, '{{ seat_code }}', 'gold')"
+                                    {% if seat_code in booked_seats %}disabled{% endif %}
+                                >
+                                    {{ seat_code }}
+                                </button>
+                            {% endfor %}
+                        </div>
+                        <div class="aisle-spacer"><span>AISLE</span></div>
+                        <div class="seat-block">
+                            {% for seat_code in r.right_seats %}
+                                <button
+                                    type="button"
+                                    class="seat-btn gold-seat {% if seat_code in booked_seats %}booked{% endif %}"
+                                    data-seat="{{ seat_code }}"
+                                    data-tier="gold"
+                                    onclick="toggleSeat(this, '{{ seat_code }}', 'gold')"
+                                    {% if seat_code in booked_seats %}disabled{% endif %}
+                                >
+                                    {{ seat_code }}
+                                </button>
+                            {% endfor %}
+                        </div>
+                        <span class="row-indicator">{{ r.row }}</span>
+                    </div>
                 {% endfor %}
-
             </div>
-
         </div>
 
-
-        <!-- SILVER SECTION (Rows F & G - 12 seats each) -->
-
+        <!-- SILVER SECTION (Rows F & G) -->
         <div class="tier-section silver" data-tier="silver">
-
             <div class="tier-section-header">
-
-                <span class="section-name">
-                    Silver Standard Section
-                </span>
-
-                <span class="section-rows">
-                    Rows F — G (₹{{ showtime.silver_price }})
-                </span>
-
+                <span class="section-name">Silver Standard Section</span>
+                <span class="section-rows">Rows F — G (₹{{ showtime.silver_price }} / seat)</span>
             </div>
 
-            <div class="seat-grid grid-12">
-
+            <div class="tier-rows-wrap">
                 {% for r in silver_rows %}
-                    {% for seat_code in r.seats %}
-                        <button
-                            type="button"
-                            class="seat-btn silver-seat {% if seat_code in booked_seats %}booked{% endif %}"
-                            data-seat="{{ seat_code }}"
-                            data-tier="silver"
-                            onclick="toggleSeat(this, '{{ seat_code }}', 'silver')"
-                            {% if seat_code in booked_seats %}disabled{% endif %}
-                        >
-                            {{ seat_code }}
-                        </button>
-                    {% endfor %}
+                    <div class="seat-row">
+                        <span class="row-indicator">{{ r.row }}</span>
+                        <div class="seat-block">
+                            {% for seat_code in r.left_seats %}
+                                <button
+                                    type="button"
+                                    class="seat-btn silver-seat {% if seat_code in booked_seats %}booked{% endif %}"
+                                    data-seat="{{ seat_code }}"
+                                    data-tier="silver"
+                                    onclick="toggleSeat(this, '{{ seat_code }}', 'silver')"
+                                    {% if seat_code in booked_seats %}disabled{% endif %}
+                                >
+                                    {{ seat_code }}
+                                </button>
+                            {% endfor %}
+                        </div>
+                        <div class="aisle-spacer"><span>AISLE</span></div>
+                        <div class="seat-block">
+                            {% for seat_code in r.right_seats %}
+                                <button
+                                    type="button"
+                                    class="seat-btn silver-seat {% if seat_code in booked_seats %}booked{% endif %}"
+                                    data-seat="{{ seat_code }}"
+                                    data-tier="silver"
+                                    onclick="toggleSeat(this, '{{ seat_code }}', 'silver')"
+                                    {% if seat_code in booked_seats %}disabled{% endif %}
+                                >
+                                    {{ seat_code }}
+                                </button>
+                            {% endfor %}
+                        </div>
+                        <span class="row-indicator">{{ r.row }}</span>
+                    </div>
                 {% endfor %}
-
             </div>
-
         </div>
 
     </section>
-
 
     <!-- =====================================================
          LEGEND
     ====================================================== -->
-
     <div class="seat-legend">
-
         <div class="legend-item">
             <span class="legend-seat"></span>
             Available
         </div>
-
         <div class="legend-item">
             <span class="legend-seat selected"></span>
             Selected
         </div>
-
         <div class="legend-item">
             <span class="legend-seat booked"></span>
             Booked
         </div>
-
     </div>
 
-
     <!-- =====================================================
-         CHECKOUT
+         STICKY CHECKOUT BAR
     ====================================================== -->
-
     <div class="checkout-bar">
+        <div class="checkout-inner">
+            <div class="summary">
+                <div class="summary-item">
+                    <span class="summary-label">Selected Tier</span>
+                    <span class="summary-val" id="selectedTierLabel">GOLD</span>
+                </div>
 
-        <div class="summary">
+                <div class="summary-item">
+                    <span class="summary-label">Selected Seats</span>
+                    <span class="summary-val" id="selectedSeatsLabel">None</span>
+                </div>
 
-            <div class="summary-row">
-                Selected Tier:
-                <strong id="selectedTierLabel">
-                    GOLD
-                </strong>
+                <div class="summary-item">
+                    <span class="summary-label">Total Amount</span>
+                    <span class="summary-total-val">₹<span id="totalPriceLabel">0</span></span>
+                </div>
             </div>
 
-            <div class="summary-row">
-                Selected Seats:
-                <strong id="selectedSeatsLabel">
-                    None
-                </strong>
-            </div>
+            <form action="{% url 'process_payment' showtime.id %}"
+                  method="GET"
+                  id="bookingForm"
+                  data-platinum-price="{{ showtime.platinum_price }}"
+                  data-gold-price="{{ showtime.gold_price }}"
+                  data-silver-price="{{ showtime.silver_price }}">
+                <input type="hidden" name="seat_tier" id="selectedTierInput" value="gold">
+                <input type="hidden" name="seats" id="selectedSeatsInput" value="">
 
-            <div class="summary-total">
-                Total Price:
-                <span>₹<span id="totalPriceLabel">0</span></span>
-            </div>
-
+                <button type="submit" class="proceed-btn" id="proceedBtn" disabled>
+                    Proceed to Payment <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </form>
         </div>
-
-
-        <form action="{% url 'process_payment' showtime.id %}" method="GET" id="bookingForm">
-
-            <input type="hidden" name="seat_tier" id="selectedTierInput" value="gold">
-            <input type="hidden" name="seats" id="selectedSeatsInput" value="">
-
-            <button type="submit" class="proceed-btn" id="proceedBtn" disabled>
-                Proceed to Payment →
-            </button>
-
-        </form>
-
     </div>
 
 </main>
+{% endblock %}
 
-
-<script>
-
-    let selectedSeatObjects = []; // Array of { code: 'C3', tier: 'gold' }
-    let currentTier = 'gold';
-
-    const prices = {
-        'platinum': parseFloat("{{ showtime.platinum_price }}"),
-        'gold': parseFloat("{{ showtime.gold_price }}"),
-        'silver': parseFloat("{{ showtime.silver_price }}")
-    };
-
-
-    /* =====================================================
-       CHANGE TIER RADIO
-    ===================================================== */
-
-    function setTier(tier) {
-        currentTier = tier;
-        const input = document.getElementById('selectedTierInput');
-        const label = document.getElementById('selectedTierLabel');
-        if (input) input.value = tier;
-        if (label) label.innerText = tier.toUpperCase();
-    }
-
-
-    /* =====================================================
-       SELECT / DESELECT MULTIPLE SEATS
-    ===================================================== */
-
-    function toggleSeat(btn, seatCode, seatTier) {
-        if (btn.classList.contains('booked')) {
-            return;
-        }
-
-        const existingIndex = selectedSeatObjects.findIndex(s => s.code === seatCode);
-
-        if (existingIndex > -1) {
-            // Deselect seat
-            selectedSeatObjects.splice(existingIndex, 1);
-            btn.classList.remove('selected');
-        } else {
-            // Select seat
-            selectedSeatObjects.push({ code: seatCode, tier: seatTier });
-            btn.classList.add('selected');
-
-            // Automatically sync current tier indicator to clicked seat's tier
-            setTier(seatTier);
-            const radio = document.querySelector(`input[name="seat_tier_radio"][value="${seatTier}"]`);
-            if (radio) radio.checked = true;
-        }
-
-        updateSummary();
-    }
-
-
-    /* =====================================================
-       UPDATE BOOKING SUMMARY
-    ===================================================== */
-
-    function updateSummary() {
-        const seatsLabel = document.getElementById('selectedSeatsLabel');
-        const priceLabel = document.getElementById('totalPriceLabel');
-        const proceedBtn = document.getElementById('proceedBtn');
-        const seatsInput = document.getElementById('selectedSeatsInput');
-
-        if (selectedSeatObjects.length > 0) {
-            const seatCodes = selectedSeatObjects.map(s => s.code);
-            const totalPrice = selectedSeatObjects.reduce((sum, s) => sum + (prices[s.tier] || prices['gold']), 0);
-
-            seatsLabel.innerText = seatCodes.join(', ');
-            priceLabel.innerText = Math.round(totalPrice);
-            seatsInput.value = seatCodes.join(', ');
-            proceedBtn.disabled = false;
-        } else {
-            seatsLabel.innerText = 'None';
-            priceLabel.innerText = '0';
-            seatsInput.value = '';
-            proceedBtn.disabled = true;
-        }
-    }
-
-</script>
-
+{% block extra_js %}
+<script src="{% static 'accounts/js/select_seats.js' %}"></script>
 {% endblock %}

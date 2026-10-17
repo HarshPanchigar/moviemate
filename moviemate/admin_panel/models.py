@@ -56,6 +56,10 @@ class Movie(models.Model):
         else:
             return f"{minutes}m"
 
+    @property
+    def total_tickets_booked(self):
+        return Booking.objects.filter(showtime__movie=self).count()
+
     def __str__(self):
         return self.title
 
@@ -67,6 +71,10 @@ class Cinema(models.Model):
     total_screens = models.IntegerField(default=4)
     facilities = models.CharField(max_length=255, default='4K Dolby Atmos, Recliners, Food Court')
     created_at = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def total_tickets_sold(self):
+        return Booking.objects.filter(showtime__cinema=self).count()
 
     def __str__(self):
         return f"{self.name} ({self.city})"

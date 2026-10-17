@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Edit Profile{% endblock %}
+{% block title %}Edit Profile | MovieMate{% endblock %}
 
 {% block nav_profile_active %}active{% endblock %}
 
@@ -10,34 +10,19 @@
 {% endblock %}
 
 {% block content %}
-
 <main class="edit-page">
-
-    <!-- SUBTLE BACKGROUND GLOW -->
-    <div class="edit-bg-glow"></div>
-
     <div class="edit-shell">
 
-        <!-- =================================================
-             PAGE HEADER
-             ================================================= -->
+        <!-- PAGE HEADER -->
         <div class="edit-heading">
             <div class="edit-eyebrow">
-                ACCOUNT SETTINGS
+                Account Settings
             </div>
-
-            <h1>
-                EDIT PROFILE
-            </h1>
-
-            <p>
-                Keep your MovieMate account information up to date.
-            </p>
+            <h1>Edit Profile</h1>
+            <p>Keep your MovieMate personal and contact information accurate.</p>
         </div>
 
-        <!-- =================================================
-             EDIT CARD
-             ================================================= -->
+        <!-- EDIT CARD -->
         <div class="edit-card">
 
             <!-- CARD HEADER -->
@@ -45,20 +30,13 @@
                 <div class="edit-avatar">
                     {{ customer.full_name|first|upper }}
                 </div>
-
                 <div>
-                    <h2>
-                        Personal Information
-                    </h2>
-                    <p>
-                        Update the details connected to your account.
-                    </p>
+                    <h2>Personal Information</h2>
+                    <p>Update your name, email address, or mobile number.</p>
                 </div>
             </div>
 
-            <!-- =================================================
-                 FORM
-                 ================================================= -->
+            <!-- FORM -->
             <form method="POST" class="edit-form">
                 {% csrf_token %}
 
@@ -86,15 +64,15 @@
                 <!-- MOBILE -->
                 <div class="edit-field">
                     <label for="mobile">MOBILE NUMBER</label>
-                    <input id="mobile" class="edit-input" type="tel" name="mobile" value="{{ customer.mobile }}" placeholder="Enter your mobile number" maxlength="15" required>
+                    <input id="mobile" class="edit-input" type="tel" name="mobile" value="{{ customer.mobile }}" placeholder="10-digit mobile number" maxlength="15" required>
                 </div>
 
                 <!-- ACTIONS -->
                 <div class="edit-actions">
-                    <button type="submit" class="btn btn-gold">
+                    <button type="submit" class="btn btn-gold" style="padding: 11px 22px; font-size: 14px; font-weight: 700; border-radius: 10px;">
                         Save Changes
                     </button>
-                    <a href="{% url 'profile' %}" class="btn btn-ghost">
+                    <a href="{% url 'profile' %}" class="btn btn-ghost" style="padding: 11px 18px; font-size: 14px; font-weight: 600; border-radius: 10px;">
                         Cancel
                     </a>
                 </div>
@@ -105,15 +83,12 @@
         <!-- BACK TO PROFILE -->
         <div class="edit-back">
             <a href="{% url 'profile' %}">
-                ← Back to Profile
+                &larr; Back to Member Profile
             </a>
         </div>
 
     </div>
-
 </main>
-
 {% endblock %}
 
-{% block footer %}
-{% endblock %}
+{% block footer %}{% endblock %}

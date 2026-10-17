@@ -72,6 +72,7 @@ def dashboard(request):
 
     recent_customers = Customer.objects.filter(role='client').order_by('-id')[:5]
     recent_movies = Movie.objects.order_by('-created_at')[:5]
+    recent_bookings = Booking.objects.select_related('customer', 'showtime__movie', 'showtime__cinema').order_by('-created_at')[:6]
     recent_logs = AdminActivityLog.objects.order_by('-timestamp')[:6]
 
     context = {
@@ -80,10 +81,12 @@ def dashboard(request):
         'total_cinemas': total_cinemas,
         'total_bookings': total_bookings,
         'total_shows': total_shows,
+        'total_showtimes': total_shows,
         'total_revenue': total_revenue,
         'avg_ticket_price': avg_ticket_price,
         'recent_customers': recent_customers,
         'recent_movies': recent_movies,
+        'recent_bookings': recent_bookings,
         'recent_logs': recent_logs,
         'active_page': 'dashboard',
         # JSON data for Chart.js
@@ -127,6 +130,7 @@ def movies_list(request):
 
     categories = Category.objects.all()
     context = {
+        'movies': movies,
         'movies_data': movies_data,
         'categories': categories,
         'active_page': 'movies'
@@ -310,6 +314,7 @@ def cinemas_list(request):
         })
 
     context = {
+        'cinemas': cinemas,
         'cinemas_data': cinemas_data,
         'active_page': 'cinemas'
     }
@@ -445,6 +450,7 @@ def allocations_list(request):
 
     context = {
         'grouped_allocations': grouped_allocations,
+        'allocation_groups': grouped_allocations,
         'raw_showtimes': raw_showtimes,
         'movies': movies,
         'cinemas': cinemas,

@@ -1,43 +1,155 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Payment Gateway | MovieMate{% endblock %}
+{% block title %}Checkout & Payment | MovieMate{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'accounts/css/payment.css' %}?v=3.2">
+{% endblock %}
 
 {% block content %}
-<main class="container" style="padding-top: 40px; padding-bottom: 60px;">
-    <div style="max-width: 540px; margin: 0 auto; background: var(--bg-surface); border: 1px solid var(--stroke); border-radius: var(--radius); padding: 32px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-        <div style="text-align: center; margin-bottom: 24px;">
-            <span class="eyebrow" style="justify-content: center;">Instant Payment & Booking</span>
-            <h1 style="font-family: 'Bebas Neue'; font-size: 32px; margin-top: 4px;">Confirm Ticket Booking</h1>
+<main class="container payment-page-container">
+    <div class="payment-shell">
+        
+        <!-- Trust & Security Eyebrow -->
+        <div class="payment-trust-eyebrow">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <span>Bank-Grade 256-Bit Encrypted Checkout</span>
         </div>
 
-        <div style="background: var(--bg-elevated); padding: 20px; border-radius: var(--radius); margin-bottom: 24px; font-size: 14px; display: flex; flex-direction: column; gap: 8px;">
-            <div><span style="color: var(--text-muted);">Movie:</span> <b>{{ showtime.movie.title }}</b></div>
-            <div><span style="color: var(--text-muted);">Cinema:</span> <b>{{ showtime.cinema.name }} ({{ showtime.cinema.city }})</b></div>
-            <div><span style="color: var(--text-muted);">Date & Time:</span> <b>{{ showtime.show_date }} at {{ showtime.start_time|time:"h:i A" }}</b></div>
-            <div><span style="color: var(--text-muted);">Selected Seats:</span> <b style="color: var(--gold); text-transform: uppercase;">{{ tier }} Tier ({{ seats }})</b></div>
-            <div style="border-top: 1px solid var(--stroke); padding-top: 8px; margin-top: 4px; display: flex; justify-content: space-between; font-size: 16px;">
-                <span>Total Amount Payable:</span>
-                <b style="color: var(--gold);">₹{{ total_amount }}</b>
+        <div class="payment-header">
+            <h1 class="payment-title">Confirm Ticket Booking</h1>
+            <p class="payment-subtitle">Review your reservation details and complete your instant UPI payment.</p>
+        </div>
+
+        <!-- Main Card -->
+        <div class="payment-card">
+            
+            <!-- Movie & Showtime Summary -->
+            <div class="payment-summary-box">
+                <div class="payment-summary-header">
+                    <div>
+                        <span class="genre-badge">
+                            {{ showtime.movie.genre|default:"Cinema Pass" }}
+                        </span>
+                        <h2 class="movie-title-checkout">{{ showtime.movie.title }}</h2>
+                    </div>
+                    {% if showtime.movie.rating %}
+                    <span class="rating-badge-checkout">
+                        <i class="fa-solid fa-star" style="font-size: 11px;"></i> {{ showtime.movie.rating }}
+                    </span>
+                    {% endif %}
+                </div>
+
+                <div class="cinema-meta-grid">
+                    <div>
+                        <div class="meta-field-label">Cinema & Hall</div>
+                        <div class="meta-field-value">{{ showtime.cinema.name }}</div>
+                        <div class="payment-subtitle" style="font-size: 12px;">{{ showtime.cinema.city }}</div>
+                    </div>
+                    <div>
+                        <div class="meta-field-label">Date & Showtime</div>
+                        <div class="meta-field-value">{{ showtime.show_date|date:"D, M d, Y" }}</div>
+                        <div class="meta-field-time">{{ showtime.start_time|time:"h:i A" }}</div>
+                    </div>
+                </div>
+
+                <div class="selected-seats-row">
+                    <span style="color: var(--text-muted);">Selected Seats:</span>
+                    <span class="seats-badge">
+                        <span style="color: var(--emerald); font-weight: 800; text-transform: uppercase;">{{ tier }}</span> Tier • {{ seats }}
+                    </span>
+                </div>
             </div>
-        </div>
 
-        <!-- Real Scannable UPI QR Payment Code -->
-        <div style="text-align: center; margin-bottom: 28px;">
-            <div style="width: 200px; height: 200px; margin: 0 auto 12px auto; background: #ffffff; padding: 14px; border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=moviemate@upi%26pn=MovieMate%26am={{ total_amount }}%26cu=INR" alt="Real UPI QR Payment Code" style="width: 170px; height: 170px; display: block;">
+            <!-- Scannable UPI QR Payment Section -->
+            <div class="upi-qr-card">
+                <div class="upi-title">
+                    Instant Scan & Pay via UPI
+                </div>
+
+                <div class="upi-qr-image-wrap">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=190x190&data=upi://pay?pa=6354755051@upi%26pn=MovieMate%26am={{ total_amount }}%26cu=INR" alt="UPI QR Code: 6354755051@upi">
+                </div>
+
+                <!-- <div class="upi-id-box">
+                    <span class="upi-id-label">Payee UPI ID & Mobile Number</span>
+                    <div class="upi-id-value-wrap">
+                        <strong class="upi-id-text" id="upiIdText">6354755051@upi</strong>
+                        <button type="button" class="btn-copy-upi" onclick="copyUPI('6354755051@upi')">
+                            <i class="fa-regular fa-copy"></i>
+                            <span id="copyFeedback">Copy</span>
+                        </button>
+                    </div>
+                    <div class="upi-number-note">UPI / PhonePe / GPay / Paytm: <strong>+91 6354755051</strong></div>
+                </div> -->
+
+                <div class="upi-apps-row">
+                    <span>Scan with</span>
+                    <span style="color: #0f172a; font-weight: 700;">GPay</span> •
+                    <span style="color: #5f259f; font-weight: 700;">PhonePe</span> •
+                    <span style="color: #00b9f1; font-weight: 700;">Paytm</span> •
+                    <span style="color: #FF7909 ; font-weight: 700;">BHIM</span>
+                </div>
             </div>
-            <p style="font-size: 13px; color: var(--text-muted);">Scan QR Code with GPay, PhonePe, or Paytm to pay ₹{{ total_amount }}</p>
+
+            <!-- Price Breakdown -->
+            <div class="price-breakdown">
+                <div class="price-row">
+                    <span>Tickets ({{ tier|title }} Tier)</span>
+                    <span style="color: var(--text); font-weight: 600;">₹{{ total_amount }}</span>
+                </div>
+                <div class="price-row" style="margin-bottom: 12px;">
+                    <span>Booking Convenience Fee</span>
+                    <span style="color: var(--emerald); font-weight: 600;">FREE</span>
+                </div>
+                <div class="price-total-row">
+                    <span style="color: var(--text);">Total Amount Payable</span>
+                    <span class="total-payable-amount">₹{{ total_amount }}</span>
+                </div>
+            </div>
+
+            <!-- Payment Confirmation Form -->
+            <form action="{% url 'process_payment' showtime.id %}" method="POST" id="checkoutForm">
+                {% csrf_token %}
+                <input type="hidden" name="seat_tier" value="{{ tier }}">
+                <input type="hidden" name="seats" value="{{ seats }}">
+                <button type="submit" class="btn btn-emerald btn-block" id="payBtn" style="padding: 16px; font-size: 15.5px; font-weight: 800; justify-content: center; border-radius: 12px; box-shadow: 0 4px 14px rgba(5, 150, 105, 0.25); background: #059669; color: #ffffff; border: none; cursor: pointer; width: 100%;">
+                    Confirm Booking & Issue Ticket Pass &rarr;
+                </button>
+                <!-- <div class="demo-bypass-note">
+                    <i class="fa-solid fa-circle-check" style="color: #059669;"></i>
+                    <span>Testing active: You can scan to send money to <strong>6354755051</strong> or click Confirm above to get your instant ticket pass.</span>
+                </div> -->
+            </form>
+
+            <div class="payment-features-row">
+                <span class="feature-check-item">
+                    <i class="fa-solid fa-check" style="color: var(--emerald);"></i> Instant PDF Pass
+                </span>
+                <span class="feature-check-item">
+                    <i class="fa-solid fa-check" style="color: var(--emerald);"></i> Contactless QR Check-in
+                </span>
+                <span class="feature-check-item">
+                    <i class="fa-solid fa-check" style="color: var(--emerald);"></i> 100% Verified Seats
+                </span>
+            </div>
+
         </div>
 
-        <form action="{% url 'process_payment' showtime.id %}" method="POST">
-            {% csrf_token %}
-            <input type="hidden" name="seat_tier" value="{{ tier }}">
-            <input type="hidden" name="seats" value="{{ seats }}">
-            <button type="submit" class="btn btn-gold btn-block" style="padding: 14px; font-size: 16px; justify-content: center;">
-                Payment & Confirm Ticket &rarr;
-            </button>
-        </form>
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="{% url 'select_seats' showtime.id %}" style="color: var(--text-muted); font-size: 13.5px; font-weight: 600; text-decoration: none;">
+                ← Change Seat Selection
+            </a>
+        </div>
+
     </div>
 </main>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'accounts/js/payment.js' %}?v=3.2"></script>
 {% endblock %}

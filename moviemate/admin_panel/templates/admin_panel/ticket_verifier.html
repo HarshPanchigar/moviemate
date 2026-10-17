@@ -1,587 +1,160 @@
 {% extends 'admin_panel/base_admin.html' %}
+{% load static %}
 
 {% block title %}Ticket QR Verifier | MovieMate Admin{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'admin_panel/css/admin_ticket_verifier.css' %}">
+{% endblock %}
+
 {% block content %}
-
-<style>
-/* =========================================================
-   MOVIEMATE — GATE TICKET VERIFICATION
-   Professional dark / red admin theme
-   ========================================================= */
-
-.verifier-page {
-    width: 100%;
-}
-
-.verifier-header {
-    margin-bottom: 24px;
-}
-
-.verifier-title {
-    margin: 0;
-    color: #f8fafc;
-    font-size: 28px;
-    font-weight: 700;
-    letter-spacing: -.025em;
-}
-
-.verifier-subtitle {
-    margin: 7px 0 0;
-    color: #94a3b8;
-    font-size: 14px;
-    line-height: 1.5;
-}
-
-/* Result message */
-
-.verifier-message {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    margin-bottom: 20px;
-    padding: 15px 17px;
-    border-radius: 10px;
-    font-size: 13px;
-    font-weight: 600;
-    line-height: 1.5;
-}
-
-.verifier-message.success {
-    background: rgba(16,185,129,.08);
-    border: 1px solid rgba(16,185,129,.25);
-    color: #34d399;
-}
-
-.verifier-message.warning {
-    background: rgba(245,158,11,.08);
-    border: 1px solid rgba(245,158,11,.25);
-    color: #fbbf24;
-}
-
-.verifier-message.error {
-    background: rgba(239,68,68,.08);
-    border: 1px solid rgba(239,68,68,.25);
-    color: #f87171;
-}
-
-.verifier-message-icon {
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    border-radius: 7px;
-    background: rgba(255,255,255,.04);
-}
-
-/* Main cards */
-
-.verifier-grid {
-    display: grid;
-    grid-template-columns: minmax(0,1fr) minmax(0,1fr);
-    gap: 18px;
-}
-
-.verifier-card {
-    overflow: hidden;
-    background: #111722;
-    border: 1px solid rgba(255,255,255,.075);
-    border-radius: 13px;
-}
-
-.verifier-card-header {
-    display: flex;
-    align-items: center;
-    gap: 11px;
-    min-height: 64px;
-    padding: 14px 18px;
-    background: #182131;
-    border-bottom: 1px solid rgba(255,255,255,.08);
-}
-
-.verifier-card-icon {
-    width: 34px;
-    height: 34px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    border-radius: 8px;
-    background: rgba(239,68,68,.10);
-    border: 1px solid rgba(239,68,68,.18);
-    color: #ef4444;
-}
-
-.verifier-card-title {
-    color: #f8fafc;
-    font-size: 13px;
-    font-weight: 700;
-}
-
-.verifier-card-subtitle {
-    margin-top: 3px;
-    color: #64748b;
-    font-size: 10px;
-}
-
-.verifier-card-body {
-    padding: 20px;
-}
-
-/* Form */
-
-.verifier-form-group {
-    margin-bottom: 16px;
-}
-
-.verifier-label {
-    display: block;
-    margin-bottom: 7px;
-    color: #cbd5e1;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.verifier-input-wrap {
-    position: relative;
-}
-
-.verifier-input-icon {
-    position: absolute;
-    top: 50%;
-    left: 12px;
-    transform: translateY(-50%);
-    color: #64748b;
-    pointer-events: none;
-}
-
-.verifier-input {
-    width: 100%;
-    min-height: 46px;
-    padding: 10px 12px 10px 38px;
-    background: #080d14 !important;
-    border: 1px solid rgba(255,255,255,.11);
-    border-radius: 8px;
-    outline: none;
-    color: #f8fafc !important;
-    font-family: Consolas, "Courier New", monospace;
-    font-size: 13px;
-    letter-spacing: .02em;
-    transition: .18s ease;
-    box-sizing: border-box;
-}
-
-.verifier-input:hover {
-    border-color: rgba(255,255,255,.17);
-}
-
-.verifier-input:focus {
-    border-color: rgba(239,68,68,.50);
-    box-shadow: 0 0 0 3px rgba(239,68,68,.07);
-}
-
-.verifier-input::placeholder {
-    color: #526075;
-}
-
-.verifier-submit {
-    width: 100%;
-    min-height: 44px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 9px;
-    padding: 0 16px;
-    background: #dc2626;
-    border: 1px solid rgba(239,68,68,.35);
-    border-radius: 8px;
-    color: #fff;
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: .18s ease;
-}
-
-.verifier-submit:hover {
-    background: #b91c1c;
-    transform: translateY(-1px);
-    box-shadow: 0 8px 22px rgba(239,68,68,.18);
-}
-
-/* Scanned ticket */
-
-.ticket-details {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-}
-
-.ticket-detail-row {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 18px;
-    padding: 12px 0;
-    border-bottom: 1px solid rgba(255,255,255,.055);
-}
-
-.ticket-detail-row:first-child {
-    padding-top: 0;
-}
-
-.ticket-detail-row:last-child {
-    padding-bottom: 0;
-    border-bottom: 0;
-}
-
-.ticket-label {
-    flex-shrink: 0;
-    color: #64748b;
-    font-size: 11px;
-    font-weight: 600;
-}
-
-.ticket-value {
-    color: #e5e7eb;
-    font-size: 12.5px;
-    font-weight: 700;
-    text-align: right;
-    line-height: 1.45;
-}
-
-.ticket-value.blue {
-    color: #60a5fa;
-}
-
-.ticket-value.green {
-    color: #34d399;
-}
-
-.ticket-value.gold {
-    color: #fbbf24;
-}
-
-.ticket-empty {
-    min-height: 240px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    color: #64748b;
-    font-size: 12px;
-    line-height: 1.5;
-}
-
-.ticket-empty-icon {
-    width: 54px;
-    height: 54px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 13px;
-    border-radius: 12px;
-    background: rgba(255,255,255,.035);
-    border: 1px solid rgba(255,255,255,.07);
-    color: #475569;
-    font-size: 21px;
-}
-
-.ticket-empty strong {
-    display: block;
-    margin-bottom: 4px;
-    color: #94a3b8;
-    font-size: 13px;
-}
-
-/* Responsive */
-
-@media (max-width: 850px) {
-    .verifier-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 600px) {
-    .verifier-title {
-        font-size: 25px;
-    }
-
-    .verifier-card-body {
-        padding: 17px;
-    }
-
-    .ticket-detail-row {
-        flex-direction: column;
-        gap: 4px;
-    }
-
-    .ticket-value {
-        text-align: left;
-    }
-}
-</style>
-
 
 <div class="verifier-page">
 
-    <div class="verifier-header">
-
-        <h1 class="verifier-title">
-            Gate Ticket Verification
-        </h1>
-
-        <p class="verifier-subtitle">
-            Scan or enter a ticket verification hash to validate cinema entry tickets.
-        </p>
-
+    <!-- PAGE HEADER -->
+    <div class="verifier-page-header">
+        <h1 class="verifier-page-title">Cinema Gate Entry Verifier</h1>
+        <p class="verifier-page-subtitle">Scan attendee QR pass hashes or enter reference IDs to validate turnstile entry.</p>
     </div>
 
-
-    {% if message_text %}
-
-        <div class="verifier-message
-            {% if 'SUCCESS' in message_text %}
-                success
-            {% elif 'WARNING' in message_text %}
-                warning
-            {% else %}
-                error
-            {% endif %}">
-
-            <div class="verifier-message-icon">
-
-                {% if 'SUCCESS' in message_text %}
-                    <i class="fa-solid fa-circle-check"></i>
-                {% elif 'WARNING' in message_text %}
-                    <i class="fa-solid fa-triangle-exclamation"></i>
-                {% else %}
-                    <i class="fa-solid fa-circle-xmark"></i>
-                {% endif %}
-
+    <!-- NOTIFICATION ALERT MESSAGE -->
+    {% if verification_status %}
+        {% if verification_status == 'valid' %}
+            <div class="verifier-message-box success">
+                <i class="fa-solid fa-circle-check"></i>
+                <div>
+                    <div><strong>Access Granted: Valid Entry Pass</strong></div>
+                    <div style="font-size: 12px; font-weight: normal; margin-top: 2px;">Attendee cleared for cinema auditorium entry.</div>
+                </div>
             </div>
-
-            <div>
-                {{ message_text }}
+        {% elif verification_status == 'already_used' %}
+            <div class="verifier-message-box warning">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <div>
+                    <div><strong>Warning: Ticket Already Checked In</strong></div>
+                    <div style="font-size: 12px; font-weight: normal; margin-top: 2px;">This pass was previously verified at the cinema gate.</div>
+                </div>
             </div>
-
-        </div>
-
+        {% elif verification_status == 'expired' %}
+            <div class="verifier-message-box error">
+                <i class="fa-solid fa-clock"></i>
+                <div>
+                    <div><strong>Showtime Expired</strong></div>
+                    <div style="font-size: 12px; font-weight: normal; margin-top: 2px;">This movie showtime has already concluded.</div>
+                </div>
+            </div>
+        {% else %}
+            <div class="verifier-message-box error">
+                <i class="fa-solid fa-circle-xmark"></i>
+                <div>
+                    <div><strong>Invalid Ticket Pass</strong></div>
+                    <div style="font-size: 12px; font-weight: normal; margin-top: 2px;">No matching ticket reservation found for this hash code.</div>
+                </div>
+            </div>
+        {% endif %}
     {% endif %}
 
+    <!-- 2-COLUMN VERIFIER INTERFACE -->
+    <div class="verifier-card-grid">
 
-    <div class="verifier-grid">
-
-        <!-- Ticket Hash Verification -->
-
-        <div class="verifier-card">
-
-            <div class="verifier-card-header">
-
-                <div class="verifier-card-icon">
+        <!-- Input Verification Form -->
+        <div class="verifier-clean-card">
+            <div class="verifier-card-top">
+                <div class="verifier-top-icon icon-blue">
                     <i class="fa-solid fa-qrcode"></i>
                 </div>
-
                 <div>
-
-                    <div class="verifier-card-title">
-                        Ticket Verification
-                    </div>
-
-                    <div class="verifier-card-subtitle">
-                        Enter the QR verification payload or ticket hash
-                    </div>
-
+                    <div class="verifier-top-title">Scan / Enter Ticket Pass</div>
+                    <div class="verifier-top-sub">Instant contactless verification</div>
                 </div>
-
             </div>
 
-
-            <div class="verifier-card-body">
-
-                <form action="{% url 'admin_panel:verifier' %}"
-                      method="POST">
-
+            <div class="verifier-card-inner">
+                <form action="{% url 'admin_panel:verifier' %}" method="POST">
                     {% csrf_token %}
-
-                    <div class="verifier-form-group">
-
-                        <label class="verifier-label">
-                            Ticket Hash Code
-                        </label>
-
-                        <div class="verifier-input-wrap">
-
-                            <i class="fa-solid fa-fingerprint verifier-input-icon"></i>
-
-                            <input type="text"
-                                   name="qr_hash"
-                                   class="verifier-input"
-                                   placeholder="MM-7f9a1b8c..."
-                                   autocomplete="off"
-                                   required>
-
-                        </div>
-
+                    <div class="form-group">
+                        <label>Ticket Pass Hash Code / Token *</label>
+                        <input type="text" name="qr_hash" class="form-control" 
+                               placeholder="e.g. MM-PASS-6abdff38 or 16-char hash" 
+                               value="{{ request.POST.qr_hash|default:'' }}" 
+                               required autofocus>
                     </div>
 
-
-                    <button type="submit"
-                            class="verifier-submit">
-
-                        <i class="fa-solid fa-shield-check"></i>
-
-                        Verify & Validate Ticket Entry
-
+                    <button type="submit" class="btn-blue" style="width: 100%; min-height: 44px; font-size: 14px;">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        Verify &amp; Validate Ticket Entry
                     </button>
-
                 </form>
-
             </div>
-
         </div>
 
-
-        <!-- Scanned Ticket Details -->
-
-        <div class="verifier-card">
-
-            <div class="verifier-card-header">
-
-                <div class="verifier-card-icon">
-
+        <!-- Scanned Ticket Details View -->
+        <div class="verifier-clean-card">
+            <div class="verifier-card-top">
+                <div class="verifier-top-icon icon-blue">
                     <i class="fa-solid fa-ticket"></i>
-
                 </div>
-
                 <div>
-
-                    <div class="verifier-card-title">
-                        Scanned Ticket Details
-                    </div>
-
-                    <div class="verifier-card-subtitle">
-                        Information from the latest verified ticket
-                    </div>
-
+                    <div class="verifier-top-title">Scanned Ticket Details</div>
+                    <div class="verifier-top-sub">Information from the latest verified ticket</div>
                 </div>
-
             </div>
 
-
-            <div class="verifier-card-body">
-
+            <div class="verifier-card-inner">
                 {% if scanned_booking %}
-
-                    <div class="ticket-details">
-
-
+                    <div>
                         <div class="ticket-detail-row">
-
-                            <span class="ticket-label">
-                                Customer
-                            </span>
-
-                            <span class="ticket-value">
-                                {{ scanned_booking.customer.full_name }}
-                            </span>
-
+                            <span class="ticket-item-label">Customer</span>
+                            <span class="ticket-item-value">{{ scanned_booking.customer.full_name }}</span>
                         </div>
 
-
                         <div class="ticket-detail-row">
-
-                            <span class="ticket-label">
-                                Movie
-                            </span>
-
-                            <span class="ticket-value">
-                                {{ scanned_booking.showtime.movie.title }}
-                            </span>
-
+                            <span class="ticket-item-label">Movie</span>
+                            <span class="ticket-item-value">{{ scanned_booking.showtime.movie.title }}</span>
                         </div>
 
-
                         <div class="ticket-detail-row">
-
-                            <span class="ticket-label">
-                                Cinema
+                            <span class="ticket-item-label">Cinema</span>
+                            <span class="ticket-item-value">
+                                {{ scanned_booking.showtime.cinema.name }} ({{ scanned_booking.showtime.cinema.city }})
                             </span>
-
-                            <span class="ticket-value">
-                                {{ scanned_booking.showtime.cinema.name }}
-                                ({{ scanned_booking.showtime.cinema.city }})
-                            </span>
-
                         </div>
 
-
                         <div class="ticket-detail-row">
-
-                            <span class="ticket-label">
-                                Show Date & Time
+                            <span class="ticket-item-label">Show Date &amp; Time</span>
+                            <span class="ticket-item-value">
+                                {{ scanned_booking.showtime.show_date }} {{ scanned_booking.showtime.start_time }}
                             </span>
-
-                            <span class="ticket-value">
-                                {{ scanned_booking.showtime.show_date }}
-                                {{ scanned_booking.showtime.start_time }}
-                            </span>
-
                         </div>
 
-
                         <div class="ticket-detail-row">
-
-                            <span class="ticket-label">
-                                Seat Tier
+                            <span class="ticket-item-label">Seat Tier</span>
+                            <span class="badge badge-blue">
+                                {{ scanned_booking.seat_tier|upper }} ({{ scanned_booking.seats }})
                             </span>
-
-                            <span class="ticket-value blue">
-                                {{ scanned_booking.seat_tier|upper }}
-                                ({{ scanned_booking.seats }})
-                            </span>
-
                         </div>
 
-
                         <div class="ticket-detail-row">
-
-                            <span class="ticket-label">
-                                Total Paid
-                            </span>
-
-                            <span class="ticket-value green">
+                            <span class="ticket-item-label">Total Paid</span>
+                            <span class="ticket-item-value" style="color: var(--accent-blue); font-size: 15px;">
                                 ₹{{ scanned_booking.total_amount }}
                             </span>
-
                         </div>
-
-
                     </div>
-
                 {% else %}
-
-                    <div class="ticket-empty">
-
+                    <div class="ticket-empty-box">
                         <div class="ticket-empty-icon">
                             <i class="fa-solid fa-ticket-simple"></i>
                         </div>
-
-                        <strong>
+                        <div style="font-weight: 700; color: var(--text-primary); font-size: 14px; margin-bottom: 4px;">
                             No Ticket Scanned
-                        </strong>
-
-                        Enter a ticket hash code on the left
-                        to verify a cinema entry ticket.
-
+                        </div>
+                        <div style="font-size: 12.5px; color: var(--text-muted);">
+                            Enter a ticket hash code on the left to verify entry.
+                        </div>
                     </div>
-
                 {% endif %}
-
             </div>
-
         </div>
 
     </div>

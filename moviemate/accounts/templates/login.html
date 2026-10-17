@@ -1,106 +1,84 @@
 {% extends 'base.html' %} 
 {% load static %}
-{% block title %}Log in{% endblock%} 
+{% block title %}Log in | MovieMate{% endblock %} 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'accounts/css/auth.css' %}" />
-{% endblock %} {% block content %}
+<link rel="stylesheet" href="{% static 'accounts/css/auth.css' %}?v=3.3" />
+{% endblock %} 
 
+{% block content %}
 <main>
   <div class="auth-shell">
-    <!-- =================================================
-             LEFT SIDE
-             ================================================= -->
-
+    
+    <!-- LEFT SIDE: HERO SHOWCASE -->
     <div class="auth-visual">
       <div class="auth-visual-mid">
         <div class="display">
-          Welcome back<br />
-
-          to the front row.
+          Welcome back to the front row.
         </div>
 
         <p>
-          Sign in to grab your seats before the show sells out, and keep every
-          ticket in one place.
+          Sign in to secure your seats before showtimes sell out, access instant QR passes, and enjoy hassle-free cinema booking.
         </p>
 
-        <!-- TICKET -->
-
+        <!-- LUXURY FLOATING TICKET PASS -->
         <div class="stub-float">
           <div class="stub-card">
-            <span class="stub-badge"> CONFIRMED </span>
-
-            <span class="stub-shine"></span>
-
-            <div class="row">
-              <span> FILM </span>
-
-              <b> CRIMSON HORIZON </b>
+            <div class="stub-shine-wrap">
+              <span class="stub-shine"></span>
             </div>
 
             <div class="row">
-              <span> SCREEN </span>
+              <span>FILM PASS</span>
+              <b>INTERSTELLAR IMAX</b>
+            </div>
 
-              <b> 04 · GOLD </b>
+            <div class="row">
+              <span>AUDITORIUM</span>
+              <b>SCREEN 01 · VIP RECLINER</b>
             </div>
 
             <div class="perf-mini"></div>
 
             <div class="row">
-              <span> SEAT </span>
-
-              <b> G12, G13 </b>
+              <span>SEATS</span>
+              <b>F12, F13</b>
             </div>
 
             <div class="row">
-              <span> SHOW </span>
-
-              <b> 07:45 PM </b>
+              <span>SHOWTIME</span>
+              <b>TODAY · 07:45 PM</b>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="auth-visual-bottom">TICKET NO. MM-2026-08-07 · AHMEDABAD</div>
+      <div class="auth-visual-bottom">
+        OFFICIAL DIGITAL ENTRY SYSTEM · AHMEDABAD
+      </div>
     </div>
 
-    <!-- =================================================
-             LOGIN FORM
-             ================================================= -->
-
+    <!-- RIGHT SIDE: LOGIN FORM -->
     <div class="auth-form-wrap">
       <form class="auth-form" method="post" action="{% url 'login' %}">
         {% csrf_token %}
 
         <h1>Log in</h1>
-
         <p class="lead">
           New to MovieMate?
-
-          <a href="{% url 'signup' %}" class="link-gold"> Create an account </a>
+          <a href="{% url 'signup' %}" class="link-gold">Create an account</a>
         </p>
 
-        <!-- =================================================
-                     LOGIN ERROR
-                     ================================================= -->
-
+        <!-- ERROR MESSAGE -->
         {% if login_error %}
-
         <div class="form-error">
-          <span class="form-error-icon"> ! </span>
-
-          <span> {{ login_error }} </span>
+          <span class="form-error-icon">!</span>
+          <span>{{ login_error }}</span>
         </div>
-
         {% endif %}
 
-        <!-- =================================================
-                     EMAIL
-                     ================================================= -->
-
+        <!-- EMAIL -->
         <div class="field">
-          <label for="id_username"> Email address </label>
-
+          <label for="id_username">Email address</label>
           <div class="input-row">
             <input
               id="id_username"
@@ -114,13 +92,9 @@
           </div>
         </div>
 
-        <!-- =================================================
-                     PASSWORD
-                     ================================================= -->
-
+        <!-- PASSWORD -->
         <div class="field">
-          <label for="id_password"> Password </label>
-
+          <label for="id_password">Password</label>
           <div class="input-row">
             <input
               id="id_password"
@@ -130,7 +104,6 @@
               autocomplete="current-password"
               required
             />
-
             <button
               type="button"
               class="toggle-eye"
@@ -141,63 +114,52 @@
           </div>
         </div>
 
-        <!-- =================================================
-                     REMEMBER / FORGOT
-                     ================================================= -->
-
+        <!-- REMEMBER / FORGOT -->
         <div class="row-between">
           <label class="checkline">
             <input
               type="checkbox"
               name="remember"
-              {%
-              if
-              request.POST.remember
-              %}
-              checked
-              {%
-              endif
-              %}
+              {% if request.POST.remember %}checked{% endif %}
             />
-
-            Remember me
+            <span>Remember me</span>
           </label>
-
-          <a href="#" class="link-gold"> Forgot password? </a>
+          <a href="#" class="link-gold" style="font-size: 13px;">Forgot password?</a>
         </div>
 
-        <!-- =================================================
-                     LOGIN BUTTON
-                     ================================================= -->
+        <!-- LOGIN BUTTON -->
+        <button class="btn btn-gold btn-block" type="submit" style="padding: 13px; font-size: 15px; font-weight: 700; border-radius: 10px; justify-content: center; box-shadow: 0 4px 14px rgba(5, 150, 105, 0.2);">
+          Log in &rarr;
+        </button>
 
-        <button class="btn btn-gold btn-block" type="submit">Log in</button>
-
-        <!-- =================================================
-                     SOCIAL LOGIN
-                     ================================================= -->
-
+        <!-- SOCIAL LOGIN -->
         <div class="divider-text">OR CONTINUE WITH</div>
 
         <div class="social-row">
-          <button type="button" class="social-btn">G Google</button>
-
-          <button type="button" class="social-btn">Apple</button>
+          <button type="button" class="social-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.4 9 5 12 5z"/><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.7-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/><path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.8s.2-2.1.4-2.8L1.9 6.3C.7 8.7 0 10.3 0 12s.7 3.3 1.9 5.7l3.7-2.9z"/><path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.4-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z"/></svg>
+            Google
+          </button>
+          <button type="button" class="social-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.84c.64-.78 1.08-1.87.96-2.96-.93.04-2.06.62-2.73 1.4-.59.68-1.11 1.79-.97 2.85 1.05.08 2.1-.51 2.74-1.29z"/></svg>
+            Apple
+          </button>
         </div>
 
-        <!-- =================================================
-                     SIGN UP
-                     ================================================= -->
-
+        <!-- SWITCH TO SIGNUP -->
         <p class="switch-line">
           Don't have an account?
-
-          <a href="{% url 'signup' %}" class="link-gold"> Sign up </a>
+          <a href="{% url 'signup' %}" class="link-gold">Sign up</a>
         </p>
       </form>
     </div>
+
   </div>
 </main>
+{% endblock %} 
 
-{% endblock %} {% block footer %} {% endblock %} {% block extra_js %}
+{% block footer %}{% endblock %} 
+
+{% block extra_js %}
 <script src="{% static 'accounts/js/auth.js' %}"></script>
 {% endblock %}

@@ -1,132 +1,87 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Select Showtime | {{ cinema.name }}{% endblock %}
+{% block title %}Select Showtime | {{ cinema.name }} | MovieMate{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'accounts/css/select_showtime.css' %}" />
+<link rel="stylesheet" href="{% static 'accounts/css/select_showtime.css' %}?v=3.1" />
 {% endblock %}
 
 {% block content %}
-
 <main class="showtime-page">
 
-    <!-- =====================================================
-         STEP HEADER
-    ====================================================== -->
-
+    <!-- STEP HEADER -->
     <section class="showtime-hero">
-
         <div class="step-label">
-            Step 2: Select Show Time
+            Step 2: Select Showtime Slot
         </div>
-
         <h1 class="cinema-name">
             {{ cinema.name }}
         </h1>
-
         <p class="movie-date">
             Showing
             <strong>{{ movie.title }}</strong>
-            <span> · </span>
+            <span> • </span>
             Date:
             <strong>{{ selected_date_str }}</strong>
         </p>
-
     </section>
 
-
-    <!-- =====================================================
-         SHOWTIMES
-    ====================================================== -->
-
+    <!-- AVAILABLE SHOWTIMES -->
     <section>
-
         <div class="section-heading">
-
             <p class="section-label">
                 Choose your preferred timing
             </p>
-
             <h2 class="section-title">
-                Available Show Time Slots
+                Available Showtime Slots
             </h2>
-
         </div>
 
-
         {% if showtimes %}
-
             <div class="showtime-grid">
-
                 {% for st in showtimes %}
-
-                    <a
-                        href="{% url 'select_seats' st.id %}"
-                        class="showtime-card"
-                    >
-
+                    <a href="{% url 'select_seats' st.id %}" class="showtime-card">
                         <!-- Time -->
-
                         <div class="showtime-time">
                             {{ st.start_time|time:"h:i" }}
                             <span>{{ st.start_time|time:"A" }}</span>
                         </div>
 
-
                         <!-- Price -->
-
                         <div class="showtime-price">
-                            Starts at
-                            <strong>₹{{ st.silver_price }}</strong>
+                            Starting from <strong>₹{{ st.silver_price }}</strong>
                         </div>
-
 
                         <!-- Bottom -->
-
                         <div class="showtime-bottom">
-
-                            <span class="seat-label">
-                                Select your seats
-                            </span>
-
+                            <span class="seat-label">Select Seats</span>
                             <span class="seat-arrow">
-                                Continue
-                                <span>→</span>
+                                Continue <span>&rarr;</span>
                             </span>
-
                         </div>
-
                     </a>
-
                 {% endfor %}
-
             </div>
-
         {% else %}
-
             <div class="empty-state">
-
                 <div class="empty-icon">
-                    🎬
+                    <i class="fa-solid fa-film"></i>
                 </div>
-
                 <h3 class="empty-title">
                     No Showtimes Available
                 </h3>
-
                 <p class="empty-description">
-                    No showtimes are available at
-                    {{ cinema.name }}
-                    for this date.
+                    There are no scheduled showtimes available at {{ cinema.name }} for this date.
                 </p>
-
+                <div style="margin-top: 18px;">
+                    <a href="{% url 'select_theater' movie.id %}" class="btn btn-gold" style="padding: 10px 20px; font-size: 13.5px; font-weight: 700; border-radius: 10px;">
+                        &larr; Choose Another Theater or Date
+                    </a>
+                </div>
             </div>
-
         {% endif %}
-
     </section>
 
 </main>
-
 {% endblock %}

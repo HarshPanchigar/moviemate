@@ -1,427 +1,401 @@
 {% extends 'admin_panel/base_admin.html' %}
+{% load static %}
 
 {% block title %}Movie Catalog | MovieMate Admin{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'admin_panel/css/admin_movies.css' %}">
+{% endblock %}
+
 {% block content %}
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+
+<!-- PAGE HEADER -->
+<div class="movies-page-header">
     <div>
-        <h1 style="font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 0.02em; margin: 0;">Movie Catalog Management</h1>
-        <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">Add, edit, view full metadata, or import movies using OMDb API.</p>
+        <h1 class="movies-page-title">Movie Catalog Management</h1>
+        <p class="movies-page-subtitle">Add, edit, view and manage cinema films circulating across theater branches.</p>
     </div>
-    <div style="display: flex; gap: 12px;">
-        <button class="btn-blue" style="background: rgba(59, 130, 246, 0.15); border: 1px solid var(--blue-primary); color: var(--blue-light);" onclick="document.getElementById('addManualMovieModal').style.display='flex'">
-            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"></path></svg>
-            Add Custom Movie
+
+    <div class="movies-header-actions">
+        <button class="btn-outline" onclick="openAdminModal('addMovieModal')">
+            <i class="fa-solid fa-plus"></i>
+            <span>Add New Movie</span>
         </button>
-        <button class="btn-blue" onclick="document.getElementById('omdbModal').style.display='flex'">
-            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-            Import via OMDb API
+        <button class="btn-blue" onclick="openAdminModal('omdbModal')">
+            <i class="fa-solid fa-cloud-arrow-down"></i>
+            <span>Import via OMDb</span>
         </button>
     </div>
 </div>
 
-<!-- Search & Filter Bar -->
-<div class="panel-card" style="padding: 16px; margin-bottom: 20px;">
-    <div style="display: flex; gap: 16px; align-items: center;">
-        <div style="position: relative; flex: 1;">
-            <input type="text" id="movieSearchInput" class="form-control" placeholder="Search by title, genre, or tag..." onkeyup="filterMoviesTable()">
+<!-- SEARCH & FILTER TOOLBAR -->
+<div class="movies-filter-card">
+    <div class="movies-filter-grid">
+        <div class="movies-search-wrap">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="movieSearchInput" class="form-control"
+                placeholder="Search by title, genre, or keyword..." onkeyup="filterMoviesTable()">
         </div>
-        <select id="movieTagFilter" class="form-control" style="width: 180px;" onchange="filterMoviesTable()">
-            <option value="">All Display Tags</option>
-            <option value="hot">Hot</option>
-            <option value="trending">Trending</option>
-            <option value="top_rated">Top Rated</option>
-            <option value="new_release">New Release</option>
-        </select>
+
+        <div style="min-width: 170px;">
+            <select id="movieTagFilter" class="form-control" onchange="filterMoviesTable()">
+                <option value="">All Display Tags</option>
+                <option value="trending">Trending</option>
+                <option value="hot">Hot</option>
+                <option value="top_rated">Top Rated</option>
+                <option value="new_release">New Release</option>
+            </select>
+        </div>
     </div>
 </div>
 
-<!-- Movie Catalog Table -->
+<!-- MOVIES DATA TABLE -->
 <div class="panel-card">
-    <table class="admin-table" id="moviesTable">
-        <thead>
-            <tr>
-                <th>Poster</th>
-                <th>Title</th>
-                <th>Display Tag</th>
-                <th>Hero Banner</th>
-                <th>Allocated Shows</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in movies_data %}
-            <tr data-title="{{ item.movie.title|lower }}" data-genre="{{ item.movie.genre|lower }}" data-tag="{{ item.movie.display_tag }}">
-                <td>
-                    {% if item.movie.poster_url %}
-                        <img src="{{ item.movie.poster_url }}" alt="{{ item.movie.title }}" style="width: 42px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border-light);">
-                    {% else %}
-                        <div style="width: 42px; height: 60px; background: var(--surface-2); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 10px;">No Pic</div>
-                    {% endif %}
-                </td>
-                <td style="font-weight: 700; color: var(--text);">
-                    {{ item.movie.title }}
-                    <div style="font-size: 11px; color: var(--text-dim);">Released: {{ item.movie.release_year }}</div>
-                </td>
-                <td><span class="badge badge-active" style="text-transform: uppercase;">{{ item.movie.get_display_tag_display }}</span></td>
-                <td>
-                    {% if item.movie.is_hero %}
-                        <a href="{% url 'admin_panel:toggle_hero_movie' item.movie.id %}" style="background: rgba(245, 158, 11, 0.2); color: #FBBF24; border: 1px solid rgba(245, 158, 11, 0.4); padding: 4px 8px; border-radius: 6px; font-weight: 700; font-size: 11px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;" title="Click to remove from Hero Banner">
-                            ★ HERO ACTIVE
-                        </a>
-                    {% else %}
-                        <a href="{% url 'admin_panel:toggle_hero_movie' item.movie.id %}" style="background: var(--surface-2); color: var(--text-muted); border: 1px solid var(--border-light); padding: 4px 8px; border-radius: 6px; font-weight: 600; font-size: 11px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;" title="Click to set as Hero Banner">
-                            + Set as Hero
-                        </a>
-                    {% endif %}
-                </td>
-                <td>
-                    <span style="font-weight: 700; color: var(--blue-light);">{{ item.show_count }} Shows</span>
-                </td>
-                <td>
-                    <div style="display: flex; gap: 6px; align-items: center;">
-                        <button class="btn-blue" style="padding: 5px 10px; font-size: 11.5px;" 
-                                onclick="openViewFullMovieModal('{{ item.movie.title|escapejs }}', '{{ item.movie.genre|escapejs }}', '{{ item.movie.duration_minutes }}', '{{ item.movie.rating }}', '{{ item.movie.release_year }}', '{{ item.movie.get_display_tag_display|escapejs }}', '{{ item.movie.poster_url|escapejs }}', '{{ item.movie.backdrop_url|default:item.movie.poster_url|escapejs }}', '{{ item.movie.plot|default:"No plot summary available."|escapejs }}', '{{ item.show_count }}', '{{ item.booking_count }}')">
-                            View Full
-                        </button>
-
-                        <button class="btn-blue" style="padding: 5px 10px; font-size: 11.5px; background: rgba(255,255,255,0.08); border: 1px solid var(--border-light);" 
-                                onclick="openEditMovieModal({{ item.movie.id }}, '{{ item.movie.title|escapejs }}', '{{ item.movie.genre|escapejs }}', '{{ item.movie.duration_minutes }}', '{{ item.movie.release_year }}', '{{ item.movie.rating }}', '{{ item.movie.display_tag }}', '{{ item.movie.poster_url|escapejs }}', '{{ item.movie.backdrop_url|escapejs }}', '{{ item.movie.plot|escapejs }}', '{{ item.movie.status }}', {% if item.movie.is_hero %}true{% else %}false{% endif %})">
-                            Edit
-                        </button>
-
-                        <a href="{% url 'admin_panel:delete_movie' item.movie.id %}" class="btn-danger-sm" style="padding: 5px 10px; font-size: 11.5px;" onclick="return confirm('Delete movie {{ item.movie.title }}?')">Delete</a>
-                    </div>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 32px;">No movies found in catalog. Add or import one above.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-
-<!-- Modal: View Full Movie Details -->
-<div id="viewFullMovieModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 250; align-items: center; justify-content: center; padding: 20px;">
-    <div style="background: var(--surface-1); border: 1px solid var(--border-light); border-radius: var(--radius); width: 100%; max-width: 680px; overflow: hidden; max-height: 90vh; display: flex; flex-direction: column;">
-        <!-- Backdrop Banner -->
-        <div id="vfmBackdrop" style="height: 180px; background-size: cover; background-position: center; position: relative;">
-            <div style="position: absolute; inset: 0; background: linear-gradient(to top, var(--surface-1), transparent);"></div>
-            <button onclick="document.getElementById('viewFullMovieModal').style.display='none'" style="position: absolute; top: 16px; right: 16px; background: rgba(0,0,0,0.6); border: none; color: #fff; width: 32px; height: 32px; border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;">&times;</button>
+    <div class="panel-header">
+        <div class="panel-title">
+            <i class="fa-solid fa-film" style="color: var(--accent-blue);"></i>
+            <span>All System Movies ({{ movies|length }})</span>
         </div>
+        <span style="font-size: 12px; color: var(--text-muted);">Database Records</span>
+    </div>
 
-        <div style="padding: 24px; overflow-y: auto; display: flex; gap: 20px; flex-direction: row; margin-top: -60px; position: relative;">
-            <img id="vfmPoster" src="" alt="" style="width: 130px; height: 185px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-light); box-shadow: 0 10px 25px rgba(0,0,0,0.5); flex-shrink: 0;">
-            
-            <div style="flex: 1; margin-top: 50px;">
-                <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; flex-wrap: wrap;">
-                    <h2 id="vfmTitle" style="font-size: 24px; font-weight: 800; color: #fff; margin: 0;"></h2>
-                    <span id="vfmTag" class="badge badge-active" style="text-transform: uppercase; font-size: 11px; flex-shrink: 0;"></span>
-                </div>
+    <div style="overflow-x: auto;">
+        <table class="admin-table" id="moviesTable">
+            <thead>
+                <tr>
+                    <th style="width: 70px;">Poster</th>
+                    <th>Movie Title</th>
+                    <th>Genre</th>
+                    <th>Runtime</th>
+                    <th>Rating</th>
+                    <th>Tag</th>
+                    <th>Showtimes</th>
+                    <th style="text-align: right; width: 150px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for movie in movies %}
+                <tr data-title="{{ movie.title|lower }}" data-genre="{{ movie.genre|lower }}"
+                    data-tag="{{ movie.display_tag }}">
+                    <td>
+                        {% if movie.poster_url %}
+                        <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" class="movie-poster-thumb">
+                        {% else %}
+                        <div class="movie-poster-placeholder">
+                            <i class="fa-solid fa-film"></i>
+                        </div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="movie-title-cell">
+                            {{ movie.title }}
+                            <span class="movie-year-badge">{{ movie.release_year }}</span>
+                        </div>
+                        <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px;">
+                            ID: #{{ movie.id }} {% if movie.imdb_id %}· {{ movie.imdb_id }}{% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        <span style="font-weight: 500;">{{ movie.genre }}</span>
+                    </td>
+                    <td>
+                        <span style="color: var(--text-muted); font-size: 12.5px;">{{ movie.duration_formatted }}</span>
+                    </td>
+                    <td>
+                        <span style="font-weight: 700; color: #b45309;">
+                            <i class="fa-solid fa-star"
+                                style="font-size: 11px; margin-right: 2px; color: #f59e0b;"></i>{{ movie.rating }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if movie.display_tag == 'hot' %}
+                        <span class="badge badge-red">Hot</span>
+                        {% elif movie.display_tag == 'trending' %}
+                        <span class="badge badge-blue">Trending</span>
+                        {% elif movie.display_tag == 'top_rated' %}
+                        <span class="badge badge-amber">Top Rated</span>
+                        {% else %}
+                        <span class="badge badge-active">New</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge badge-blue">
+                            <i class="fa-solid fa-calendar-day"></i>
+                            {{ movie.showtimes.count }} Shows
+                        </span>
+                    </td>
+                    <td style="text-align: right;">
+                        <div class="movie-actions-cell">
+                            <button type="button" class="action-icon-btn" title="View Full Details"
+                                onclick="openViewFullMovieModal('{{ movie.title|escapejs }}', '{{ movie.genre|escapejs }}', '{{ movie.duration_minutes }}', '{{ movie.rating }}', '{{ movie.release_year }}', '{{ movie.display_tag }}', '{{ movie.poster_url|escapejs }}', '{{ movie.backdrop_url|escapejs }}', '{{ movie.plot|escapejs }}', '{{ movie.showtimes.count }}', '{{ movie.total_tickets_booked }}')">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
 
-                <!-- Structured Metadata Cards for Genre, Rating, Duration -->
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px;">
-                    <div style="background: var(--surface-2); border: 1px solid var(--border-light); padding: 10px 12px; border-radius: 8px;">
-                        <div style="font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 3px;">Genre</div>
-                        <div id="vfmGenre" style="font-size: 13px; font-weight: 700; color: #fff;"></div>
-                    </div>
-                    <div style="background: var(--surface-2); border: 1px solid var(--border-light); padding: 10px 12px; border-radius: 8px;">
-                        <div style="font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 3px;">Rating</div>
-                        <div id="vfmRating" style="font-size: 13px; font-weight: 800; color: #FBBF24;"></div>
-                    </div>
-                    <div style="background: var(--surface-2); border: 1px solid var(--border-light); padding: 10px 12px; border-radius: 8px;">
-                        <div style="font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 3px;">Duration</div>
-                        <div id="vfmDuration" style="font-size: 13px; font-weight: 700; color: var(--blue-light);"></div>
-                    </div>
-                </div>
+                            <button type="button" class="action-icon-btn" title="Edit Movie"
+                                onclick="openEditMovieModal('{{ movie.id }}', '{{ movie.title|escapejs }}', '{{ movie.genre|escapejs }}', '{{ movie.duration_minutes }}', '{{ movie.release_year }}', '{{ movie.rating }}', '{{ movie.display_tag }}', '{{ movie.poster_url|escapejs }}', '{{ movie.backdrop_url|escapejs }}', '{{ movie.plot|escapejs }}', '{{ movie.status }}')">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
 
-                <div style="background: var(--surface-2); border: 1px solid var(--border-light); padding: 14px; border-radius: 8px; margin-bottom: 16px;">
-                    <div style="font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 6px;">Plot Summary</div>
-                    <div id="vfmPlot" style="font-size: 13px; color: var(--text); line-height: 1.5;"></div>
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                    <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); padding: 12px; border-radius: 8px; text-align: center;">
-                        <div style="font-size: 11px; color: var(--text-muted); font-weight: 600;">Allocated Shows</div>
-                        <div id="vfmShows" style="font-size: 20px; font-weight: 800; color: var(--blue-light); margin-top: 2px;"></div>
-                    </div>
-                    <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); padding: 12px; border-radius: 8px; text-align: center;">
-                        <div style="font-size: 11px; color: var(--text-muted); font-weight: 600;">Total Tickets Sold</div>
-                        <div id="vfmBookings" style="font-size: 20px; font-weight: 800; color: #10B981; margin-top: 2px;"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div style="padding: 16px 24px; background: var(--bg-page); border-top: 1px solid var(--border-light); display: flex; justify-content: flex-end;">
-            <button onclick="document.getElementById('viewFullMovieModal').style.display='none'" class="btn-blue">Close Details</button>
-        </div>
+                            <a href="{% url 'admin_panel:delete_movie' movie.id %}" class="action-icon-btn danger"
+                                title="Delete Movie"
+                                onclick="return confirm('Are you sure you want to delete {{ movie.title|escapejs }}?')">
+                                <i class="fa-regular fa-trash-can"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" style="padding: 48px; text-align: center; color: var(--text-muted);">
+                        <i class="fa-solid fa-film"
+                            style="display: block; font-size: 32px; margin-bottom: 12px; color: #cbd5e1;"></i>
+                        No movies found in the catalog.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 
-<!-- Modal: Add Custom Manual Movie -->
-<div id="addManualMovieModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 200; align-items: center; justify-content: center; padding: 20px;">
-    <div style="background: var(--surface-1); border: 1px solid var(--border-light); border-radius: var(--radius); width: 100%; max-width: 580px; padding: 28px; max-height: 90vh; overflow-y: auto;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h3 style="font-size: 20px; font-weight: 700; color: var(--text); margin: 0;">Add Custom Movie</h3>
-            <button onclick="document.getElementById('addManualMovieModal').style.display='none'" style="background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer;">&times;</button>
+<!-- =====================================================
+     MODAL 1: ADD MOVIE
+     ===================================================== -->
+<div id="addMovieModal" class="modal-overlay">
+    <div class="modal-card">
+        <div class="modal-header-clean">
+            <h2>Add Movie to Catalog</h2>
+            <button type="button" onclick="closeAdminModal('addMovieModal')" class="modal-close-btn">&times;</button>
         </div>
         <form action="{% url 'admin_panel:add_movie' %}" method="POST">
             {% csrf_token %}
-            <div class="form-group">
-                <label>Movie Title</label>
-                <input type="text" name="title" class="form-control" placeholder="e.g. Interstellar, Oppenheimer" required>
-            </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="modal-body-scroll">
                 <div class="form-group">
-                    <label>Genre</label>
-                    <input type="text" name="genre" class="form-control" placeholder="Action, Sci-Fi, Drama" required>
+                    <label>Movie Title *</label>
+                    <input type="text" name="title" class="form-control" placeholder="e.g. Inception" required>
                 </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                    <div class="form-group">
+                        <label>Genre *</label>
+                        <input type="text" name="genre" class="form-control" placeholder="Action, Sci-Fi" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Release Year *</label>
+                        <input type="number" name="release_year" class="form-control" value="2026" required>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                    <div class="form-group">
+                        <label>Duration (Minutes) *</label>
+                        <input type="number" name="duration_minutes" class="form-control" value="120" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Rating (e.g. 8.5) *</label>
+                        <input type="number" step="0.1" name="rating" class="form-control" value="8.0" required>
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <label>Display Tag</label>
                     <select name="display_tag" class="form-control">
-                        <option value="trending">Trending</option>
+                        <option value="trending" selected>Trending</option>
                         <option value="hot">Hot</option>
                         <option value="top_rated">Top Rated</option>
                         <option value="new_release">New Release</option>
                     </select>
                 </div>
-            </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+
                 <div class="form-group">
-                    <label>Duration (mins)</label>
-                    <input type="number" name="duration_minutes" class="form-control" value="120" required>
+                    <label>Poster Image URL</label>
+                    <input type="url" name="poster_url" class="form-control" placeholder="https://...">
                 </div>
+
                 <div class="form-group">
-                    <label>Release Year</label>
-                    <input type="number" name="release_year" class="form-control" value="2026" required>
+                    <label>Backdrop Banner URL</label>
+                    <input type="url" name="backdrop_url" class="form-control" placeholder="https://...">
                 </div>
+
                 <div class="form-group">
-                    <label>Rating (1-10)</label>
-                    <input type="number" step="0.1" name="rating" class="form-control" value="8.5" required>
+                    <label>Plot Synopsis</label>
+                    <textarea name="plot" class="form-control" rows="3"
+                        placeholder="Brief movie overview..."></textarea>
                 </div>
             </div>
-            <div class="form-group">
-                <label>Poster Image URL</label>
-                <input type="url" name="poster_url" class="form-control" placeholder="https://example.com/poster.jpg">
-            </div>
-            <div class="form-group">
-                <label>Backdrop Banner URL (Optional)</label>
-                <input type="url" name="backdrop_url" class="form-control" placeholder="https://example.com/backdrop.jpg">
-            </div>
-            <div class="form-group">
-                <label>Plot Summary</label>
-                <textarea name="plot" class="form-control" rows="3" placeholder="Enter movie story overview..."></textarea>
-            </div>
-            <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
-                <button type="button" onclick="document.getElementById('addManualMovieModal').style.display='none'" class="btn-danger-sm" style="background: transparent;">Cancel</button>
-                <button type="submit" class="btn-blue">Save Movie</button>
+            <div class="modal-footer-clean">
+                <button type="button" onclick="closeAdminModal('addMovieModal')" class="btn-outline">Cancel</button>
+                <button type="submit" class="btn-blue">Save &amp; Add Movie</button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Modal: Edit Movie Details -->
-<div id="editMovieModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 200; align-items: center; justify-content: center; padding: 20px;">
-    <div style="background: var(--surface-1); border: 1px solid var(--border-light); border-radius: var(--radius); width: 100%; max-width: 580px; padding: 28px; max-height: 90vh; overflow-y: auto;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h3 style="font-size: 20px; font-weight: 700; color: var(--text); margin: 0;">Edit Movie</h3>
-            <button onclick="document.getElementById('editMovieModal').style.display='none'" style="background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer;">&times;</button>
+<!-- =====================================================
+     MODAL 2: EDIT MOVIE
+     ===================================================== -->
+<div id="editMovieModal" class="modal-overlay">
+    <div class="modal-card">
+        <div class="modal-header-clean">
+            <h2>Edit Movie Information</h2>
+            <button type="button" onclick="closeAdminModal('editMovieModal')" class="modal-close-btn">&times;</button>
         </div>
-        <form id="editMovieForm" method="POST">
+        <form id="editMovieForm" action="" method="POST">
             {% csrf_token %}
-            <div class="form-group">
-                <label>Movie Title</label>
-                <input type="text" name="title" id="editTitle" class="form-control" required>
-            </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="modal-body-scroll">
                 <div class="form-group">
-                    <label>Genre</label>
-                    <input type="text" name="genre" id="editGenre" class="form-control" required>
+                    <label>Movie Title *</label>
+                    <input type="text" id="editTitle" name="title" class="form-control" required>
                 </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                    <div class="form-group">
+                        <label>Genre *</label>
+                        <input type="text" id="editGenre" name="genre" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Release Year *</label>
+                        <input type="number" id="editYear" name="release_year" class="form-control" required>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                    <div class="form-group">
+                        <label>Duration (Minutes) *</label>
+                        <input type="number" id="editDuration" name="duration_minutes" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Rating *</label>
+                        <input type="number" step="0.1" id="editRating" name="rating" class="form-control" required>
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <label>Display Tag</label>
-                    <select name="display_tag" id="editDisplayTag" class="form-control">
+                    <select id="editDisplayTag" name="display_tag" class="form-control">
                         <option value="trending">Trending</option>
                         <option value="hot">Hot</option>
                         <option value="top_rated">Top Rated</option>
                         <option value="new_release">New Release</option>
                     </select>
                 </div>
-            </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+
                 <div class="form-group">
-                    <label>Duration (mins)</label>
-                    <input type="number" name="duration_minutes" id="editDuration" class="form-control" required>
+                    <label>Poster Image URL</label>
+                    <input type="url" id="editPoster" name="poster_url" class="form-control">
                 </div>
+
                 <div class="form-group">
-                    <label>Release Year</label>
-                    <input type="number" name="release_year" id="editYear" class="form-control" required>
+                    <label>Backdrop Banner URL</label>
+                    <input type="url" id="editBackdrop" name="backdrop_url" class="form-control">
                 </div>
+
                 <div class="form-group">
-                    <label>Rating (1-10)</label>
-                    <input type="number" step="0.1" name="rating" id="editRating" class="form-control" required>
+                    <label>Plot Synopsis</label>
+                    <textarea id="editPlot" name="plot" class="form-control" rows="3"></textarea>
                 </div>
             </div>
-            <div class="form-group">
-                <label>Poster Image URL</label>
-                <input type="url" name="poster_url" id="editPoster" class="form-control">
-            </div>
-            <div class="form-group">
-                <label>Backdrop Banner URL</label>
-                <input type="url" name="backdrop_url" id="editBackdrop" class="form-control">
-            </div>
-            <div class="form-group">
-                <label>Plot Summary</label>
-                <textarea name="plot" id="editPlot" class="form-control" rows="3"></textarea>
-            </div>
-            <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
-                <button type="button" onclick="document.getElementById('editMovieModal').style.display='none'" class="btn-danger-sm" style="background: transparent;">Cancel</button>
+            <div class="modal-footer-clean">
+                <button type="button" onclick="closeAdminModal('editMovieModal')" class="btn-outline">Cancel</button>
                 <button type="submit" class="btn-blue">Update Movie</button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Modal: OMDb Search & Import -->
-<div id="omdbModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 200; align-items: center; justify-content: center;">
-    <div style="background: var(--surface-1); border: 1px solid var(--border-light); border-radius: var(--radius); width: 100%; max-width: 600px; padding: 28px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h3 style="font-size: 20px; font-weight: 700; color: var(--text); margin: 0;">Search & Import via OMDb API</h3>
-            <button onclick="document.getElementById('omdbModal').style.display='none'" style="background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer;">&times;</button>
+<!-- =====================================================
+     MODAL 3: VIEW FULL MOVIE
+     ===================================================== -->
+<div id="viewFullMovieModal" class="modal-overlay">
+    <div class="modal-card">
+        <div class="modal-header-clean">
+            <h2>Movie Details</h2>
+            <button type="button" onclick="closeAdminModal('viewFullMovieModal')"
+                class="modal-close-btn">&times;</button>
         </div>
+        <div class="modal-body-scroll">
+            <div id="vfmBackdrop" class="movie-view-backdrop"></div>
+            <div class="movie-view-details-grid">
+                <img id="vfmPoster" src="" alt="Poster" class="movie-view-poster">
+                <div>
+                    <h3 id="vfmTitle"
+                        style="font-size: 18px; font-weight: 800; color: var(--text-primary); margin: 0 0 4px;"></h3>
+                    <div id="vfmGenre" style="font-size: 13px; color: var(--text-muted); font-weight: 600;"></div>
+                    <div class="movie-stats-pill-row">
+                        <span id="vfmDuration" class="movie-stats-pill"></span>
+                        <span class="movie-stats-pill" style="color: #b45309; font-weight: 700;">
+                            <i class="fa-solid fa-star" style="color: #f59e0b; margin-right: 4px;"></i>
+                            <span id="vfmRating"></span>
+                        </span>
+                        <span id="vfmTag" class="badge badge-blue"></span>
+                    </div>
+                </div>
+            </div>
 
-        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-            <input type="text" id="omdbQuery" class="form-control" placeholder="Enter movie title" onkeydown="if(event.key === 'Enter'){ searchOMDb(); event.preventDefault(); }">
-            <button class="btn-blue" type="button" onclick="searchOMDb()">Search</button>
+            <div style="margin-bottom: 16px;">
+                <div
+                    style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px;">
+                    Plot Synopsis</div>
+                <p id="vfmPlot" style="font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin: 0;"></p>
+            </div>
+
+            <div
+                style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; border-top: 1px solid var(--border-color); padding-top: 14px;">
+                <div
+                    style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
+                    <div style="font-size: 11px; color: var(--text-muted); font-weight: 700;">Active Showtimes</div>
+                    <div id="vfmShows"
+                        style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin-top: 2px;"></div>
+                </div>
+                <div
+                    style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
+                    <div style="font-size: 11px; color: var(--text-muted); font-weight: 700;">Total Tickets Sold</div>
+                    <div id="vfmBookings"
+                        style="font-size: 16px; font-weight: 800; color: var(--accent-blue); margin-top: 2px;"></div>
+                </div>
+            </div>
         </div>
-
-        <div id="omdbResults" style="max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;">
-            <div style="text-align: center; color: var(--text-muted); padding: 20px;">Type a title and click search...</div>
+        <div class="modal-footer-clean">
+            <button type="button" onclick="closeAdminModal('viewFullMovieModal')" class="btn-outline">Close</button>
         </div>
     </div>
 </div>
 
+<!-- =====================================================
+     MODAL 4: OMDB IMPORT
+     ===================================================== -->
+<div id="omdbModal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 640px;">
+        <div class="modal-header-clean">
+            <h2>Import Film from OMDb API</h2>
+            <button type="button" onclick="closeAdminModal('omdbModal')" class="modal-close-btn">&times;</button>
+        </div>
+        <div class="modal-body-scroll">
+            <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+                <input type="text" id="omdbQuery" class="form-control"
+                    placeholder="Search by title (e.g. Oppenheimer, Batman)...">
+                <button type="button" onclick="searchOMDb()" data-search-url="{% url 'admin_panel:omdb_search' %}"
+                    data-import-url="{% url 'admin_panel:import_omdb' %}" id="omdbSearchBtn" class="btn-blue"
+                    style="white-space: nowrap;">
+                    <i class="fa-solid fa-magnifying-glass"></i> Search
+                </button>
+            </div>
+            <div id="omdbResults" style="max-height: 380px; overflow-y: auto;">
+                <div style="text-align: center; color: var(--text-muted); padding: 32px 20px; font-size: 13px;">
+                    <i class="fa-solid fa-cloud-arrow-down"
+                        style="display: block; font-size: 28px; margin-bottom: 8px; color: #cbd5e1;"></i>
+                    Type any movie title above to query the live OMDb movie database.
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer-clean">
+            <button type="button" onclick="closeAdminModal('omdbModal')" class="btn-outline">Close</button>
+        </div>
+    </div>
+</div>
 
+{% endblock %}
 
-<style>
-/* Movie Catalog popup overrides */
-#viewFullMovieModal, #addManualMovieModal, #editMovieModal, #omdbModal { background: rgba(2,5,10,.86) !important; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
-#viewFullMovieModal > div, #addManualMovieModal > div, #editMovieModal > div, #omdbModal > div { background: #101722 !important; border: 1px solid rgba(255,255,255,.12) !important; border-radius: 14px !important; box-shadow: 0 30px 80px rgba(0,0,0,.65); color:#e5e7eb !important; }
-#addManualMovieModal input, #addManualMovieModal select, #addManualMovieModal textarea, #editMovieModal input, #editMovieModal select, #editMovieModal textarea, #omdbModal input, #omdbModal select { background:#080d14 !important; color:#f8fafc !important; border-color:rgba(255,255,255,.11) !important; }
-#addManualMovieModal label, #editMovieModal label { color:#cbd5e1 !important; }
-#addManualMovieModal h3, #editMovieModal h3, #omdbModal h3 { color:#f8fafc !important; }
-#addManualMovieModal > div > div:first-child, #editMovieModal > div > div:first-child, #omdbModal > div > div:first-child { border-bottom:1px solid rgba(255,255,255,.08); }
-#addManualMovieModal .btn-blue, #editMovieModal .btn-blue, #omdbModal .btn-blue { background:#dc2626 !important; border-color:rgba(239,68,68,.35) !important; color:#fff !important; }
-#addManualMovieModal .btn-danger-sm, #editMovieModal .btn-danger-sm { background:#182131 !important; border-color:rgba(255,255,255,.10) !important; color:#cbd5e1 !important; }
-#omdbResults > div { background:#151e2b !important; border:1px solid rgba(255,255,255,.08) !important; color:#e5e7eb; }
-@media(max-width:650px){ #addManualMovieModal > div, #editMovieModal > div, #omdbModal > div { max-height:94vh !important; overflow-y:auto !important; } }
-</style>
-
-<script>
-function formatDuration(minutes) {
-    const total = parseInt(minutes, 10) || 0;
-    const hours = Math.floor(total / 60);
-    const mins = total % 60;
-    if (hours > 0 && mins > 0) return `${hours}h ${mins}m`;
-    if (hours > 0) return `${hours}h`;
-    return `${mins}m`;
-}
-
-function openViewFullMovieModal(title, genre, duration, rating, year, tag, poster, backdrop, plot, shows, bookings) {
-    document.getElementById('vfmTitle').innerText = title + ' (' + year + ')';
-    document.getElementById('vfmGenre').innerText = genre;
-    document.getElementById('vfmDuration').innerText = formatDuration(duration);
-    document.getElementById('vfmRating').innerText = '★ ' + rating;
-    document.getElementById('vfmTag').innerText = tag;
-    document.getElementById('vfmPlot').innerText = plot;
-    document.getElementById('vfmShows').innerText = shows + ' Shows';
-    document.getElementById('vfmBookings').innerText = bookings + ' Tickets';
-    
-    document.getElementById('vfmPoster').src = poster || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba';
-    document.getElementById('vfmBackdrop').style.backgroundImage = `url('${backdrop || poster}')`;
-    
-    document.getElementById('viewFullMovieModal').style.display = 'flex';
-}
-
-function openEditMovieModal(id, title, genre, duration, year, rating, tag, poster, backdrop, plot, status) {
-    document.getElementById('editMovieForm').action = `/admin-panel/movies/edit/${id}/`;
-    document.getElementById('editTitle').value = title;
-    document.getElementById('editGenre').value = genre;
-    document.getElementById('editDuration').value = duration;
-    document.getElementById('editYear').value = year;
-    document.getElementById('editRating').value = rating;
-    document.getElementById('editDisplayTag').value = tag;
-    document.getElementById('editPoster').value = poster;
-    document.getElementById('editBackdrop').value = backdrop;
-    document.getElementById('editPlot').value = plot;
-    document.getElementById('editMovieModal').style.display = 'flex';
-}
-
-function filterMoviesTable() {
-    const q = document.getElementById('movieSearchInput').value.toLowerCase();
-    const tag = document.getElementById('movieTagFilter').value;
-    const rows = document.querySelectorAll('#moviesTable tbody tr');
-
-    rows.forEach(row => {
-        const title = row.getAttribute('data-title') || '';
-        const genre = row.getAttribute('data-genre') || '';
-        const rowTag = row.getAttribute('data-tag') || '';
-
-        const matchesQuery = !q || title.includes(q) || genre.includes(q);
-        const matchesTag = !tag || rowTag === tag;
-
-        if (matchesQuery && matchesTag) {
-            row.style.display = '';
-        } else {
-            row.style.display = 'none';
-        }
-    });
-}
-
-function searchOMDb() {
-    const query = document.getElementById('omdbQuery').value;
-    const container = document.getElementById('omdbResults');
-    if (!query) return;
-    
-    container.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 20px;">Searching OMDb API...</div>';
-    
-    fetch(`{% url "admin_panel:omdb_search" %}?q=${encodeURIComponent(query)}`)
-        .then(res => res.json())
-        .then(data => {
-            if (data.movies && data.movies.length > 0) {
-                container.innerHTML = data.movies.map(m => `
-                    <div style="display: flex; justify-content: space-between; align-items: center; background: var(--surface-2); padding: 12px; border-radius: 8px;">
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <img src="${m.Poster !== 'N/A' ? m.Poster : 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba'}" style="width: 36px; height: 50px; object-fit: cover; border-radius: 4px;">
-                            <div>
-                                <div style="font-weight: 700; font-size: 14px;">${m.Title} (${m.Year})</div>
-                                <div style="font-size: 11px; color: var(--text-dim);">${m.imdbID}</div>
-                            </div>
-                        </div>
-                        <form action="{% url 'admin_panel:import_omdb' %}" method="POST" style="display: flex; gap: 8px; align-items: center;">
-                            {% csrf_token %}
-                            <input type="hidden" name="imdb_id" value="${m.imdbID}">
-                            <select name="display_tag" style="background: var(--bg-page); color: #fff; border: 1px solid var(--border-light); padding: 6px; border-radius: 6px; font-size: 12px;">
-                                <option value="hot">Hot</option>
-                                <option value="trending" selected>Trending</option>
-                                <option value="top_rated">Top Rated</option>
-                                <option value="new_release">New Release</option>
-                            </select>
-                            <button type="submit" class="btn-blue" style="padding: 6px 12px; font-size: 12px;">Import</button>
-                        </form>
-                    </div>
-                `).join('');
-            } else {
-                container.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 20px;">No movies found on OMDb.</div>';
-            }
-        })
-        .catch(err => {
-            console.error('OMDb API error:', err);
-            container.innerHTML = '<div style="text-align: center; color: #ED1D37; padding: 20px;">Error searching OMDb API. Please try again.</div>';
-        });
-}
-</script>
+{% block extra_js %}
+<script src="{% static 'admin_panel/js/admin_movies.js' %}"></script>
 {% endblock %}

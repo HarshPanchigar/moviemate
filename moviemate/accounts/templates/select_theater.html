@@ -4,7 +4,7 @@
 {% block title %}Select Cinema & Showtime | {{ movie.title }}{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'accounts/css/select_theater.css' %}" />
+<link rel="stylesheet" href="{% static 'accounts/css/select_theater.css' %}?v=3.2" />
 {% endblock %}
 
 {% block content %}
@@ -12,22 +12,16 @@
 <main class="cinema-page">
 
     <!-- =====================================================
-         MOVIE HEADER
+         MOVIE HEADER CARD
     ====================================================== -->
-
     <section class="movie-hero">
-
         {% if movie.poster_url %}
-            <img
-                src="{{ movie.poster_url }}"
-                alt="{{ movie.title }}"
-                class="movie-poster"
-            >
+            <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" class="movie-poster">
         {% endif %}
 
         <div class="movie-info">
-
-            <div class="step-label">
+            <div class="step-badge">
+                <i class="fa-solid fa-circle-check" style="font-size: 11px;"></i>
                 Step 1: Select Cinema & Showtime
             </div>
 
@@ -35,205 +29,136 @@
                 {{ movie.title }}
             </h1>
 
-            <p class="movie-description">
-                {{ movie.plot|default:"Experience this cinematic masterpiece in top 4K Dolby Atmos screens." }}
-            </p>
+            <div class="movie-description-wrap">
+                <p id="moviePlotText" class="movie-description clamped">
+                    {{ movie.plot|default:"Experience this cinematic masterpiece in top 4K Dolby Atmos screens across Ahmedabad." }}
+                </p>
+                {% if movie.plot and movie.plot|length > 130 %}
+                    <button type="button" id="plotToggleBtn" class="plot-toggle-btn" onclick="togglePlotExpand()" aria-expanded="false">
+                        <span id="plotToggleText">Read synopsis</span>
+                        <i id="plotToggleIcon" class="fa-solid fa-chevron-down"></i>
+                    </button>
+                {% endif %}
+            </div>
 
             <div class="movie-meta">
-
                 <span class="meta-pill rating-pill">
-                    <span class="rating-star">★</span>
-                    {{ movie.rating }}
+                    <i class="fa-solid fa-star" style="font-size: 11px;"></i> {{ movie.rating }}
                 </span>
-
                 <span class="meta-pill">
                     {{ movie.genre }}
                 </span>
-
                 <span class="meta-pill">
                     {{ movie.duration_formatted }}
                 </span>
-
             </div>
-
         </div>
-
     </section>
 
-
     <!-- =====================================================
-         DATE SELECTOR (Shows 7 days then scroll)
+         DATE SELECTOR
     ====================================================== -->
-
     <section class="date-section">
-
         <p class="section-label">
-            Select Movie Date
+            <i class="fa-regular fa-calendar" style="margin-right: 4px;"></i>
+            Select Screening Date
         </p>
 
         <div class="date-wrapper">
-
-            <button
-                type="button"
-                class="date-arrow"
-                onclick="scrollDates(-280)"
-                aria-label="Previous dates"
-            >
-                ‹
+            <button type="button" class="date-arrow" onclick="scrollDates(-280)" aria-label="Previous dates">
+                <i class="fa-solid fa-chevron-left"></i>
             </button>
 
-            <div
-                id="dateScrollTrack"
-                class="date-scroll"
-            >
-
+            <div id="dateScrollTrack" class="date-scroll">
                 {% for d in available_dates %}
-
-                    <a
-                        href="?date={{ d|date:'Y-m-d' }}"
-                        class="date-card {% if selected_date_str == d|date:'Y-m-d' %}active{% endif %}"
-                    >
-
-                        <span class="date-day">
-                            {{ d|date:"D" }}
-                        </span>
-
-                        <span class="date-number">
-                            {{ d|date:"d M" }}
-                        </span>
-
+                    <a href="?date={{ d|date:'Y-m-d' }}" class="date-card {% if selected_date_str == d|date:'Y-m-d' %}active{% endif %}">
+                        <span class="date-day">{{ d|date:"D" }}</span>
+                        <span class="date-number">{{ d|date:"d" }}</span>
+                        <span class="date-month">{{ d|date:"M" }}</span>
                     </a>
-
                 {% empty %}
-
-                    <div style="color:#858193; font-size:13px; padding:15px;">
-                        No upcoming show dates currently scheduled.
+                    <div style="color: var(--text-muted); font-size: 13.5px; padding: 14px;">
+                        No upcoming screening dates scheduled.
                     </div>
-
                 {% endfor %}
-
             </div>
 
-            <button
-                type="button"
-                class="date-arrow"
-                onclick="scrollDates(280)"
-                aria-label="Next dates"
-            >
-                ›
+            <button type="button" class="date-arrow" onclick="scrollDates(280)" aria-label="Next dates">
+                <i class="fa-solid fa-chevron-right"></i>
             </button>
-
         </div>
-
     </section>
 
-
     <!-- =====================================================
-         THEATERS & SHOWTIMES DIRECTLY UNDERNEATH
+         THEATERS & SHOWTIMES LIST
     ====================================================== -->
-
     <section class="theater-section">
-
-        <div class="section-heading">
-
-            <h2 class="section-title">
-                Available Cinema Halls & Showtimes
-            </h2>
-
-        </div>
-
+        <p class="section-label">
+            <i class="fa-solid fa-building" style="margin-right: 4px;"></i>
+            Available Cinema Halls in Ahmedabad
+        </p>
 
         {% if cinemas %}
-
-            <div class="theater-list">
-
-                {% for cinema in cinemas %}
-
-                    <article class="theater-card">
-
-                        <div class="theater-header-info">
-
-                            <div class="theater-left">
-
-                                <div class="theater-icon">
-                                    🎬
-                                </div>
-
-                                <div class="theater-details">
-
-                                    <h3 class="theater-name">
-                                        {{ cinema.name }}
-                                    </h3>
-
-                                    <p class="theater-address">
-                                        {{ cinema.address }}
-                                        {% if cinema.facilities %}
-                                            · {{ cinema.facilities }}
-                                        {% endif %}
-                                    </p>
-
-                                </div>
-
+            {% for cinema in cinemas %}
+                <article class="theater-card">
+                    <div class="theater-header-info">
+                        <div class="theater-left">
+                            <div class="theater-icon">
+                                <i class="fa-solid fa-film"></i>
                             </div>
 
+                            <div class="theater-details">
+                                <h3 class="theater-name">{{ cinema.name }}</h3>
+                                <p class="theater-address">
+                                    {{ cinema.address }}
+                                    {% if cinema.facilities %}
+                                        · <span style="color: var(--brand-emerald); font-weight: 600;">{{ cinema.facilities }}</span>
+                                    {% endif %}
+                                </p>
+                            </div>
                         </div>
+                    </div>
 
-                        <!-- Showtimes directly under each theater -->
-                        <div class="theater-showtimes">
-
-                            <div class="showtimes-header-label">
-                                Available Showtimes:
-                            </div>
-
-                            <div class="showtimes-grid">
-                                {% for st in cinema.showtime_list %}
-                                    <a href="{% url 'select_seats' st.id %}" class="showtime-pill">
-                                        <span class="pill-time">{{ st.start_time|time:"h:i A" }}</span>
-                                        <span class="pill-price">₹{{ st.silver_price }}</span>
-                                    </a>
-                                {% empty %}
-                                    <span style="color:#858193; font-size:12.5px;">No showtimes available for this date.</span>
-                                {% endfor %}
-                            </div>
-
+                    <!-- Showtimes Under Each Theater -->
+                    <div class="theater-showtimes">
+                        <div class="showtimes-header-label">Available Showtimes:</div>
+                        <div class="showtimes-grid">
+                            {% for st in cinema.showtime_list %}
+                                <a href="{% url 'select_seats' st.id %}" class="showtime-pill">
+                                    <span class="pill-time">{{ st.start_time|time:"h:i A" }}</span>
+                                    <span class="pill-price">from ₹{{ st.silver_price }}</span>
+                                </a>
+                            {% empty %}
+                                <span style="color: var(--text-muted); font-size: 13px;">No showtimes available for this date.</span>
+                            {% endfor %}
                         </div>
-
-                    </article>
-
-                {% endfor %}
-
-            </div>
-
+                    </div>
+                </article>
+            {% endfor %}
         {% else %}
-
             <div class="empty-state">
-
-                <div class="empty-icon">
-                    🎬
-                </div>
-
-                <p>
-                    No cinemas available for the selected date.
-                </p>
-
+                <i class="fa-solid fa-clock-rotate-left empty-icon" style="color: #059669;"></i>
+                {% if has_ended_today %}
+                    <h3 style="font-size: 17px; font-weight: 700; color: #0f172a; margin-bottom: 6px;">All Shows For Today Have Concluded</h3>
+                    <p style="color: #64748b; font-size: 13.5px; max-width: 460px; margin: 0 auto 16px;">
+                        Screenings for today have ended. Please pick an upcoming date to reserve your tickets.
+                    </p>
+                    {% if available_dates %}
+                        <a href="?date={{ available_dates.0|date:'Y-m-d' }}" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 10px; font-size: 13.5px; font-weight: 700; text-decoration: none; color: #ffffff; background: #059669;">
+                            View Shows for {{ available_dates.0|date:'D, d M' }} <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    {% endif %}
+                {% else %}
+                    <h3 style="font-size: 17px; font-weight: 700; color: #0f172a; margin-bottom: 6px;">No Shows Available</h3>
+                    <p style="color: #64748b; font-size: 13.5px;">No cinema halls have scheduled shows for the selected date.</p>
+                {% endif %}
             </div>
-
         {% endif %}
-
     </section>
 
 </main>
+{% endblock %}
 
-
-<script>
-    function scrollDates(offset) {
-        const track = document.getElementById("dateScrollTrack");
-        if (!track) return;
-        track.scrollBy({
-            left: offset,
-            behavior: "smooth"
-        });
-    }
-</script>
-
+{% block extra_js %}
+<script src="{% static 'accounts/js/select_theater.js' %}?v=3.2"></script>
 {% endblock %}
