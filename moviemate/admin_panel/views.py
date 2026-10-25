@@ -177,7 +177,7 @@ def add_movie(request):
             action=f"Manually added Movie '{title}' ({genre})",
             performed_by="System Admin"
         )
-        messages.success(request, f"Movie '{title}' added to catalog successfully!")
+        messages.success(request, f"Movie '{title}' added to catalog successfully!", extra_tags='admin')
     return redirect('admin_panel:movies')
 
 
@@ -205,7 +205,7 @@ def edit_movie(request, movie_id):
             action=f"Updated details for Movie '{movie.title}'",
             performed_by="System Admin"
         )
-        messages.success(request, f"Movie '{movie.title}' updated successfully.")
+        messages.success(request, f"Movie '{movie.title}' updated successfully.", extra_tags='admin')
     return redirect('admin_panel:movies')
 
 
@@ -221,7 +221,16 @@ def toggle_hero_movie(request, movie_id):
         action=f"Movie '{movie.title}' {status_str}",
         performed_by="System Admin"
     )
-    messages.success(request, f"Movie '{movie.title}' is now {status_str}.")
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.GET.get('format') == 'json':
+        return JsonResponse({
+            'success': True,
+            'movie_id': movie.id,
+            'is_hero': movie.is_hero,
+            'title': movie.title,
+            'message': f"Movie '{movie.title}' is now {status_str}."
+        })
+
+    messages.success(request, f"Movie '{movie.title}' is now {status_str}.", extra_tags='admin')
     return redirect('admin_panel:movies')
 
 
@@ -237,6 +246,7 @@ def import_omdb_movie(request):
     if request.method == 'POST':
         imdb_id = request.POST.get('imdb_id')
         display_tag = request.POST.get('display_tag', 'trending')
+        is_hero = request.POST.get('is_hero') in ['on', 'true', '1']
         
         details = get_movie_details_omdb(imdb_id)
         if details:
@@ -255,28 +265,33 @@ def import_omdb_movie(request):
             except ValueError:
                 rating = 8.5
 
+            defaults_data = {
+                'title': title,
+                'genre': genre,
+                'duration_minutes': duration,
+                'rating': rating,
+                'poster_url': poster,
+                'plot': plot,
+                'display_tag': display_tag,
+                'status': 'active'
+            }
+            if request.POST.get('is_hero'):
+                defaults_data['is_hero'] = is_hero
+
             movie, created = Movie.objects.update_or_create(
                 imdb_id=imdb_id,
-                defaults={
-                    'title': title,
-                    'genre': genre,
-                    'duration_minutes': duration,
-                    'rating': rating,
-                    'poster_url': poster,
-                    'plot': plot,
-                    'display_tag': display_tag,
-                    'status': 'active'
-                }
+                defaults=defaults_data
             )
 
+            hero_log_tag = " [HERO BANNER]" if getattr(movie, 'is_hero', False) else ""
             AdminActivityLog.objects.create(
-                action=f"Imported Movie '{title}' via OMDb API ({display_tag.upper()})",
+                action=f"Imported Movie '{title}' via OMDb API ({display_tag.upper()}){hero_log_tag}",
                 performed_by="System Admin"
             )
 
-            messages.success(request, f"Movie '{title}' imported successfully!")
+            messages.success(request, f"Movie '{title}' imported successfully!", extra_tags='admin')
         else:
-            messages.error(request, "Failed to fetch movie from OMDb API.")
+            messages.error(request, "Failed to fetch movie from OMDb API.", extra_tags='admin')
 
     return redirect('admin_panel:movies')
 
@@ -292,7 +307,7 @@ def delete_movie(request, movie_id):
         performed_by="System Admin"
     )
 
-    messages.success(request, f"Movie '{title}' removed.")
+    messages.success(request, f"Movie '{title}' removed.", extra_tags='admin')
     return redirect('admin_panel:movies')
 
 
@@ -341,7 +356,7 @@ def add_cinema(request):
             performed_by="System Admin"
         )
 
-        messages.success(request, f"Cinema '{name}' added successfully.")
+        messages.success(request, f"Cinema '{name}' added successfully.", extra_tags='admin')
     return redirect('admin_panel:cinemas')
 
 
@@ -360,7 +375,7 @@ def edit_cinema(request, cinema_id):
             performed_by="System Admin"
         )
 
-        messages.success(request, f"Cinema '{cinema.name}' updated successfully.")
+        messages.success(request, f"Cinema '{cinema.name}' updated successfully.", extra_tags='admin')
     return redirect('admin_panel:cinemas')
 
 
@@ -375,12 +390,15 @@ def delete_cinema(request, cinema_id):
         performed_by="System Admin"
     )
 
-    messages.success(request, f"Cinema '{name}' deleted.")
+    messages.success(request, f"Cinema '{name}' deleted.", extra_tags='admin')
     return redirect('admin_panel:cinemas')
 
 
 @admin_required
 def allocations_list(request):
+    if request.method == 'POST':
+        return add_allocation(request)
+
     raw_showtimes = Showtime.objects.select_related('movie', 'cinema').prefetch_related('bookings').order_by('movie__title', 'cinema__name', 'show_date', 'start_time')
     
     # Group showtimes by (movie, cinema)
@@ -441,7 +459,13 @@ def allocations_list(request):
             'platinum_price': g['platinum_price'],
             'gold_price': g['gold_price'],
             'silver_price': g['silver_price'],
+            'sample_show': {
+                'platinum_price': g['platinum_price'],
+                'gold_price': g['gold_price'],
+                'silver_price': g['silver_price'],
+            },
             'total_bookings': g['total_bookings'],
+            'total_tickets_sold': g['total_bookings'],
             'total_revenue': g['total_revenue'],
         })
 
@@ -466,24 +490,57 @@ def add_allocation(request):
         cinema_id = request.POST.get('cinema_id')
         start_date_str = request.POST.get('start_date')
         end_date_str = request.POST.get('end_date')
-        times_list = request.POST.getlist('show_times')
-        plat_price = request.POST.get('platinum_price', 350)
-        gold_price = request.POST.get('gold_price', 250)
-        silv_price = request.POST.get('silver_price', 180)
+
+        # Accept both 'times' (used in modal) and 'show_times'
+        raw_times = request.POST.getlist('times') or request.POST.getlist('show_times')
+        times_list = []
+        for t in raw_times:
+            if t and t.strip():
+                for part in t.split(','):
+                    clean_t = part.strip()
+                    if clean_t and clean_t not in times_list:
+                        times_list.append(clean_t)
+
+        if not times_list:
+            times_list = ['10:00', '14:30', '18:00', '21:30']
+
+        plat_price = request.POST.get('platinum_price') or 350
+        gold_price = request.POST.get('gold_price') or 250
+        silv_price = request.POST.get('silver_price') or 180
+
+        if not movie_id or not cinema_id:
+            messages.error(request, "Please select both a movie and a cinema venue.", extra_tags='admin')
+            return redirect('admin_panel:allocations')
 
         movie = get_object_or_404(Movie, id=movie_id)
         cinema = get_object_or_404(Cinema, id=cinema_id)
 
         from datetime import datetime, timedelta
-        start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
-        end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date() if end_date_str else start_date
+        if not start_date_str:
+            start_date = timezone.localdate()
+        else:
+            try:
+                start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+            except ValueError:
+                start_date = timezone.localdate()
+
+        if not end_date_str:
+            end_date = start_date
+        else:
+            try:
+                end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
+            except ValueError:
+                end_date = start_date
+
+        if end_date < start_date:
+            end_date = start_date
 
         total_created = 0
         curr_date = start_date
         while curr_date <= end_date:
             for time_str in times_list:
                 if time_str.strip():
-                    Showtime.objects.get_or_create(
+                    st_obj, created = Showtime.objects.get_or_create(
                         movie=movie,
                         cinema=cinema,
                         show_date=curr_date,
@@ -494,15 +551,20 @@ def add_allocation(request):
                             'silver_price': silv_price
                         }
                     )
+                    if not created:
+                        st_obj.platinum_price = plat_price
+                        st_obj.gold_price = gold_price
+                        st_obj.silver_price = silv_price
+                        st_obj.save()
                     total_created += 1
             curr_date += timedelta(days=1)
 
         AdminActivityLog.objects.create(
-            action=f"Allocated '{movie.title}' to '{cinema.name}' ({start_date_str} to {end_date_str}, {len(times_list)} shows/day)",
+            action=f"Allocated '{movie.title}' to '{cinema.name}' ({start_date} to {end_date}, {len(times_list)} shows/day)",
             performed_by="System Admin"
         )
 
-        messages.success(request, f"Successfully created {total_created} showtime slot(s) for '{movie.title}'.")
+        messages.success(request, f"Successfully created {total_created} showtime slot(s) for '{movie.title}' at '{cinema.name}'.", extra_tags='admin')
     return redirect('admin_panel:allocations')
 
 
@@ -514,24 +576,52 @@ def edit_allocation_group(request, movie_id, cinema_id):
     if request.method == 'POST':
         start_date_str = request.POST.get('start_date')
         end_date_str = request.POST.get('end_date')
-        times_list = request.POST.getlist('show_times')
-        plat_price = request.POST.get('platinum_price', 350)
-        gold_price = request.POST.get('gold_price', 250)
-        silv_price = request.POST.get('silver_price', 180)
+
+        raw_times = request.POST.getlist('times') or request.POST.getlist('show_times')
+        times_list = []
+        for t in raw_times:
+            if t and t.strip():
+                for part in t.split(','):
+                    clean_t = part.strip()
+                    if clean_t and clean_t not in times_list:
+                        times_list.append(clean_t)
+
+        if not times_list:
+            times_list = ['10:00', '14:30', '18:00', '21:30']
+
+        plat_price = request.POST.get('platinum_price') or 350
+        gold_price = request.POST.get('gold_price') or 250
+        silv_price = request.POST.get('silver_price') or 180
 
         # Delete old showtimes without active bookings
         Showtime.objects.filter(movie=movie, cinema=cinema, bookings__isnull=True).delete()
 
         from datetime import datetime, timedelta
-        start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
-        end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date() if end_date_str else start_date
+        if not start_date_str:
+            start_date = timezone.localdate()
+        else:
+            try:
+                start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+            except ValueError:
+                start_date = timezone.localdate()
+
+        if not end_date_str:
+            end_date = start_date
+        else:
+            try:
+                end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
+            except ValueError:
+                end_date = start_date
+
+        if end_date < start_date:
+            end_date = start_date
 
         total_created = 0
         curr_date = start_date
         while curr_date <= end_date:
             for time_str in times_list:
                 if time_str.strip():
-                    Showtime.objects.get_or_create(
+                    st_obj, created = Showtime.objects.get_or_create(
                         movie=movie,
                         cinema=cinema,
                         show_date=curr_date,
@@ -542,6 +632,11 @@ def edit_allocation_group(request, movie_id, cinema_id):
                             'silver_price': silv_price
                         }
                     )
+                    if not created:
+                        st_obj.platinum_price = plat_price
+                        st_obj.gold_price = gold_price
+                        st_obj.silver_price = silv_price
+                        st_obj.save()
                     total_created += 1
             curr_date += timedelta(days=1)
 
@@ -550,7 +645,7 @@ def edit_allocation_group(request, movie_id, cinema_id):
             performed_by="System Admin"
         )
 
-        messages.success(request, f"Updated allocation for '{movie.title}' at {cinema.name} successfully.")
+        messages.success(request, f"Updated allocation for '{movie.title}' at {cinema.name} successfully. {total_created} shows active.", extra_tags='admin')
     return redirect('admin_panel:allocations')
 
 
@@ -565,7 +660,7 @@ def delete_allocation(request, showtime_id):
         performed_by="System Admin"
     )
 
-    messages.success(request, f"Showtime allocation deleted.")
+    messages.success(request, f"Showtime allocation deleted.", extra_tags='admin')
     return redirect('admin_panel:allocations')
 
 
@@ -581,7 +676,7 @@ def delete_allocation_group(request, movie_id, cinema_id):
         performed_by="System Admin"
     )
 
-    messages.success(request, f"Successfully deleted all {deleted_count} showtime allocations for '{movie.title}' at {cinema.name}.")
+    messages.success(request, f"Successfully deleted all {deleted_count} showtime allocations for '{movie.title}' at {cinema.name}.", extra_tags='admin')
     return redirect('admin_panel:allocations')
 
 
@@ -632,7 +727,7 @@ def delete_user(request, user_id):
         performed_by="System Admin"
     )
 
-    messages.success(request, f"User '{name}' removed successfully.")
+    messages.success(request, f"User '{name}' removed successfully.", extra_tags='admin')
     return redirect('admin_panel:users')
 
 
@@ -766,5 +861,5 @@ def clear_activity_logs(request):
             action=f"Cleared {count} activity audit logs ({duration_label})",
             performed_by="System Admin"
         )
-        messages.success(request, f"Successfully cleared {count} activity log entries ({duration_label}).")
+        messages.success(request, f"Successfully cleared {count} activity log entries ({duration_label}).", extra_tags='admin')
     return redirect('admin_panel:activity_logs')

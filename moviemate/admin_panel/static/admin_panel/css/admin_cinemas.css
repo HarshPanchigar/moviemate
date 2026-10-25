@@ -1,6 +1,6 @@
 /* =========================================================
    MOVIEMATE ADMIN CINEMAS STYLESHEET
-   Conversion-Optimized Royal Blue Theme
+   Dual-Theme (Light: Slate/Emerald, Dark: Apple True-Black/Soft Purple)
    ========================================================= */
 
 .cinema-page-header {
@@ -26,34 +26,6 @@
     font-size: 13.5px;
 }
 
-/* Filter Card */
-.cinema-filter-card {
-    background: #ffffff;
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-lg);
-    padding: 14px 18px;
-    margin-bottom: 20px;
-    box-shadow: var(--shadow-card);
-}
-
-.cinema-search-wrap {
-    position: relative;
-    width: 100%;
-}
-
-.cinema-search-wrap i {
-    position: absolute;
-    top: 50%;
-    left: 12px;
-    transform: translateY(-50%);
-    color: #94a3b8;
-    font-size: 13px;
-}
-
-.cinema-search-wrap input {
-    padding-left: 36px;
-}
-
 /* Table items */
 .cinema-name-text {
     font-weight: 700;
@@ -73,11 +45,22 @@
 .cinema-movie-chip {
     display: inline-flex;
     align-items: center;
-    padding: 3px 8px;
-    border-radius: 4px;
-    background: #eff6ff;
-    border: 1px solid #bfdbfe;
-    color: #1d4ed8;
+    padding: 3px 9px;
+    border-radius: 6px;
     font-size: 11.5px;
     font-weight: 600;
+    line-height: 1.4;
+    transition: all 0.15s ease;
+}
+
+[data-theme="dark"] .cinema-movie-chip {
+    background: rgba(124, 92, 219, 0.15) !important;
+    border: 1px solid rgba(124, 92, 219, 0.35) !important;
+    color: #c4b5fd !important;
+}
+
+[data-theme="light"] .cinema-movie-chip {
+    background: #ecfdf5 !important;
+    border: 1px solid #a7f3d0 !important;
+    color: #047857 !important;
 }

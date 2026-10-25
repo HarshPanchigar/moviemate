@@ -55,17 +55,6 @@
     <!-- RIGHT SIDE: ACCOUNT DETAILS -->
     <section class="profile-form-wrap">
       <div class="profile-form">
-        
-        <!-- MESSAGES -->
-        {% if messages %} 
-        {% for message in messages %}
-        <div class="profile-message {% if message.tags == 'success' %}profile-message-success{% else %}profile-message-error{% endif %}">
-          <span>{% if message.tags == 'success' %}✓{% else %}!{% endif %}</span>
-          <span>{{ message }}</span>
-        </div>
-        {% endfor %} 
-        {% endif %}
-
         <!-- HEADER -->
         <div class="profile-heading">
           <h1>Account Settings</h1>

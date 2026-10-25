@@ -1,1 +1,19 @@
-venv
+# Virtual Environment
+venv/
+.env/
+
+# Environment and Secrets (NEVER COMMIT SENSITIVE KEYS)
+.env
+*.env
+.env.*
+!.env.example
+moviemate/.env
+
+# Python Cache & Database
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+db.sqlite3
+.DS_Store
+Thumbs.db

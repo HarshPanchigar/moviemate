@@ -40,15 +40,6 @@
             <form method="POST" class="edit-form">
                 {% csrf_token %}
 
-                <!-- MESSAGES -->
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="edit-message {% if message.tags == 'success' %}edit-success{% else %}edit-error{% endif %}">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
-                {% endif %}
-
                 <!-- FULL NAME -->
                 <div class="edit-field">
                     <label for="full_name">FULL NAME</label>

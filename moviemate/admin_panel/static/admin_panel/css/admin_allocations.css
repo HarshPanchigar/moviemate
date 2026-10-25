@@ -1,6 +1,6 @@
 /* =========================================================
    MOVIEMATE ADMIN ALLOCATIONS STYLESHEET
-   Conversion-Optimized Royal Blue Theme
+   Dual-Theme (Light: Slate/Emerald, Dark: Apple True-Black/Soft Purple)
    ========================================================= */
 
 .alloc-page-header {
@@ -26,39 +26,6 @@
     font-size: 13.5px;
 }
 
-/* Toolbar */
-.alloc-toolbar-card {
-    background: #ffffff;
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-lg);
-    padding: 14px 18px;
-    margin-bottom: 20px;
-    box-shadow: var(--shadow-card);
-    display: flex;
-    gap: 14px;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.alloc-search-wrap {
-    flex: 1;
-    min-width: 260px;
-    position: relative;
-}
-
-.alloc-search-wrap i {
-    position: absolute;
-    top: 50%;
-    left: 12px;
-    transform: translateY(-50%);
-    color: #94a3b8;
-    font-size: 13px;
-}
-
-.alloc-search-wrap input {
-    padding-left: 36px;
-}
-
 /* Allocations List & Cards */
 .alloc-card-list {
     display: flex;
@@ -68,21 +35,42 @@
 
 .allocation-card, .alloc-item-card {
     display: grid;
-    grid-template-columns: minmax(220px, 1.2fr) minmax(280px, 1.8fr) minmax(180px, 0.9fr) 140px;
+    grid-template-columns: minmax(220px, 1.2fr) minmax(280px, 1.8fr) minmax(180px, 0.9fr) 130px;
     gap: 20px;
     align-items: center;
-    padding: 18px 20px;
-    background: #ffffff;
-    border: 1px solid var(--border-color);
+    padding: 16px 20px;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-card);
-    transition: all 0.15s ease;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="dark"] .allocation-card,
+[data-theme="dark"] .alloc-item-card {
+    background: #121214 !important;
+    border: 1px solid #27272a !important;
+    color: #ffffff !important;
+}
+
+[data-theme="light"] .allocation-card,
+[data-theme="light"] .alloc-item-card {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    color: #0f172a !important;
 }
 
 .allocation-card:hover, .alloc-item-card:hover {
-    background: #eff6ff !important;
-    border-color: #bfdbfe !important;
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+}
+
+[data-theme="dark"] .allocation-card:hover,
+[data-theme="dark"] .alloc-item-card:hover {
+    border-color: #7c5cdb !important;
+}
+
+[data-theme="light"] .allocation-card:hover,
+[data-theme="light"] .alloc-item-card:hover {
+    border-color: #059669 !important;
 }
 
 .alloc-movie-flex {
@@ -101,6 +89,27 @@
     flex-shrink: 0;
 }
 
+.alloc-movie-thumb-placeholder {
+    width: 48px;
+    height: 68px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+
+[data-theme="dark"] .alloc-movie-thumb-placeholder {
+    background: #18181b;
+    color: #71717a;
+}
+
+[data-theme="light"] .alloc-movie-thumb-placeholder {
+    background: #f1f5f9;
+    color: #94a3b8;
+}
+
 .alloc-showtimes-wrap {
     display: flex;
     flex-wrap: wrap;
@@ -109,13 +118,25 @@
 }
 
 .alloc-time-pill {
+    display: inline-flex;
+    align-items: center;
     padding: 3px 8px;
-    background: #f8fafc;
-    border: 1px solid #cbd5e1;
     border-radius: 6px;
     font-size: 11.5px;
     font-weight: 700;
-    color: var(--text-primary);
+    transition: all 0.15s ease;
+}
+
+[data-theme="dark"] .alloc-time-pill {
+    background: #1c1c20 !important;
+    border: 1px solid #2e2e34 !important;
+    color: #e4e4e7 !important;
+}
+
+[data-theme="light"] .alloc-time-pill {
+    background: #f1f5f9 !important;
+    border: 1px solid #e2e8f0 !important;
+    color: #334155 !important;
 }
 
 .alloc-price-box {

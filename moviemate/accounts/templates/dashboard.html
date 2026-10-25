@@ -46,6 +46,9 @@
           </div>
 
           <div class="hero-poster" style="{% if movie.poster_url %}background-image: url('{{ movie.poster_url }}'); background-size: cover; background-position: center;{% else %}background: #f3f4f6;{% endif %}">
+            {% if movie.poster_url %}
+              <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" class="hero-poster-img" />
+            {% endif %}
             <span class="hero-badge">
               {% if movie.display_tag == 'hot' %}<i class="fa-solid fa-fire"></i> HOT
               {% elif movie.display_tag == 'trending' %}<i class="fa-solid fa-arrow-trend-up"></i> TRENDING
@@ -102,11 +105,11 @@
               <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--text-muted);">No Poster</div>
             {% endif %}
             <span class="stub-rating-badge"><i class="fa-solid fa-star" style="font-size: 11px;"></i> {{ movie.rating }}</span>
-            <span class="stub-new-tag">NEW</span>
+            {% comment %} <span class="stub-new-tag">NEW</span> {% endcomment %}
           </div>
           <div class="stub-info">
             <div class="stub-title" title="{{ movie.title }}">{{ movie.title }}</div>
-            <div class="stub-genre">{{ movie.genre }} • {{ movie.duration_formatted }}</div>
+            <div class="stub-genre">{{ movie.genre }}</div>
             <a href="{% url 'select_theater' movie.id %}" class="btn btn-emerald btn-block" style="font-size: 13px; padding: 9px; margin-top: auto;">
               Book Tickets
             </a>

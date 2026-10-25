@@ -22,6 +22,34 @@
   <!-- Additional Page Head / CSS -->
   {% block extra_head %}{% endblock %}
   {% block extra_style %}{% endblock %}
+
+  <!-- Apple Dark Theme Stylesheet (Client Only) -->
+  <link rel="stylesheet" href="{% static 'accounts/css/dark_theme.css' %}?v=1.0" />
+
+  <!-- Immediate Theme Initializer (Prevents FOUC / Flashing & Syncs on Back/Forward Navigation) -->
+  <script>
+    (function () {
+      function syncTheme() {
+        try {
+          var t = localStorage.getItem('moviemate-theme');
+          if (t === 'dark' || (!t && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+          } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+          }
+        } catch (e) {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      }
+      syncTheme();
+      window.addEventListener('pageshow', syncTheme);
+      window.addEventListener('storage', function (e) {
+        if (e.key === 'moviemate-theme') {
+          syncTheme();
+        }
+      });
+    })();
+  </script>
 </head>
 
 <body>
@@ -45,7 +73,7 @@
 
         <div class="search-wrap" onclick="openSearchModalPopup()">
           <i class="fa-solid fa-magnifying-glass search-icon"></i>
-          <input type="text" id="headerSearchInput" placeholder="Search movies, genres..." readonly />
+          <input type="text" id="headerSearchInput" placeholder="Search movies" readonly />
         </div>
       </div>
 
@@ -62,6 +90,16 @@
         </nav>
 
         <div class="nav-auth">
+          <!-- Theme Switcher (Apple Black / Light) -->
+          <button type="button" id="themeToggleBtn" class="theme-toggle-btn" aria-label="Toggle Theme" title="Switch Theme">
+            <span class="theme-toggle-track">
+              <span class="theme-toggle-thumb">
+                <i class="fa-solid fa-sun sun-icon"></i>
+                <i class="fa-solid fa-moon moon-icon"></i>
+              </span>
+            </span>
+          </button>
+
           {% if request.session.customer_id %}
           <a href="{% url 'profile' %}" class="profile-icon {% block nav_profile_active %}{% endblock %}" title="Account Profile">
             <i class="fa-solid fa-user"></i>
@@ -75,6 +113,160 @@
       </div>
     </div>
   </header>
+
+  <!-- Floating Toast Notifications (Client Flash Messages) -->
+  {% if messages %}
+  <div class="client-toast-stack" id="clientFlashToasts">
+    {% for message in messages %}
+      {% if 'admin' not in message.tags and 'Hero Banner' not in message.message and 'catalog' not in message.message and 'showtime slot' not in message.message and 'allocation' not in message.message and 'OMDb' not in message.message %}
+      <div class="client-toast-item toast-{{ message.tags|default:'info' }}" role="alert">
+        <div class="toast-left">
+          {% if 'error' in message.tags %}
+          <i class="fa-solid fa-triangle-exclamation toast-icon"></i>
+          {% elif 'success' in message.tags %}
+          <i class="fa-solid fa-circle-check toast-icon"></i>
+          {% else %}
+          <i class="fa-solid fa-circle-info toast-icon"></i>
+          {% endif %}
+          <span class="toast-text">{{ message }}</span>
+        </div>
+        <button type="button" class="toast-dismiss-btn" onclick="dismissClientToast(this.closest('.client-toast-item'))" aria-label="Close notification">&times;</button>
+      </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+  <style>
+    .client-toast-stack {
+      position: fixed;
+      top: 86px;
+      right: 24px;
+      z-index: 999999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 440px;
+      width: calc(100% - 48px);
+      pointer-events: none;
+    }
+    .client-toast-item {
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 13px 18px;
+      border-radius: 12px;
+      font-size: 13.5px;
+      font-weight: 600;
+      line-height: 1.45;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.16), 0 3px 8px rgba(0, 0, 0, 0.08);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      animation: clientToastSlide 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+    @keyframes clientToastSlide {
+      from {
+        opacity: 0;
+        transform: translateY(-12px) scale(0.96);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    .toast-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+    }
+    .toast-icon {
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .toast-dismiss-btn {
+      background: none;
+      border: none;
+      color: inherit;
+      cursor: pointer;
+      font-size: 20px;
+      line-height: 1;
+      opacity: 0.65;
+      padding: 2px 6px;
+      border-radius: 6px;
+      transition: opacity 0.15s ease;
+    }
+    .toast-dismiss-btn:hover {
+      opacity: 1;
+    }
+    /* Light Theme */
+    .client-toast-item.toast-success {
+      background: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+    .client-toast-item.toast-success .toast-icon {
+      color: #059669;
+    }
+    .client-toast-item.toast-error {
+      background: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+    .client-toast-item.toast-error .toast-icon {
+      color: #dc2626;
+    }
+    .client-toast-item.toast-info {
+      background: #eff6ff;
+      color: #1e40af;
+      border: 1px solid #bfdbfe;
+    }
+    .client-toast-item.toast-info .toast-icon {
+      color: #2563eb;
+    }
+    /* Dark Theme */
+    [data-theme="dark"] .client-toast-item.toast-success {
+      background: rgba(16, 185, 129, 0.16) !important;
+      color: #34d399 !important;
+      border: 1px solid rgba(16, 185, 129, 0.4) !important;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.7) !important;
+    }
+    [data-theme="dark"] .client-toast-item.toast-error {
+      background: rgba(239, 68, 68, 0.16) !important;
+      color: #f87171 !important;
+      border: 1px solid rgba(239, 68, 68, 0.4) !important;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.7) !important;
+    }
+    [data-theme="dark"] .client-toast-item.toast-info {
+      background: rgba(124, 92, 219, 0.16) !important;
+      color: #c4b5fd !important;
+      border: 1px solid rgba(124, 92, 219, 0.4) !important;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.7) !important;
+    }
+  </style>
+  <script>
+    function dismissClientToast(el) {
+      if (!el) return;
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(-10px) scale(0.95)';
+      setTimeout(function() {
+        el.remove();
+        var stack = document.getElementById('clientFlashToasts');
+        if (stack && stack.children.length === 0) {
+          stack.remove();
+        }
+      }, 250);
+    }
+    // Auto-dismiss after 4.5 seconds
+    setTimeout(function() {
+      var toasts = document.querySelectorAll('.client-toast-item');
+      toasts.forEach(function(toast) {
+        dismissClientToast(toast);
+      });
+    }, 4500);
+  </script>
+  {% endif %}
 
   {% block content %}{% endblock %}
 
@@ -158,7 +350,7 @@
   </div>
 
   <!-- Base Scripts -->
-  <script src="{% static 'accounts/js/base.js' %}"></script>
+  <script src="{% static 'accounts/js/base.js' %}?v=1.1"></script>
   {% block extra_js %}{% endblock %}
 </body>
 

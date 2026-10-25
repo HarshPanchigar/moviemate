@@ -18,10 +18,35 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- Admin Base Stylesheet (Royal Blue Theme) -->
-    <link rel="stylesheet" href="{% static 'admin_panel/css/admin_base.css' %}">
+    <!-- Admin Base Stylesheet (Dual Light & Dark Theme) -->
+    <link rel="stylesheet" href="{% static 'admin_panel/css/admin_base.css' %}?v=25.0">
 
     {% block extra_css %}{% endblock %}
+
+    <!-- Immediate Theme Initializer (Prevents FOUC & Syncs with Client Side) -->
+    <script>
+      (function () {
+        function syncTheme() {
+          try {
+            var t = localStorage.getItem('moviemate-theme');
+            if (t === 'dark' || (!t && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+              document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+              document.documentElement.setAttribute('data-theme', 'light');
+            }
+          } catch (e) {
+            document.documentElement.setAttribute('data-theme', 'light');
+          }
+        }
+        syncTheme();
+        window.addEventListener('pageshow', syncTheme);
+        window.addEventListener('storage', function (e) {
+          if (e.key === 'moviemate-theme') {
+            syncTheme();
+          }
+        });
+      })();
+    </script>
 </head>
 
 <body>
@@ -29,7 +54,7 @@
 <div class="admin-wrapper">
 
     <!-- =====================================================
-         SIDEBAR (Royal Blue Control Suite)
+         SIDEBAR (Dual-Theme Control Suite)
          ===================================================== -->
     <aside class="admin-sidebar">
 
@@ -116,6 +141,16 @@
             </div>
 
             <div class="topbar-actions">
+                <!-- Theme Switcher (Matching Client Side) -->
+                <button type="button" id="themeToggleBtn" class="theme-toggle-btn" aria-label="Toggle Theme" title="Switch Theme">
+                    <span class="theme-toggle-track">
+                        <span class="theme-toggle-thumb">
+                            <i class="fa-solid fa-sun sun-icon"></i>
+                            <i class="fa-solid fa-moon moon-icon"></i>
+                        </span>
+                    </span>
+                </button>
+
                 <a href="{% url 'dashboard' %}" class="client-switch-btn" title="View Customer Website">
                     <i class="fa-solid fa-arrow-up-right-from-square"></i>
                     <span>Go to Client</span>
@@ -124,13 +159,14 @@
 
         </header>
 
-        <!-- DJANGO MESSAGES -->
+        <!-- DJANGO MESSAGES (Admin Panel Only) -->
         {% if messages %}
-            <div class="admin-messages">
+            <div class="admin-messages" id="adminFlashMessages">
                 {% for message in messages %}
-                    <div class="admin-message">
-                        <i class="fa-solid fa-circle-info"></i>
+                    <div class="admin-message {% if 'error' in message.tags %}admin-message-error{% elif 'success' in message.tags %}admin-message-success{% endif %}">
+                        <i class="fa-solid {% if 'error' in message.tags %}fa-triangle-exclamation{% elif 'success' in message.tags %}fa-circle-check{% else %}fa-circle-info{% endif %}"></i>
                         <span>{{ message }}</span>
+                        <button type="button" class="admin-message-close" onclick="this.parentElement.remove()" style="margin-left: auto; background: none; border: none; color: inherit; cursor: pointer; font-size: 16px; opacity: 0.6; padding: 0 4px;" title="Dismiss message">&times;</button>
                     </div>
                 {% endfor %}
             </div>

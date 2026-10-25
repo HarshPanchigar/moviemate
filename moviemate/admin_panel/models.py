@@ -131,3 +131,25 @@ class AdminActivityLog(models.Model):
 
     def __str__(self):
         return f"{self.performed_by} - {self.action} at {self.timestamp.strftime('%Y-%m-%d %H:%M')}"
+
+
+class SeatHold(models.Model):
+    showtime = models.ForeignKey(Showtime, on_delete=models.CASCADE, related_name='seat_holds')
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='seat_holds')
+    seat_code = models.CharField(max_length=10) # e.g. "A1", "C3"
+    expires_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['showtime', 'seat_code']),
+            models.Index(fields=['expires_at']),
+        ]
+
+    def __str__(self):
+        return f"{self.showtime.movie.title} ({self.seat_code}) held by {self.customer.full_name}"
+
+    @property
+    def is_active(self):
+        return timezone.now() < self.expires_at
+

@@ -15,10 +15,16 @@
          HEADER
     ====================================================== -->
     <header class="booking-header">
-        <div class="step-label">
-            <i class="fa-solid fa-circle-check" style="font-size: 11px;"></i>
-            Step 2: Choose Your Seats
-        </div>
+        {% comment %} <div style="display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;">
+            <div class="step-label">
+                <i class="fa-solid fa-circle-check" style="font-size: 11px;"></i>
+                Step 2: Choose Your Seats
+            </div>
+            <div class="live-pulse-badge" title="Seats are synced in real-time to avoid duplicate bookings">
+                <span class="live-dot-pulse"></span>
+                <span>Live Seat Guard Active</span>
+            </div>
+        </div> {% endcomment %}
 
         <h1 class="booking-title">
             {{ showtime.movie.title }}
@@ -34,7 +40,7 @@
     <!-- =====================================================
          TIER SELECTOR
     ====================================================== -->
-    <section class="tier-wrapper">
+    {% comment %} <section class="tier-wrapper">
         <p class="tier-title">
             Choose your seating category
         </p>
@@ -76,8 +82,24 @@
                 </div>
             </label>
         </div>
-    </section>
-
+    </section> {% endcomment %}
+ <!-- =====================================================
+         LEGEND
+    ====================================================== -->
+    <div class="seat-legend">
+        <div class="legend-item">
+            <span class="legend-seat"></span>
+            Available
+        </div>
+        <div class="legend-item">
+            <span class="legend-seat selected"></span>
+            Selected
+        </div>
+        <div class="legend-item">
+            <span class="legend-seat booked"></span>
+            Booked / In Checkout
+        </div>
+    </div>
     <!-- =====================================================
          SCREEN VISUAL
     ====================================================== -->
@@ -231,23 +253,8 @@
 
     </section>
 
-    <!-- =====================================================
-         LEGEND
-    ====================================================== -->
-    <div class="seat-legend">
-        <div class="legend-item">
-            <span class="legend-seat"></span>
-            Available
-        </div>
-        <div class="legend-item">
-            <span class="legend-seat selected"></span>
-            Selected
-        </div>
-        <div class="legend-item">
-            <span class="legend-seat booked"></span>
-            Booked
-        </div>
-    </div>
+    <!-- Live Toast Notification Container -->
+    <div id="seatCollisionToast" class="seat-collision-toast" style="display: none;"></div>
 
     <!-- =====================================================
          STICKY CHECKOUT BAR
@@ -274,6 +281,7 @@
             <form action="{% url 'process_payment' showtime.id %}"
                   method="GET"
                   id="bookingForm"
+                  data-status-url="{% url 'seat_status_api' showtime.id %}"
                   data-platinum-price="{{ showtime.platinum_price }}"
                   data-gold-price="{{ showtime.gold_price }}"
                   data-silver-price="{{ showtime.silver_price }}">

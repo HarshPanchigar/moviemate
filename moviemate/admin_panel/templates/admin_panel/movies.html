@@ -4,7 +4,7 @@
 {% block title %}Movie Catalog | MovieMate Admin{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'admin_panel/css/admin_movies.css' %}">
+<link rel="stylesheet" href="{% static 'admin_panel/css/admin_movies.css' %}?v=25.0">
 {% endblock %}
 
 {% block content %}
@@ -29,23 +29,22 @@
 </div>
 
 <!-- SEARCH & FILTER TOOLBAR -->
-<div class="movies-filter-card">
-    <div class="movies-filter-grid">
-        <div class="movies-search-wrap">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="movieSearchInput" class="form-control"
-                placeholder="Search by title, genre, or keyword..." onkeyup="filterMoviesTable()">
-        </div>
+<div class="admin-toolbar">
+    <div class="admin-search-box" style="flex: 1; max-width: 460px;">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="movieSearchInput"
+            placeholder="Search by title, genre, or keyword..." onkeyup="filterMoviesTable()">
+    </div>
 
-        <div style="min-width: 170px;">
-            <select id="movieTagFilter" class="form-control" onchange="filterMoviesTable()">
-                <option value="">All Display Tags</option>
-                <option value="trending">Trending</option>
-                <option value="hot">Hot</option>
-                <option value="top_rated">Top Rated</option>
-                <option value="new_release">New Release</option>
-            </select>
-        </div>
+    <div class="admin-select-box" style="min-width: 200px;">
+        <select id="movieTagFilter" onchange="filterMoviesTable()">
+            <option value="">All Categories & Tags</option>
+            <option value="hero">★ Hero Banner Only</option>
+            <option value="trending">Trending</option>
+            <option value="hot">Hot</option>
+            <option value="top_rated">Top Rated</option>
+            <option value="new_release">New Release</option>
+        </select>
     </div>
 </div>
 
@@ -70,13 +69,13 @@
                     <th>Rating</th>
                     <th>Tag</th>
                     <th>Showtimes</th>
-                    <th style="text-align: right; width: 150px;">Actions</th>
+                    <th style="text-align: right; width: 170px;">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for movie in movies %}
                 <tr data-title="{{ movie.title|lower }}" data-genre="{{ movie.genre|lower }}"
-                    data-tag="{{ movie.display_tag }}">
+                    data-tag="{{ movie.display_tag }}" data-hero="{% if movie.is_hero %}true{% else %}false{% endif %}" id="movie-row-{{ movie.id }}">
                     <td>
                         {% if movie.poster_url %}
                         <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" class="movie-poster-thumb">
@@ -126,13 +125,21 @@
                     </td>
                     <td style="text-align: right;">
                         <div class="movie-actions-cell">
+                            <a href="{% url 'admin_panel:toggle_hero_movie' movie.id %}" 
+                               class="action-icon-btn {% if movie.is_hero %}hero-action-active{% endif %}" 
+                               id="hero-action-btn-{{ movie.id }}"
+                               title="{% if movie.is_hero %}Remove from Hero Banner{% else %}Feature in Hero Banner{% endif %}"
+                               onclick="toggleHeroAjax(event, this, {{ movie.id }})">
+                                <i class="fa-{% if movie.is_hero %}solid{% else %}regular{% endif %} fa-star"></i>
+                            </a>
+
                             <button type="button" class="action-icon-btn" title="View Full Details"
                                 onclick="openViewFullMovieModal('{{ movie.title|escapejs }}', '{{ movie.genre|escapejs }}', '{{ movie.duration_minutes }}', '{{ movie.rating }}', '{{ movie.release_year }}', '{{ movie.display_tag }}', '{{ movie.poster_url|escapejs }}', '{{ movie.backdrop_url|escapejs }}', '{{ movie.plot|escapejs }}', '{{ movie.showtimes.count }}', '{{ movie.total_tickets_booked }}')">
                                 <i class="fa-solid fa-eye"></i>
                             </button>
 
                             <button type="button" class="action-icon-btn" title="Edit Movie"
-                                onclick="openEditMovieModal('{{ movie.id }}', '{{ movie.title|escapejs }}', '{{ movie.genre|escapejs }}', '{{ movie.duration_minutes }}', '{{ movie.release_year }}', '{{ movie.rating }}', '{{ movie.display_tag }}', '{{ movie.poster_url|escapejs }}', '{{ movie.backdrop_url|escapejs }}', '{{ movie.plot|escapejs }}', '{{ movie.status }}')">
+                                onclick="openEditMovieModal('{{ movie.id }}', '{{ movie.title|escapejs }}', '{{ movie.genre|escapejs }}', '{{ movie.duration_minutes }}', '{{ movie.release_year }}', '{{ movie.rating }}', '{{ movie.display_tag }}', '{{ movie.poster_url|escapejs }}', '{{ movie.backdrop_url|escapejs }}', '{{ movie.plot|escapejs }}', '{{ movie.status }}', '{{ movie.is_hero|yesno:"true,false" }}')">
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </button>
 
@@ -162,10 +169,10 @@
      MODAL 1: ADD MOVIE
      ===================================================== -->
 <div id="addMovieModal" class="modal-overlay">
-    <div class="modal-card">
+    <div class="modal-card modal-lg">
         <div class="modal-header-clean">
-            <h2>Add Movie to Catalog</h2>
-            <button type="button" onclick="closeAdminModal('addMovieModal')" class="modal-close-btn">&times;</button>
+            <h2><i class="fa-solid fa-film" style="color: var(--brand-primary); font-size: 17px;"></i> Add Movie to Catalog</h2>
+            <button type="button" onclick="closeAdminModal('addMovieModal')" class="modal-close-btn" title="Close dialog">&times;</button>
         </div>
         <form action="{% url 'admin_panel:add_movie' %}" method="POST">
             {% csrf_token %}
@@ -207,6 +214,18 @@
                     </select>
                 </div>
 
+                <!-- Hero Toggle Switch -->
+                <div class="form-group hero-toggle-box">
+                    <label class="hero-toggle-label" for="addIsHero">
+                        <input type="checkbox" id="addIsHero" name="is_hero" value="true">
+                        <span class="hero-toggle-custom"></span>
+                        <span class="hero-toggle-info">
+                            <span class="hero-toggle-title"><i class="fa-solid fa-star" style="color: #f59e0b;"></i> Feature in Hero Banner</span>
+                            <span class="hero-toggle-desc">Showcase this film in the main top banner on the client homepage</span>
+                        </span>
+                    </label>
+                </div>
+
                 <div class="form-group">
                     <label>Poster Image URL</label>
                     <input type="url" name="poster_url" class="form-control" placeholder="https://...">
@@ -235,10 +254,10 @@
      MODAL 2: EDIT MOVIE
      ===================================================== -->
 <div id="editMovieModal" class="modal-overlay">
-    <div class="modal-card">
+    <div class="modal-card modal-lg">
         <div class="modal-header-clean">
-            <h2>Edit Movie Information</h2>
-            <button type="button" onclick="closeAdminModal('editMovieModal')" class="modal-close-btn">&times;</button>
+            <h2><i class="fa-solid fa-pen-to-square" style="color: var(--brand-primary); font-size: 17px;"></i> Edit Movie Information</h2>
+            <button type="button" onclick="closeAdminModal('editMovieModal')" class="modal-close-btn" title="Close dialog">&times;</button>
         </div>
         <form id="editMovieForm" action="" method="POST">
             {% csrf_token %}
@@ -280,6 +299,18 @@
                     </select>
                 </div>
 
+                <!-- Hero Toggle Switch -->
+                <div class="form-group hero-toggle-box">
+                    <label class="hero-toggle-label" for="editIsHero">
+                        <input type="checkbox" id="editIsHero" name="is_hero" value="true">
+                        <span class="hero-toggle-custom"></span>
+                        <span class="hero-toggle-info">
+                            <span class="hero-toggle-title"><i class="fa-solid fa-star" style="color: #f59e0b;"></i> Feature in Hero Banner</span>
+                            <span class="hero-toggle-desc">Showcase this film in the main top banner on the client homepage</span>
+                        </span>
+                    </label>
+                </div>
+
                 <div class="form-group">
                     <label>Poster Image URL</label>
                     <input type="url" id="editPoster" name="poster_url" class="form-control">
@@ -307,11 +338,11 @@
      MODAL 3: VIEW FULL MOVIE
      ===================================================== -->
 <div id="viewFullMovieModal" class="modal-overlay">
-    <div class="modal-card">
+    <div class="modal-card modal-lg">
         <div class="modal-header-clean">
-            <h2>Movie Details</h2>
+            <h2><i class="fa-solid fa-circle-info" style="color: var(--brand-primary); font-size: 17px;"></i> Movie Details</h2>
             <button type="button" onclick="closeAdminModal('viewFullMovieModal')"
-                class="modal-close-btn">&times;</button>
+                class="modal-close-btn" title="Close dialog">&times;</button>
         </div>
         <div class="modal-body-scroll">
             <div id="vfmBackdrop" class="movie-view-backdrop"></div>
@@ -342,16 +373,16 @@
             <div
                 style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; border-top: 1px solid var(--border-color); padding-top: 14px;">
                 <div
-                    style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
+                    style="background: var(--bg-surface-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
                     <div style="font-size: 11px; color: var(--text-muted); font-weight: 700;">Active Showtimes</div>
                     <div id="vfmShows"
                         style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin-top: 2px;"></div>
                 </div>
                 <div
-                    style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
+                    style="background: var(--bg-surface-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
                     <div style="font-size: 11px; color: var(--text-muted); font-weight: 700;">Total Tickets Sold</div>
                     <div id="vfmBookings"
-                        style="font-size: 16px; font-weight: 800; color: var(--accent-blue); margin-top: 2px;"></div>
+                        style="font-size: 16px; font-weight: 800; color: var(--brand-primary); margin-top: 2px;"></div>
                 </div>
             </div>
         </div>
@@ -365,22 +396,23 @@
      MODAL 4: OMDB IMPORT
      ===================================================== -->
 <div id="omdbModal" class="modal-overlay">
-    <div class="modal-card" style="max-width: 640px;">
+    <div class="modal-card modal-lg">
         <div class="modal-header-clean">
-            <h2>Import Film from OMDb API</h2>
-            <button type="button" onclick="closeAdminModal('omdbModal')" class="modal-close-btn">&times;</button>
+            <h2><i class="fa-solid fa-cloud-arrow-down" style="color: var(--brand-primary); font-size: 17px;"></i> Import Film from OMDb API</h2>
+            <button type="button" onclick="closeAdminModal('omdbModal')" class="modal-close-btn" title="Close dialog">&times;</button>
         </div>
         <div class="modal-body-scroll">
-            <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+            <form onsubmit="event.preventDefault(); searchOMDb();" style="display: flex; gap: 10px; margin-bottom: 16px; width: 100%;">
                 <input type="text" id="omdbQuery" class="form-control"
-                    placeholder="Search by title (e.g. Oppenheimer, Batman)...">
-                <button type="button" onclick="searchOMDb()" data-search-url="{% url 'admin_panel:omdb_search' %}"
+                    placeholder="Search by title (e.g. Oppenheimer, Batman)..."
+                    onkeydown="if(event.key === 'Enter'){ event.preventDefault(); searchOMDb(); }">
+                <button type="submit" data-search-url="{% url 'admin_panel:omdb_search' %}"
                     data-import-url="{% url 'admin_panel:import_omdb' %}" id="omdbSearchBtn" class="btn-blue"
                     style="white-space: nowrap;">
                     <i class="fa-solid fa-magnifying-glass"></i> Search
                 </button>
-            </div>
-            <div id="omdbResults" style="max-height: 380px; overflow-y: auto;">
+            </form>
+            <div id="omdbResults" style="max-height: 400px; overflow-y: auto;">
                 <div style="text-align: center; color: var(--text-muted); padding: 32px 20px; font-size: 13px;">
                     <i class="fa-solid fa-cloud-arrow-down"
                         style="display: block; font-size: 28px; margin-bottom: 8px; color: #cbd5e1;"></i>

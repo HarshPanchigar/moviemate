@@ -10,12 +10,15 @@ urlpatterns = [
     path("profile/", views.profile_view, name="profile"),
     path("profile/edit/", views.edit_profile, name="edit_profile"),
     path("profile/change-password/", views.change_password, name="change_password"),
+    path("profile/change-password/send-otp/", views.send_password_change_otp, name="send_password_change_otp"),
     path("profile/delete/", views.delete_account, name="delete_account"),
     
     # Booking Engine Routes
     path("movie/<int:movie_id>/theaters/", views.select_theater, name="select_theater"),
     path("movie/<int:movie_id>/cinema/<int:cinema_id>/showtimes/", views.select_showtime, name="select_showtime"),
     path("showtime/<int:showtime_id>/seats/", views.select_seats, name="select_seats"),
+    path("showtime/<int:showtime_id>/seat-status/", views.seat_status_api, name="seat_status_api"),
+    path("showtime/<int:showtime_id>/release-hold/", views.release_seat_hold, name="release_seat_hold"),
     path("showtime/<int:showtime_id>/payment/", views.process_payment, name="process_payment"),
     path("booking/<uuid:booking_id>/confirmation/", views.booking_confirmation, name="booking_confirmation"),
     path("my-bookings/", views.my_bookings, name="my_bookings"),

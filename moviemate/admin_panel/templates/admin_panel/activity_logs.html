@@ -4,7 +4,7 @@
 {% block title %}Activity Audit Logs | MovieMate Admin{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'admin_panel/css/admin_activity_logs.css' %}">
+<link rel="stylesheet" href="{% static 'admin_panel/css/admin_activity_logs.css' %}?v=25.0">
 {% endblock %}
 
 {% block content %}
@@ -34,18 +34,18 @@
     </div>
 
     <!-- FILTER TOOLBAR -->
-    <div class="audit-filter-card">
-        <form method="GET" action="{% url 'admin_panel:activity_logs' %}" class="audit-filter-form">
-            <div class="audit-search-wrap">
+    <div class="admin-toolbar">
+        <form method="GET" action="{% url 'admin_panel:activity_logs' %}" style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; width: 100%;">
+            <div class="admin-search-box" style="flex: 1; min-width: 260px;">
+                <i class="fa-solid fa-magnifying-glass"></i>
                 <input type="text"
                        name="q"
                        value="{{ query }}"
-                       class="form-control"
                        placeholder="Search by action description or performed by...">
             </div>
 
-            <div style="width: 230px;">
-                <select name="performer" class="form-control">
+            <div class="admin-select-box" style="min-width: 220px;">
+                <select name="performer">
                     <option value="">All Performers / Admins</option>
                     {% for p in performers %}
                         <option value="{{ p }}" {% if performer == p %}selected{% endif %}>
@@ -170,10 +170,10 @@
 
 <!-- MODAL: Clear Activity Logs -->
 <div id="clearLogsModal" class="modal-overlay">
-    <div class="modal-content-card" style="max-width: 500px;">
+    <div class="modal-card modal-sm">
         <div class="modal-header-clean">
-            <h3 class="modal-title-clean">Clear Activity Audit Logs</h3>
-            <button type="button" class="modal-close-btn" onclick="document.getElementById('clearLogsModal').style.display='none'">&times;</button>
+            <h3 class="modal-title-clean"><i class="fa-solid fa-trash-can" style="color: #b91c1c; font-size: 16px;"></i> Clear Activity Audit Logs</h3>
+            <button type="button" class="modal-close-btn" onclick="closeAdminModal('clearLogsModal')" title="Close dialog">&times;</button>
         </div>
 
         <form action="{% url 'admin_panel:clear_activity_logs' %}" method="POST">
@@ -196,7 +196,7 @@
             </div>
 
             <div class="modal-footer-clean">
-                <button type="button" class="btn-outline" onclick="document.getElementById('clearLogsModal').style.display='none'">Cancel</button>
+                <button type="button" class="btn-outline" onclick="closeAdminModal('clearLogsModal')">Cancel</button>
                 <button type="submit" class="btn-danger-sm" style="min-height: 40px; padding: 0 16px; font-size: 13px;" onclick="return confirm('Are you sure you want to delete these log entries?')">
                     <i class="fa-solid fa-trash-can"></i> Confirm & Clear Logs
                 </button>

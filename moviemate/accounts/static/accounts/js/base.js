@@ -65,8 +65,88 @@ function handlePopupSearch(e) {
     }, 150);
 }
 
+// Theme Management (Apple Dark Mode & Light Mode)
+function updateThemeToggleState(theme) {
+    const toggleBtn = document.getElementById('themeToggleBtn');
+    if (!toggleBtn) return;
+    const isDark = theme === 'dark';
+    toggleBtn.setAttribute('title', isDark ? 'Switch to Light mode' : 'Switch to Dark mode (Apple Black)');
+    toggleBtn.setAttribute('aria-label', isDark ? 'Switch to Light mode' : 'Switch to Dark mode');
+    toggleBtn.setAttribute('aria-checked', isDark ? 'true' : 'false');
+}
+
+function syncThemeState() {
+    try {
+        const savedTheme = localStorage.getItem('moviemate-theme');
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const targetTheme = (savedTheme === 'dark' || (!savedTheme && prefersDark)) ? 'dark' : 'light';
+
+        if (document.documentElement.getAttribute('data-theme') !== targetTheme) {
+            document.documentElement.setAttribute('data-theme', targetTheme);
+        }
+        updateThemeToggleState(targetTheme);
+    } catch (err) {
+        console.warn('Unable to sync theme from storage', err);
+    }
+}
+
+function initThemeToggle() {
+    const toggleBtn = document.getElementById('themeToggleBtn');
+    if (!toggleBtn) return;
+
+    syncThemeState();
+
+    if (!toggleBtn.dataset.themeBound) {
+        toggleBtn.dataset.themeBound = 'true';
+        toggleBtn.addEventListener('click', () => {
+            const activeTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const nextTheme = activeTheme === 'dark' ? 'light' : 'dark';
+
+            document.documentElement.classList.add('theme-transition');
+            document.documentElement.setAttribute('data-theme', nextTheme);
+
+            try {
+                localStorage.setItem('moviemate-theme', nextTheme);
+            } catch (err) {
+                console.warn('Unable to persist theme in localStorage', err);
+            }
+
+            updateThemeToggleState(nextTheme);
+
+            setTimeout(() => {
+                document.documentElement.classList.remove('theme-transition');
+            }, 300);
+        });
+    }
+
+    // Listen to OS preference changes if no manual override is saved
+    if (window.matchMedia && !window._moviematePrefersThemeBound) {
+        window._moviematePrefersThemeBound = true;
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!localStorage.getItem('moviemate-theme')) {
+                const autoTheme = e.matches ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', autoTheme);
+                updateThemeToggleState(autoTheme);
+            }
+        });
+    }
+}
+
+// Sync theme on pageshow (e.g. Back/Forward cache navigation) and across tabs via storage event
+window.addEventListener('pageshow', () => {
+    syncThemeState();
+});
+
+window.addEventListener('storage', (e) => {
+    if (e.key === 'moviemate-theme') {
+        syncThemeState();
+    }
+});
+
 // Global keyboard & backdrop event listeners
 document.addEventListener('DOMContentLoaded', () => {
+    initThemeToggle();
+
     // Close search modal on Escape key press
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
@@ -82,3 +162,4 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+

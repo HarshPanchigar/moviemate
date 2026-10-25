@@ -4,7 +4,7 @@
 {% block title %}Cinemas &amp; Halls | MovieMate Admin{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'admin_panel/css/admin_cinemas.css' %}">
+<link rel="stylesheet" href="{% static 'admin_panel/css/admin_cinemas.css' %}?v=25.0">
 {% endblock %}
 
 {% block content %}
@@ -22,10 +22,10 @@
 </div>
 
 <!-- SEARCH / FILTER TOOLBAR -->
-<div class="cinema-filter-card">
-    <div class="cinema-search-wrap">
+<div class="admin-toolbar">
+    <div class="admin-search-box">
         <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" id="cinemaSearchInput" class="form-control" placeholder="Search by cinema name or city..." onkeyup="filterCinemasTable()">
+        <input type="text" id="cinemaSearchInput" placeholder="Search by cinema name or city..." onkeyup="filterCinemasTable()">
     </div>
 </div>
 
@@ -84,7 +84,7 @@
                                 <span style="color: var(--text-muted); font-size: 12px;">No active shows</span>
                             {% endfor %}
                             {% if cinema.showtimes.count > 2 %}
-                                <span class="badge" style="background: #f1f5f9; color: var(--text-muted); font-size: 10.5px;">+{{ cinema.showtimes.count|add:"-2" }} more</span>
+                                <span class="badge badge-subtle">+{{ cinema.showtimes.count|add:"-2" }} more</span>
                             {% endif %}
                         </div>
                     </td>
@@ -125,10 +125,10 @@
      MODAL 1: ADD CINEMA
      ===================================================== -->
 <div id="addCinemaModal" class="modal-overlay">
-    <div class="modal-card">
+    <div class="modal-card modal-lg">
         <div class="modal-header-clean">
-            <h2>Register New Cinema Hall</h2>
-            <button type="button" onclick="closeAdminModal('addCinemaModal')" class="modal-close-btn">&times;</button>
+            <h2><i class="fa-solid fa-building-circle-check" style="color: var(--brand-primary); font-size: 17px;"></i> Register New Cinema Hall</h2>
+            <button type="button" onclick="closeAdminModal('addCinemaModal')" class="modal-close-btn" title="Close dialog">&times;</button>
         </div>
         <form action="{% url 'admin_panel:add_cinema' %}" method="POST">
             {% csrf_token %}
@@ -173,17 +173,17 @@
      MODAL 2: VIEW FULL CINEMA DETAILS
      ===================================================== -->
 <div id="viewFullCinemaModal" class="modal-overlay">
-    <div class="modal-card">
+    <div class="modal-card modal-lg">
         <div class="modal-header-clean">
-            <h2>Cinema Venue Overview</h2>
-            <button type="button" onclick="closeAdminModal('viewFullCinemaModal')" class="modal-close-btn">&times;</button>
+            <h2><i class="fa-solid fa-building" style="color: var(--brand-primary); font-size: 17px;"></i> Cinema Venue Overview</h2>
+            <button type="button" onclick="closeAdminModal('viewFullCinemaModal')" class="modal-close-btn" title="Close dialog">&times;</button>
         </div>
         <div class="modal-body-scroll">
             <div style="margin-bottom: 20px;">
                 <h3 id="vfcName" style="font-size: 20px; font-weight: 800; color: var(--text-primary); margin: 0 0 6px;"></h3>
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <span id="vfcCity" class="badge badge-blue"></span>
-                    <span id="vfcScreens" class="badge" style="background: #f1f5f9; color: var(--text-secondary);"></span>
+                    <span id="vfcScreens" class="badge" style="background: var(--bg-surface-elevated); color: var(--text-secondary); border: 1px solid var(--border-color);"></span>
                 </div>
             </div>
 
@@ -203,13 +203,13 @@
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; border-top: 1px solid var(--border-color); padding-top: 16px;">
-                <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
+                <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
                     <div style="font-size: 11px; color: var(--text-muted); font-weight: 700;">Scheduled Shows</div>
                     <div id="vfcShows" style="font-size: 18px; font-weight: 800; color: var(--text-primary); margin-top: 2px;"></div>
                 </div>
-                <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
+                <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
                     <div style="font-size: 11px; color: var(--text-muted); font-weight: 700;">Tickets Issued</div>
-                    <div id="vfcBookings" style="font-size: 18px; font-weight: 800; color: var(--accent-blue); margin-top: 2px;"></div>
+                    <div id="vfcBookings" style="font-size: 18px; font-weight: 800; color: var(--brand-primary); margin-top: 2px;"></div>
                 </div>
             </div>
         </div>
@@ -223,10 +223,10 @@
      MODAL 3: EDIT CINEMA
      ===================================================== -->
 <div id="editCinemaModal" class="modal-overlay">
-    <div class="modal-card">
+    <div class="modal-card modal-lg">
         <div class="modal-header-clean">
-            <h2>Edit Cinema Details</h2>
-            <button type="button" onclick="closeAdminModal('editCinemaModal')" class="modal-close-btn">&times;</button>
+            <h2><i class="fa-solid fa-pen-to-square" style="color: var(--brand-primary); font-size: 17px;"></i> Edit Cinema Details</h2>
+            <button type="button" onclick="closeAdminModal('editCinemaModal')" class="modal-close-btn" title="Close dialog">&times;</button>
         </div>
         <form id="editCinemaForm" action="" method="POST">
             {% csrf_token %}

@@ -37,20 +37,20 @@
     gap: 8px;
     min-height: 36px;
     padding: 0 14px;
-    background: #eff6ff;
-    border: 1px solid #bfdbfe;
+    background: var(--bg-surface-elevated);
+    border: 1px solid var(--border-color);
     border-radius: 9999px;
-    color: #1d4ed8;
+    color: var(--text-secondary);
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .dash-status-dot {
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+    background: var(--brand-primary);
+    box-shadow: 0 0 0 3px var(--brand-primary-light);
 }
 
 /* Stats Row */
@@ -62,7 +62,7 @@
 }
 
 .dash-stat-card {
-    background: #ffffff;
+    background: var(--bg-surface);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
     padding: 20px;
@@ -70,12 +70,13 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
 .dash-stat-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border-color: var(--border-color-hover);
+    box-shadow: var(--shadow-md);
 }
 
 .dash-stat-top {
@@ -120,33 +121,33 @@
 
 /* Icon Variations */
 .icon-blue {
-    background: #eff6ff;
-    color: #2563eb;
-    border: 1px solid #bfdbfe;
+    background: var(--brand-primary-light);
+    color: var(--brand-primary);
+    border: 1px solid var(--brand-primary-border);
 }
 
 .icon-green {
-    background: #ecfdf5;
-    color: #059669;
-    border: 1px solid #a7f3d0;
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
 .icon-amber {
-    background: #fffbeb;
-    color: #d97706;
-    border: 1px solid #fde68a;
+    background: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+    border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
 .icon-purple {
-    background: #f5f3ff;
-    color: #7c3aed;
-    border: 1px solid #ddd6fe;
+    background: rgba(139, 92, 246, 0.15);
+    color: #a78bfa;
+    border: 1px solid rgba(139, 92, 246, 0.3);
 }
 
 .icon-rose {
-    background: #fff1f2;
-    color: #e11d48;
-    border: 1px solid #fecdd3;
+    background: rgba(244, 63, 94, 0.15);
+    color: #fb7185;
+    border: 1px solid rgba(244, 63, 94, 0.3);
 }
 
 /* Section Grid: Chart & Tables */
@@ -158,7 +159,7 @@
 }
 
 .dash-chart-card {
-    background: #ffffff;
+    background: var(--bg-surface);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-card);
@@ -212,15 +213,16 @@
 }
 
 .dash-activity-item:hover {
-    background: #f8fafc;
+    background: var(--bg-hover);
 }
 
 .dash-activity-icon {
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background: #eff6ff;
-    color: #2563eb;
+    background: var(--brand-primary-light);
+    color: var(--brand-primary);
+    border: 1px solid var(--brand-primary-border);
     display: flex;
     align-items: center;
     justify-content: center;

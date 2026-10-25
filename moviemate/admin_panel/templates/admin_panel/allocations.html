@@ -4,7 +4,7 @@
 {% block title %}Show Allocations | MovieMate Admin{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'admin_panel/css/admin_allocations.css' %}">
+<link rel="stylesheet" href="{% static 'admin_panel/css/admin_allocations.css' %}?v=25.0">
 {% endblock %}
 
 {% block content %}
@@ -23,14 +23,14 @@
 </div>
 
 <!-- TOOLBAR -->
-<div class="alloc-toolbar-card">
-    <div class="alloc-search-wrap">
+<div class="admin-toolbar">
+    <div class="admin-search-box" style="flex: 1; max-width: 480px;">
         <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" id="allocSearchInput" class="form-control" placeholder="Search by movie, cinema or city..." onkeyup="filterAllocations()">
+        <input type="text" id="allocSearchInput" placeholder="Search by movie, cinema or city..." onkeyup="filterAllocations()">
     </div>
 
-    <div style="min-width: 200px;">
-        <select id="allocCinemaFilter" class="form-control" onchange="filterAllocations()">
+    <div class="admin-select-box" style="min-width: 220px;">
+        <select id="allocCinemaFilter" onchange="filterAllocations()">
             <option value="">All Cinema Halls</option>
             {% for cinema in cinemas %}
                 <option value="{{ cinema.name }}">{{ cinema.name }}</option>
@@ -49,7 +49,7 @@
             {% if group.movie.poster_url %}
                 <img src="{{ group.movie.poster_url }}" alt="{{ group.movie.title }}" class="alloc-movie-thumb">
             {% else %}
-                <div class="alloc-movie-thumb" style="background: #f1f5f9; display: flex; align-items: center; justify-content: center; color: #94a3b8;">
+                <div class="alloc-movie-thumb-placeholder">
                     <i class="fa-solid fa-film"></i>
                 </div>
             {% endif %}
@@ -71,7 +71,7 @@
             <div style="font-size: 12.5px; color: var(--text-secondary); display: flex; align-items: center; gap: 8px;">
                 <i class="fa-solid fa-calendar-days" style="color: var(--accent-blue);"></i>
                 <span>{{ group.start_date|date:"M d" }} — {{ group.end_date|date:"M d, Y" }}</span>
-                <span class="badge" style="background: #f1f5f9; color: var(--text-muted); font-size: 10.5px;">{{ group.total_days }} Days</span>
+                <span class="badge badge-subtle">{{ group.total_days }} Days</span>
             </div>
             
             <div class="alloc-showtimes-wrap">
@@ -84,24 +84,24 @@
         <!-- Pricing & Volume -->
         <div>
             <div class="alloc-price-box">
-                <span>Plat: <b>₹{{ group.sample_show.platinum_price|floatformat:0 }}</b></span>
-                <span>Gold: <b>₹{{ group.sample_show.gold_price|floatformat:0 }}</b></span>
-                <span>Silv: <b>₹{{ group.sample_show.silver_price|floatformat:0 }}</b></span>
+                <span>Plat: <b>₹{{ group.platinum_price|default:group.sample_show.platinum_price|floatformat:0 }}</b></span>
+                <span>Gold: <b>₹{{ group.gold_price|default:group.sample_show.gold_price|floatformat:0 }}</b></span>
+                <span>Silv: <b>₹{{ group.silver_price|default:group.sample_show.silver_price|floatformat:0 }}</b></span>
             </div>
             <div style="margin-top: 6px; font-size: 11.5px; color: var(--text-muted);">
-                <b>{{ group.total_shows }}</b> scheduled shows · <b>{{ group.total_tickets_sold }}</b> tickets
+                <b>{{ group.total_shows }}</b> scheduled shows · <b>{{ group.total_tickets_sold|default:group.total_bookings|default:0 }}</b> tickets
             </div>
         </div>
 
         <!-- Actions -->
         <div style="display: flex; gap: 8px; justify-content: flex-end;">
             <button type="button" class="action-icon-btn" title="View Schedule Details"
-                    onclick="openViewFullAllocModal('{{ group.movie.title|escapejs }}', '{{ group.cinema.name|escapejs }}', '{{ group.cinema.city|escapejs }}', '{{ group.start_date|date:'M d, Y' }}', '{{ group.end_date|date:'M d, Y' }}', '{{ group.total_days }}', '{{ group.total_shows }}', '{{ group.sample_show.platinum_price|floatformat:0 }}', '{{ group.sample_show.gold_price|floatformat:0 }}', '{{ group.sample_show.silver_price|floatformat:0 }}', '{{ group.total_tickets_sold }}', '{{ group.total_revenue|floatformat:0 }}', '{{ group.movie.poster_url|escapejs }}')">
+                    onclick="openViewFullAllocModal('{{ group.movie.title|escapejs }}', '{{ group.cinema.name|escapejs }}', '{{ group.cinema.city|escapejs }}', '{{ group.start_date|date:'M d, Y' }}', '{{ group.end_date|date:'M d, Y' }}', '{{ group.total_days }}', '{{ group.total_shows }}', '{{ group.platinum_price|default:group.sample_show.platinum_price|floatformat:0 }}', '{{ group.gold_price|default:group.sample_show.gold_price|floatformat:0 }}', '{{ group.silver_price|default:group.sample_show.silver_price|floatformat:0 }}', '{{ group.total_tickets_sold|default:group.total_bookings|default:0 }}', '{{ group.total_revenue|floatformat:0 }}', '{{ group.movie.poster_url|escapejs }}')">
                 <i class="fa-solid fa-eye"></i>
             </button>
 
             <button type="button" class="action-icon-btn" title="Edit Allocation"
-                    onclick="openEditAllocModal('{{ group.movie.id }}', '{{ group.cinema.id }}', '{{ group.movie.title|escapejs }}', '{{ group.cinema.name|escapejs }}', '{{ group.start_date|date:'Y-m-d' }}', '{{ group.end_date|date:'Y-m-d' }}', '{{ group.raw_times_str|escapejs }}', '{{ group.sample_show.platinum_price }}', '{{ group.sample_show.gold_price }}', '{{ group.sample_show.silver_price }}')">
+                    onclick="openEditAllocModal('{{ group.movie.id }}', '{{ group.cinema.id }}', '{{ group.movie.title|escapejs }}', '{{ group.cinema.name|escapejs }}', '{{ group.start_date|date:'Y-m-d' }}', '{{ group.end_date|date:'Y-m-d' }}', '{{ group.raw_times_str|escapejs }}', '{{ group.platinum_price|default:group.sample_show.platinum_price|floatformat:0 }}', '{{ group.gold_price|default:group.sample_show.gold_price|floatformat:0 }}', '{{ group.silver_price|default:group.sample_show.silver_price|floatformat:0 }}')">
                 <i class="fa-solid fa-pen-to-square"></i>
             </button>
 
@@ -125,12 +125,12 @@
      MODAL 1: CREATE BULK SCHEDULE
      ===================================================== -->
 <div id="bulkScheduleModal" class="modal-overlay">
-    <div class="modal-card">
+    <div class="modal-card modal-lg">
         <div class="modal-header-clean">
-            <h2>Create Showtimes Schedule</h2>
-            <button type="button" onclick="closeAdminModal('bulkScheduleModal')" class="modal-close-btn">&times;</button>
+            <h2><i class="fa-solid fa-calendar-plus" style="color: var(--brand-primary); font-size: 17px;"></i> Create Showtimes Schedule</h2>
+            <button type="button" onclick="closeAdminModal('bulkScheduleModal')" class="modal-close-btn" title="Close dialog">&times;</button>
         </div>
-        <form action="{% url 'admin_panel:allocations' %}" method="POST">
+        <form action="{% url 'admin_panel:add_allocation' %}" method="POST">
             {% csrf_token %}
             <div class="modal-body-scroll">
                 <div class="form-group">
@@ -203,33 +203,33 @@
      MODAL 2: VIEW FULL ALLOCATION
      ===================================================== -->
 <div id="viewFullAllocModal" class="modal-overlay">
-    <div class="modal-card">
+    <div class="modal-card modal-lg">
         <div class="modal-header-clean">
-            <h2>Show Allocation Overview</h2>
-            <button type="button" onclick="closeAdminModal('viewFullAllocModal')" class="modal-close-btn">&times;</button>
+            <h2><i class="fa-solid fa-calendar-week" style="color: var(--brand-primary); font-size: 17px;"></i> Show Allocation Overview</h2>
+            <button type="button" onclick="closeAdminModal('viewFullAllocModal')" class="modal-close-btn" title="Close dialog">&times;</button>
         </div>
         <div class="modal-body-scroll">
             <div style="display: flex; gap: 16px; margin-bottom: 20px;">
                 <img id="vfaPoster" src="" alt="Poster" style="width: 80px; height: 115px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-color);">
                 <div>
                     <h3 id="vfaMovieTitle" style="font-size: 18px; font-weight: 800; color: var(--text-primary); margin: 0 0 4px;"></h3>
-                    <div id="vfaCinemaName" style="font-size: 13.5px; color: var(--accent-blue); font-weight: 600;"></div>
+                    <div id="vfaCinemaName" style="font-size: 13.5px; color: var(--brand-primary); font-weight: 600;"></div>
                     <div id="vfaDates" style="font-size: 12px; color: var(--text-muted); margin-top: 6px;"></div>
                 </div>
             </div>
 
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px;">
-                <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center;">
+                <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center;">
                     <div style="font-size: 11px; color: var(--text-muted); font-weight: 700;">Total Shows</div>
                     <div id="vfaTotalShows" style="font-size: 18px; font-weight: 800; color: var(--text-primary); margin-top: 2px;"></div>
                 </div>
-                <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center;">
+                <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center;">
                     <div style="font-size: 11px; color: var(--text-muted); font-weight: 700;">Tickets Sold</div>
-                    <div id="vfaBookings" style="font-size: 18px; font-weight: 800; color: var(--accent-blue); margin-top: 2px;"></div>
+                    <div id="vfaBookings" style="font-size: 18px; font-weight: 800; color: var(--brand-primary); margin-top: 2px;"></div>
                 </div>
-                <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center;">
+                <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center;">
                     <div style="font-size: 11px; color: var(--text-muted); font-weight: 700;">Total Revenue</div>
-                    <div id="vfaRevenue" style="font-size: 18px; font-weight: 800; color: #15803d; margin-top: 2px;"></div>
+                    <div id="vfaRevenue" style="font-size: 18px; font-weight: 800; color: #10b981; margin-top: 2px;"></div>
                 </div>
             </div>
 
@@ -252,15 +252,15 @@
      MODAL 3: EDIT ALLOCATION
      ===================================================== -->
 <div id="editAllocModal" class="modal-overlay">
-    <div class="modal-card">
+    <div class="modal-card modal-lg">
         <div class="modal-header-clean">
-            <h2>Edit Allocation Schedule</h2>
-            <button type="button" onclick="closeAdminModal('editAllocModal')" class="modal-close-btn">&times;</button>
+            <h2><i class="fa-solid fa-pen-to-square" style="color: var(--brand-primary); font-size: 17px;"></i> Edit Allocation Schedule</h2>
+            <button type="button" onclick="closeAdminModal('editAllocModal')" class="modal-close-btn" title="Close dialog">&times;</button>
         </div>
         <form id="editAllocForm" action="" method="POST">
             {% csrf_token %}
             <div class="modal-body-scroll">
-                <div id="editAllocSubtitle" style="font-size: 14px; font-weight: 700; color: var(--accent-blue); margin-bottom: 16px;"></div>
+                <div id="editAllocSubtitle" style="font-size: 14px; font-weight: 700; color: var(--brand-primary); margin-bottom: 16px;"></div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
                     <div class="form-group">

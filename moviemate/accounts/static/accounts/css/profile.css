@@ -319,9 +319,9 @@
 }
 
 .account-field label {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
-  color: #64748b;
+  color: #000000;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -329,7 +329,7 @@
 .account-field-value {
   font-size: 14.5px;
   font-weight: 600;
-  color: var(--profile-text);
+  color: #64748b;
   word-break: break-word;
 }
 
@@ -389,11 +389,12 @@
 .profile-action-content b {
   font-size: 13.5px;
   font-weight: 700;
+  color: #000;
 }
 
 .profile-action-content span {
-  font-size: 11.5px;
-  color: var(--profile-muted);
+  font-size: 12px;
+  color: #64748b;
 }
 
 .profile-delete-action:hover {
@@ -542,12 +543,18 @@
 .edit-card-header h2 {
   font-size: 18px;
   font-weight: 800;
-  color: var(--profile-text);
+  color: #000;
   margin: 0 0 3px;
 }
 
 .edit-card-header p {
-  color: var(--profile-muted);
+  color: #000;
+  font-size: 13px;
+  margin: 0;
+}
+
+.edit-card-header h5 {
+  color: #000;
   font-size: 13px;
   margin: 0;
 }
@@ -572,7 +579,7 @@
   border: 1.5px solid #e2e8f0;
   border-radius: 10px;
   padding: 12px 14px;
-  color: var(--profile-text);
+  color: #000;
   outline: none;
   font-size: 14px;
   font-family: inherit;
